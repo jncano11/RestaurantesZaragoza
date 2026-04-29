@@ -56,11 +56,20 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
     val snackState           = remember { SnackbarHostState() }
 
     LaunchedEffect(restaurante.id) {
+        // Cargar detalle completo (con menú y horarios)
         try {
-            restauranteDetalle = RetrofitClient.instancia.detalleRestaurante(restaurante.id)
+            val detalle = RetrofitClient.instancia.detalleRestaurante(restaurante.id)
+            restauranteDetalle = detalle
+            android.util.Log.d("DetailScreen", "Detalle OK. Menu size: ${detalle.menu.size}, Horarios: ${detalle.horarios.size}")
+        } catch (e: Exception) {
+            android.util.Log.e("DetailScreen", "Error cargando detalle: ${e.message}", e)
+            restauranteDetalle = restaurante  // fallback sin menú
+        }
+        // Cargar valoraciones independientemente
+        try {
             valoraciones = RetrofitClient.instancia.valoracionesRestaurante(restaurante.id)
-        } catch (_: Exception) {
-            restauranteDetalle = restaurante
+        } catch (e: Exception) {
+            android.util.Log.e("DetailScreen", "Error valoraciones: ${e.message}")
         }
     }
 
@@ -189,7 +198,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 }
 
                 // ── Horarios ──────────────────────────────────────────────────
-                val horarios = restauranteDetalle?.horarios ?: emptyList()
+                val horarios = rest.horarios  // rest = restauranteDetalle ?: restaurante
                 if (horarios.isNotEmpty()) {
                     Text("Horarios", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(10.dp))
@@ -218,7 +227,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 }
 
                 // ── MENÚ ──────────────────────────────────────────────────────
-                val menu = restauranteDetalle?.menu ?: emptyList()
+                val menu = rest.menu  // rest = restauranteDetalle ?: restaurante
                 if (menu.isNotEmpty()) {
                     Text("Menú", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(10.dp))
@@ -348,7 +357,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
     if (showReservaSheet) {
         ReservaBottomSheet(
             restaurante = rest,
-            horarios    = restauranteDetalle?.horarios ?: emptyList(),
+            horarios    = rest.horarios,
             onDismiss   = { showReservaSheet = false },
             onSuccess   = { msg -> showReservaSheet = false; snackMsg = msg }
         )

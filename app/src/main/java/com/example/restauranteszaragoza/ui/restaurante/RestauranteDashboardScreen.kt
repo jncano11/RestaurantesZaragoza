@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.restauranteszaragoza.model.MenuCategoria
+import com.example.restauranteszaragoza.model.PlatoDetalle
 import com.example.restauranteszaragoza.model.Reserva
 import com.example.restauranteszaragoza.model.Restaurante
 import com.example.restauranteszaragoza.network.RetrofitClient
@@ -27,13 +29,23 @@ private val ACCENT    = Color(0xFFFFA726)
 private val CARD_BG   = Color(0xFF1E1A14)
 private val BG_COLORS = listOf(Color(0xFF1A0A00), Color(0xFF2C1810), Color(0xFF1A0A00))
 
+// Categorías de restaurante disponibles para creación
+private val CATEGORIAS_REST = listOf(
+    "Parrilla", "Sushi", "Pasta", "Alta cocina", "Mariscos",
+    "Mexicana", "Vegana", "Americana", "Fusión", "Sidreria", "Kebab", "Otros"
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     val scope         = rememberCoroutineScope()
     var reservas      by remember { mutableStateOf<List<Reserva>>(emptyList()) }
     var miRestaurante by remember { mutableStateOf<Restaurante?>(null) }
+    var platos        by remember { mutableStateOf<List<PlatoDetalle>>(emptyList()) }
+    var categorias    by remember { mutableStateOf<List<MenuCategoria>>(emptyList()) }
     var loading       by remember { mutableStateOf(true) }
+    // null = aún no sabemos, true = no tiene restaurante, false = tiene restaurante
+    var sinRestaurante by remember { mutableStateOf<Boolean?>(null) }
     var errorMsg      by remember { mutableStateOf<String?>(null) }
     var tabIndex      by remember { mutableStateOf(0) }
     var snackMsg      by remember { mutableStateOf<String?>(null) }
@@ -42,54 +54,50 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     val usuario = SessionManager.usuarioActual
 
     fun cargarDatos() {
-        loading = true; errorMsg = null
+        loading = true; errorMsg = null; sinRestaurante = null
         scope.launch {
             try {
                 val r = RetrofitClient.instancia.miRestaurante(SessionManager.usuarioId)
                 miRestaurante = r
+                sinRestaurante = false
                 reservas = RetrofitClient.instancia.reservasPorRestaurante(r.id)
+                val menuResp = RetrofitClient.instancia.listarMenu(r.id)
+                platos = menuResp.platos
+                categorias = RetrofitClient.instancia.listarCategorias()
             } catch (e: Exception) {
-                errorMsg = "No se pudo cargar tu restaurante.\nComprueba la conexión."
+                val msg = e.message ?: ""
+                if (msg.contains("404") || msg.contains("No tienes ningún restaurante", true)) {
+                    sinRestaurante = true   // BUG FIX: no tiene restaurante → mostrar formulario
+                } else {
+                    errorMsg = "No se pudo cargar tu restaurante.\nComprueba la conexión."
+                }
                 android.util.Log.e("RestauranteDashboard", "Error", e)
             } finally { loading = false }
         }
     }
 
     LaunchedEffect(Unit) { cargarDatos() }
-
-    LaunchedEffect(snackMsg) {
-        snackMsg?.let { snackState.showSnackbar(it); snackMsg = null }
-    }
+    LaunchedEffect(snackMsg) { snackMsg?.let { snackState.showSnackbar(it); snackMsg = null } }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackState) },
         containerColor = Color(0xFF1A0A00)
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(BG_COLORS))
-                .padding(padding)
-        ) {
+        Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(BG_COLORS)).padding(padding)) {
             Column(Modifier.fillMaxSize()) {
 
-                // ── Header ──────────────────────────────────────────────────
+                // ── Header siempre visible ────────────────────────────────────
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                         .background(Brush.horizontalGradient(listOf(Color(0xFF7B3F00), Color(0xFFBF360C))))
                         .padding(20.dp)
                 ) {
                     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                         Column {
                             Text("Panel de Restaurante 🍽️", color = Color.White.copy(0.7f), fontSize = 13.sp)
-                            Text(
-                                "¡Hola, ${usuario?.nombre ?: "Chef"}!",
-                                color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp
-                            )
-                            miRestaurante?.let {
-                                Text(it.nombre, color = ACCENT, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            }
+                            Text("¡Hola, ${usuario?.nombre ?: "Chef"}!", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                            miRestaurante?.let { Text(it.nombre, color = ACCENT, fontSize = 14.sp, fontWeight = FontWeight.Medium) }
+                            if (sinRestaurante == true) Text("Crea tu restaurante para empezar", color = ACCENT.copy(0.7f), fontSize = 13.sp)
                         }
                         IconButton(
                             onClick = onLogout,
@@ -101,85 +109,61 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                 }
 
                 when {
-                    loading -> {
-                        Box(Modifier.fillMaxSize(), Alignment.Center) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularProgressIndicator(color = ACCENT)
-                                Spacer(Modifier.height(12.dp))
-                                Text("Cargando tu restaurante...", color = Color.Gray)
-                            }
+                    loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(color = ACCENT)
+                            Spacer(Modifier.height(12.dp))
+                            Text("Cargando...", color = Color.Gray)
                         }
                     }
 
-                    errorMsg != null -> {
-                        Box(Modifier.fillMaxSize(), Alignment.Center) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.padding(32.dp)
-                            ) {
-                                Icon(Icons.Default.ErrorOutline, null, tint = Color(0xFFEF5350), modifier = Modifier.size(64.dp))
-                                Spacer(Modifier.height(16.dp))
-                                Text(errorMsg ?: "", color = Color.LightGray, fontSize = 15.sp, textAlign = TextAlign.Center)
-                                Spacer(Modifier.height(20.dp))
-                                Button(
-                                    onClick = { cargarDatos() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = ACCENT),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Icon(Icons.Default.Refresh, null, tint = Color.Black)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Reintentar", color = Color.Black, fontWeight = FontWeight.Bold)
-                                }
+                    // ── BUG FIX: pantalla de creación de restaurante ──────────
+                    sinRestaurante == true -> {
+                        CrearRestauranteScreen(
+                            onCreado = {
+                                snackMsg = "🎉 ¡Restaurante creado con éxito!"
+                                cargarDatos()
+                            }
+                        )
+                    }
+
+                    errorMsg != null -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+                            Icon(Icons.Default.ErrorOutline, null, tint = Color(0xFFEF5350), modifier = Modifier.size(64.dp))
+                            Spacer(Modifier.height(16.dp))
+                            Text(errorMsg ?: "", color = Color.LightGray, fontSize = 15.sp, textAlign = TextAlign.Center)
+                            Spacer(Modifier.height(20.dp))
+                            Button(onClick = { cargarDatos() }, colors = ButtonDefaults.buttonColors(containerColor = ACCENT), shape = RoundedCornerShape(12.dp)) {
+                                Icon(Icons.Default.Refresh, null, tint = Color.Black)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Reintentar", color = Color.Black, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
 
                     else -> {
-                        // ── Tarjeta info restaurante ─────────────────────────
+                        // ── Tarjeta info restaurante ──────────────────────────
                         miRestaurante?.let { rest ->
                             Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(containerColor = CARD_BG)
                             ) {
-                                Column(Modifier.padding(16.dp)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.Restaurant, null, tint = ACCENT, modifier = Modifier.size(20.dp))
-                                        Spacer(Modifier.width(8.dp))
-                                        Text(rest.nombre, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Restaurant, null, tint = ACCENT, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(10.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text(rest.nombre, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                        Text("${rest.categoria} · ${rest.precioMedio}", color = Color.Gray, fontSize = 12.sp)
                                     }
-                                    Spacer(Modifier.height(4.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.Place, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
-                                        Spacer(Modifier.width(4.dp))
-                                        Text(rest.direccion, color = Color.Gray, fontSize = 13.sp)
-                                    }
-                                    Spacer(Modifier.height(2.dp))
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.Category, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
-                                            Spacer(Modifier.width(4.dp))
-                                            Text(rest.categoria, color = Color.Gray, fontSize = 13.sp)
-                                        }
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.EuroSymbol, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
-                                            Text(rest.precioMedio, color = Color.Gray, fontSize = 13.sp)
-                                        }
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.Star, null, tint = Color(0xFFFFB300), modifier = Modifier.size(14.dp))
-                                            Text("${rest.ratingGlobal} (${rest.numValoraciones})", color = Color.Gray, fontSize = 13.sp)
-                                        }
+                                        Icon(Icons.Default.Star, null, tint = Color(0xFFFFB300), modifier = Modifier.size(14.dp))
+                                        Text(" ${rest.ratingGlobal}", color = Color.LightGray, fontSize = 13.sp)
                                     }
                                 }
                             }
                         }
 
-                        // ── Stats ────────────────────────────────────────────
                         val pendientes  = reservas.count { it.estado == "pendiente" }
                         val confirmadas = reservas.count { it.estado == "confirmada" }
                         val hoy         = reservas.count { it.fecha == java.time.LocalDate.now().toString() }
@@ -193,60 +177,90 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                             StatCard("Hoy",         hoy.toString(),         Icons.Default.Today,        Color(0xFF1E88E5), Modifier.weight(1f))
                         }
 
-                        // ── Tabs ─────────────────────────────────────────────
                         TabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT) {
-                            listOf("Todas", "Pendientes", "Hoy").forEachIndexed { idx, label ->
+                            listOf("Todas", "Pendientes", "Hoy", "Menú").forEachIndexed { idx, label ->
                                 Tab(selected = tabIndex == idx, onClick = { tabIndex = idx }) {
-                                    Text(label, modifier = Modifier.padding(12.dp),
-                                        color = if (tabIndex == idx) ACCENT else Color.Gray)
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+                                        if (label == "Menú") Icon(Icons.Default.MenuBook, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray)
+                                        if (label == "Menú") Spacer(Modifier.width(4.dp))
+                                        Text(label, color = if (tabIndex == idx) ACCENT else Color.Gray, fontSize = 13.sp)
+                                    }
                                 }
                             }
                         }
 
-                        val listaFiltrada = when (tabIndex) {
-                            1    -> reservas.filter { it.estado == "pendiente" }
-                            2    -> reservas.filter { it.fecha == java.time.LocalDate.now().toString() }
-                            else -> reservas
-                        }
-
-                        if (listaFiltrada.isEmpty()) {
-                            Box(Modifier.fillMaxSize().padding(top = 48.dp), Alignment.TopCenter) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(Icons.Default.EventAvailable, null, tint = Color.Gray, modifier = Modifier.size(56.dp))
-                                    Spacer(Modifier.height(12.dp))
-                                    Text("Sin reservas en este filtro", color = Color.Gray)
+                        if (tabIndex == 3) {
+                            MenuTab(
+                                restauranteId = miRestaurante?.id ?: 0,
+                                platos = platos,
+                                categorias = categorias,
+                                onPlatoEliminado = { platoId ->
+                                    scope.launch {
+                                        try {
+                                            RetrofitClient.instancia.eliminarPlato(mapOf(
+                                                "plato_id"       to platoId.toString(),
+                                                "restaurante_id" to (miRestaurante?.id ?: 0).toString()
+                                            ))
+                                            val menuResp = RetrofitClient.instancia.listarMenu(miRestaurante?.id ?: 0)
+                                            platos = menuResp.platos
+                                            snackMsg = "🗑️ Plato eliminado"
+                                        } catch (_: Exception) { snackMsg = "❌ Error al eliminar" }
+                                    }
+                                },
+                                onPlatoCreado = {
+                                    scope.launch {
+                                        val menuResp = RetrofitClient.instancia.listarMenu(miRestaurante?.id ?: 0)
+                                        platos = menuResp.platos
+                                        snackMsg = "✅ Plato añadido al menú"
+                                    }
                                 }
-                            }
+                            )
                         } else {
-                            LazyColumn(
-                                contentPadding = PaddingValues(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items(listaFiltrada) { reserva ->
-                                    val restauranteId = miRestaurante?.id ?: 0
-                                    ReservaRestauranteCard(
-                                        reserva = reserva,
-                                        onConfirmar = {
-                                            scope.launch {
-                                                try {
-                                                    RetrofitClient.instancia.confirmarReserva(mapOf("reserva_id" to reserva.id.toString()))
-                                                    reservas = RetrofitClient.instancia.reservasPorRestaurante(restauranteId)
-                                                    snackMsg = "✅ Reserva confirmada"
-                                                } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
-                                            }
-                                        },
-                                        onCancelar = {
-                                            scope.launch {
-                                                try {
-                                                    RetrofitClient.instancia.cancelarReserva(mapOf("reserva_id" to reserva.id.toString()))
-                                                    reservas = RetrofitClient.instancia.reservasPorRestaurante(restauranteId)
-                                                    snackMsg = "Reserva cancelada"
-                                                } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
-                                            }
-                                        }
-                                    )
+                            val listaFiltrada = when (tabIndex) {
+                                1    -> reservas.filter { it.estado == "pendiente" }
+                                2    -> reservas.filter { it.fecha == java.time.LocalDate.now().toString() }
+                                else -> reservas
+                            }
+
+                            if (listaFiltrada.isEmpty()) {
+                                Box(Modifier.fillMaxSize().padding(top = 48.dp), Alignment.TopCenter) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(Icons.Default.EventAvailable, null, tint = Color.Gray, modifier = Modifier.size(56.dp))
+                                        Spacer(Modifier.height(12.dp))
+                                        Text("Sin reservas en este filtro", color = Color.Gray)
+                                    }
                                 }
-                                item { Spacer(Modifier.height(24.dp)) }
+                            } else {
+                                LazyColumn(
+                                    contentPadding = PaddingValues(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    items(listaFiltrada) { reserva ->
+                                        val restauranteId = miRestaurante?.id ?: 0
+                                        ReservaRestauranteCard(
+                                            reserva = reserva,
+                                            onConfirmar = {
+                                                scope.launch {
+                                                    try {
+                                                        RetrofitClient.instancia.confirmarReserva(mapOf("reserva_id" to reserva.id.toString()))
+                                                        reservas = RetrofitClient.instancia.reservasPorRestaurante(restauranteId)
+                                                        snackMsg = "✅ Reserva confirmada"
+                                                    } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                                                }
+                                            },
+                                            onCancelar = {
+                                                scope.launch {
+                                                    try {
+                                                        RetrofitClient.instancia.cancelarReserva(mapOf("reserva_id" to reserva.id.toString()))
+                                                        reservas = RetrofitClient.instancia.reservasPorRestaurante(restauranteId)
+                                                        snackMsg = "Reserva cancelada"
+                                                    } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                                                }
+                                            }
+                                        )
+                                    }
+                                    item { Spacer(Modifier.height(24.dp)) }
+                                }
                             }
                         }
                     }
@@ -256,12 +270,375 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Pantalla de creación de restaurante (BUG FIX)
+// ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun StatCard(
-    label: String, value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: Color, modifier: Modifier
+private fun CrearRestauranteScreen(onCreado: () -> Unit) {
+    val scope       = rememberCoroutineScope()
+    var nombre      by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var direccion   by remember { mutableStateOf("") }
+    var telefono    by remember { mutableStateOf("") }
+    var email       by remember { mutableStateOf("") }
+    var categoria   by remember { mutableStateOf("") }
+    var precioMedio by remember { mutableStateOf("") }
+    var aforo       by remember { mutableStateOf("") }
+    var categoriaExpanded by remember { mutableStateOf(false) }
+    var loading     by remember { mutableStateOf(false) }
+    var error       by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Icono + título
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .background(ACCENT.copy(0.15f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Default.AddBusiness, null, tint = ACCENT, modifier = Modifier.size(40.dp))
+        }
+        Spacer(Modifier.height(16.dp))
+        Text("Crea tu restaurante", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+        Text(
+            "Todavía no tienes un restaurante asociado a tu cuenta.\nRellena los datos para empezar a gestionar reservas.",
+            color = Color.Gray, fontSize = 13.sp, textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+        )
+
+        // ── Campos del formulario ─────────────────────────────────────────────
+        OutlinedTextField(
+            value = nombre, onValueChange = { nombre = it; error = null },
+            label = { Text("Nombre del restaurante *") },
+            modifier = Modifier.fillMaxWidth(), singleLine = true,
+            shape = RoundedCornerShape(12.dp), colors = fieldColors()
+        )
+        Spacer(Modifier.height(12.dp))
+
+        // Categoría dropdown
+        ExposedDropdownMenuBox(expanded = categoriaExpanded, onExpandedChange = { categoriaExpanded = it }) {
+            OutlinedTextField(
+                value = categoria.ifBlank { "Selecciona categoría *" },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Categoría *") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoriaExpanded) },
+                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                shape = RoundedCornerShape(12.dp), colors = fieldColors()
+            )
+            ExposedDropdownMenu(
+                expanded = categoriaExpanded,
+                onDismissRequest = { categoriaExpanded = false },
+                containerColor = Color(0xFF1E1A14)
+            ) {
+                CATEGORIAS_REST.forEach { cat ->
+                    DropdownMenuItem(
+                        text = { Text(cat, color = Color.White) },
+                        onClick = { categoria = cat; categoriaExpanded = false }
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = descripcion, onValueChange = { descripcion = it },
+            label = { Text("Descripción") }, maxLines = 3,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp), colors = fieldColors()
+        )
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = direccion, onValueChange = { direccion = it; error = null },
+            label = { Text("Dirección *") }, singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp), colors = fieldColors()
+        )
+        Spacer(Modifier.height(12.dp))
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            OutlinedTextField(
+                value = telefono, onValueChange = { telefono = it },
+                label = { Text("Teléfono") }, singleLine = true,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp), colors = fieldColors()
+            )
+            OutlinedTextField(
+                value = aforo, onValueChange = { aforo = it },
+                label = { Text("Aforo") }, singleLine = true,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp), colors = fieldColors()
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = email, onValueChange = { email = it },
+            label = { Text("Email de contacto") }, singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp), colors = fieldColors()
+        )
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = precioMedio, onValueChange = { precioMedio = it },
+            label = { Text("Precio medio (€, ej: 15)") }, singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp), colors = fieldColors()
+        )
+
+        // Error
+        error?.let {
+            Spacer(Modifier.height(12.dp))
+            Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1A1A))) {
+                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Warning, null, tint = Color(0xFFEF5350), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(it, color = Color(0xFFEF5350), fontSize = 13.sp)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                when {
+                    nombre.isBlank()    -> { error = "El nombre es obligatorio"; return@Button }
+                    categoria.isBlank() -> { error = "Selecciona una categoría"; return@Button }
+                    direccion.isBlank() -> { error = "La dirección es obligatoria"; return@Button }
+                }
+                loading = true
+                scope.launch {
+                    try {
+                        val body = buildMap {
+                            put("usuario_id",   SessionManager.usuarioId.toString())
+                            put("nombre",       nombre)
+                            put("categoria",    categoria)
+                            put("descripcion",  descripcion)
+                            put("direccion",    direccion)
+                            put("ciudad",       "Zaragoza")
+                            put("telefono",     telefono)
+                            put("email_contacto", email)
+                            put("precio_medio", precioMedio.toIntOrNull()?.toString() ?: "0")
+                            put("aforo_total",  aforo.toIntOrNull()?.toString() ?: "0")
+                        }
+                        val resp = RetrofitClient.instancia.crearRestaurante(body)
+                        if (resp.success) onCreado()
+                        else error = resp.message.ifBlank { "No se pudo crear el restaurante" }
+                    } catch (e: Exception) {
+                        error = "Error de conexión: ${e.message}"
+                    } finally { loading = false }
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(54.dp),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = ACCENT),
+            enabled = !loading
+        ) {
+            if (loading) CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.Black, strokeWidth = 2.dp)
+            else {
+                Icon(Icons.Default.AddBusiness, null, tint = Color.Black, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(10.dp))
+                Text("Crear mi restaurante", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
+        }
+        Spacer(Modifier.height(32.dp))
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tab Menú, platos y resto de composables (sin cambios)
+// ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MenuTab(
+    restauranteId: Int,
+    platos: List<PlatoDetalle>,
+    categorias: List<MenuCategoria>,
+    onPlatoEliminado: (Int) -> Unit,
+    onPlatoCreado: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    var showAddSheet by remember { mutableStateOf(false) }
+
+    Box(Modifier.fillMaxSize()) {
+        if (platos.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(Icons.Default.MenuBook, null, tint = Color.Gray, modifier = Modifier.size(64.dp))
+                Spacer(Modifier.height(16.dp))
+                Text("Tu menú está vacío", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Pulsa + para añadir tus primeros platos", color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Center)
+            }
+        } else {
+            val platosPorCategoria = platos.groupBy { it.categoriaNombre }
+            LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                platosPorCategoria.forEach { (cat, lista) ->
+                    item {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
+                            HorizontalDivider(modifier = Modifier.weight(1f), color = ACCENT.copy(0.3f))
+                            Surface(color = ACCENT.copy(0.12f), shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(horizontal = 8.dp)) {
+                                Text(cat, color = ACCENT, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                            }
+                            HorizontalDivider(modifier = Modifier.weight(1f), color = ACCENT.copy(0.3f))
+                        }
+                    }
+                    items(lista) { plato ->
+                        PlatoGestionCard(plato = plato, onEliminar = { onPlatoEliminado(plato.id) })
+                    }
+                }
+                item { Spacer(Modifier.height(80.dp)) }
+            }
+        }
+        FloatingActionButton(
+            onClick = { showAddSheet = true },
+            modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp),
+            containerColor = ACCENT, contentColor = Color.Black
+        ) {
+            Icon(Icons.Default.Add, "Añadir plato", modifier = Modifier.size(28.dp))
+        }
+    }
+
+    if (showAddSheet) {
+        AñadirPlatoSheet(
+            restauranteId = restauranteId,
+            categorias = categorias,
+            onDismiss = { showAddSheet = false },
+            onSuccess = { showAddSheet = false; onPlatoCreado() }
+        )
+    }
+}
+
+@Composable
+private fun PlatoGestionCard(plato: PlatoDetalle, onEliminar: () -> Unit) {
+    var showConfirm by remember { mutableStateOf(false) }
+    if (showConfirm) {
+        AlertDialog(
+            onDismissRequest = { showConfirm = false },
+            containerColor = Color(0xFF1E1A14),
+            title = { Text("Eliminar plato", color = Color.White, fontWeight = FontWeight.Bold) },
+            text  = { Text("¿Seguro que quieres eliminar \"${plato.nombre}\" del menú?", color = Color.LightGray) },
+            confirmButton = { TextButton(onClick = { showConfirm = false; onEliminar() }) { Text("Eliminar", color = Color(0xFFEF5350), fontWeight = FontWeight.Bold) } },
+            dismissButton = { TextButton(onClick = { showConfirm = false }) { Text("Cancelar", color = Color.Gray) } }
+        )
+    }
+    Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG), modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(plato.nombre, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                if (plato.descripcion.isNotBlank()) { Spacer(Modifier.height(2.dp)); Text(plato.descripcion, color = Color.Gray, fontSize = 12.sp, maxLines = 2) }
+                if (plato.alergenos.isNotBlank()) { Spacer(Modifier.height(3.dp)); Text("⚠️ ${plato.alergenos}", color = Color(0xFFFFCC80), fontSize = 11.sp) }
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(horizontalAlignment = Alignment.End) {
+                Surface(color = ACCENT.copy(0.15f), shape = RoundedCornerShape(8.dp)) {
+                    Text("${plato.precio}€", color = ACCENT, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                }
+                Spacer(Modifier.height(6.dp))
+                IconButton(onClick = { showConfirm = true }, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Default.DeleteOutline, "Eliminar", tint = Color(0xFFEF5350), modifier = Modifier.size(20.dp))
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AñadirPlatoSheet(
+    restauranteId: Int,
+    categorias: List<MenuCategoria>,
+    onDismiss: () -> Unit,
+    onSuccess: () -> Unit
+) {
+    val scope       = rememberCoroutineScope()
+    var nombre      by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var precio      by remember { mutableStateOf("") }
+    var alergenos   by remember { mutableStateOf("") }
+    var categoriaId  by remember { mutableStateOf(0) }
+    var categoriaNom by remember { mutableStateOf("Selecciona categoría") }
+    var expandedCat  by remember { mutableStateOf(false) }
+    var loading      by remember { mutableStateOf(false) }
+    var error        by remember { mutableStateOf<String?>(null) }
+
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Color(0xFF1A1408), dragHandle = { BottomSheetDefaults.DragHandle(color = ACCENT.copy(0.5f)) }) {
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 32.dp)) {
+            Text("Añadir plato al menú", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Spacer(Modifier.height(20.dp))
+            OutlinedTextField(value = nombre, onValueChange = { nombre = it; error = null }, label = { Text("Nombre del plato *") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp), colors = fieldColors())
+            Spacer(Modifier.height(12.dp))
+            ExposedDropdownMenuBox(expanded = expandedCat, onExpandedChange = { expandedCat = it }) {
+                OutlinedTextField(value = categoriaNom, onValueChange = {}, readOnly = true, label = { Text("Categoría *") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCat) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
+                ExposedDropdownMenu(expanded = expandedCat, onDismissRequest = { expandedCat = false }, containerColor = Color(0xFF1E1A14)) {
+                    categorias.forEach { cat -> DropdownMenuItem(text = { Text(cat.nombre, color = Color.White) }, onClick = { categoriaId = cat.id; categoriaNom = cat.nombre; expandedCat = false }) }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción (opcional)") }, maxLines = 3, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(value = precio, onValueChange = { precio = it; error = null }, label = { Text("Precio (€) *") }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(value = alergenos, onValueChange = { alergenos = it }, label = { Text("Alérgenos (opcional)") }, singleLine = true, placeholder = { Text("gluten, lactosa...", color = Color.Gray) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
+            error?.let {
+                Spacer(Modifier.height(10.dp))
+                Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1A1A))) {
+                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Warning, null, tint = Color(0xFFEF5350), modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(it, color = Color(0xFFEF5350), fontSize = 13.sp)
+                    }
+                }
+            }
+            Spacer(Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    when {
+                        nombre.isBlank()  -> { error = "El nombre es obligatorio"; return@Button }
+                        categoriaId == 0  -> { error = "Selecciona una categoría"; return@Button }
+                        precio.toDoubleOrNull() == null || (precio.toDoubleOrNull() ?: 0.0) <= 0.0 -> { error = "Introduce un precio válido"; return@Button }
+                    }
+                    loading = true
+                    scope.launch {
+                        try {
+                            val resp = RetrofitClient.instancia.crearPlato(mapOf("restaurante_id" to restauranteId.toString(), "categoria_id" to categoriaId.toString(), "nombre" to nombre, "descripcion" to descripcion, "precio" to precio, "alergenos" to alergenos))
+                            if (resp.success) onSuccess() else error = resp.message
+                        } catch (e: Exception) { error = "Error de conexión" } finally { loading = false }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = ACCENT), enabled = !loading
+            ) {
+                if (loading) CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.Black, strokeWidth = 2.dp)
+                else { Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text("Añadir plato", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun fieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = ACCENT, unfocusedBorderColor = Color(0xFF3A2E1A),
+    focusedLabelColor = ACCENT, unfocusedLabelColor = Color.Gray,
+    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+    cursorColor = ACCENT, focusedContainerColor = Color(0xFF1E1A14),
+    unfocusedContainerColor = Color(0xFF1E1A14)
+)
+
+@Composable
+private fun StatCard(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color, modifier: Modifier) {
     Card(modifier = modifier, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG)) {
         Column(modifier = Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, null, tint = color, modifier = Modifier.size(24.dp))
@@ -289,8 +666,7 @@ private fun ReservaRestauranteCard(reserva: Reserva, onConfirmar: () -> Unit, on
                     }
                     Spacer(Modifier.width(12.dp))
                     Column {
-                        Text(reserva.nombreUsuario.ifBlank { "Cliente #${reserva.usuarioId}" },
-                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Text(reserva.nombreUsuario.ifBlank { "Cliente #${reserva.usuarioId}" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         Text(reserva.estado.replaceFirstChar { it.uppercase() }, color = statusColor, fontSize = 12.sp)
                     }
                 }
@@ -299,7 +675,7 @@ private fun ReservaRestauranteCard(reserva: Reserva, onConfirmar: () -> Unit, on
                     Text(reserva.hora, color = ACCENT, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.People, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
@@ -308,24 +684,12 @@ private fun ReservaRestauranteCard(reserva: Reserva, onConfirmar: () -> Unit, on
                 }
                 Text("ID #${reserva.id}", color = Color.DarkGray, fontSize = 12.sp)
             }
-            if (reserva.notas.isNotBlank()) {
-                Spacer(Modifier.height(6.dp))
-                Text("📝 ${reserva.notas}", color = Color.LightGray, fontSize = 12.sp)
-            }
+            if (reserva.notas.isNotBlank()) { Spacer(Modifier.height(6.dp)); Text("📝 ${reserva.notas}", color = Color.LightGray, fontSize = 12.sp) }
             if (reserva.estado == "pendiente") {
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedButton(
-                        onClick = onCancelar, modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFEF5350)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF5350))
-                    ) { Text("Cancelar") }
-                    Button(
-                        onClick = onConfirmar, modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047))
-                    ) { Text("Confirmar", color = Color.White) }
+                    OutlinedButton(onClick = onCancelar, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, Color(0xFFEF5350)), colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF5350))) { Text("Cancelar") }
+                    Button(onClick = onConfirmar, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047))) { Text("Confirmar", color = Color.White) }
                 }
             }
         }

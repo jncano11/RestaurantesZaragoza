@@ -1,6 +1,5 @@
 package com.example.restauranteszaragoza.ui.perfil
 
-import com.example.restauranteszaragoza.model.PerfilStats
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.restauranteszaragoza.model.PerfilStats
 import com.example.restauranteszaragoza.model.Reserva
 import com.example.restauranteszaragoza.network.RetrofitClient
 import com.example.restauranteszaragoza.network.SessionManager

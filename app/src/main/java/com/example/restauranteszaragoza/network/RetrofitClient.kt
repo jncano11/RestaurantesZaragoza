@@ -65,8 +65,25 @@ interface ApiService {
     @GET("restaurantes/mi_restaurante.php")
     suspend fun miRestaurante(@Query("usuario_id") usuarioId: Int): Restaurante
 
+
     @GET("usuarios/perfil_stats.php")
     suspend fun perfilStats(@Query("usuario_id") usuarioId: Int): PerfilStats
+
+    // ── Menú ──
+    @GET("menu/listar.php")
+    suspend fun listarMenu(@Query("restaurante_id") restauranteId: Int): MenuResponse
+
+    @GET("menu/listar_categorias.php")
+    suspend fun listarCategorias(): List<MenuCategoria>
+
+    @POST("menu/crear_plato.php")
+    suspend fun crearPlato(@Body body: Map<String, String>): ApiResponse
+
+    @POST("menu/eliminar_plato.php")
+    suspend fun eliminarPlato(@Body body: Map<String, String>): ApiResponse
+
+    @POST("restaurantes/crear.php")
+    suspend fun crearRestaurante(@Body body: Map<String, String>): ApiResponse
 
     @POST("restaurantes/editar.php")
     suspend fun editarRestaurante(@Body body: Map<String, String>): ApiResponse
@@ -112,6 +129,12 @@ interface ApiService {
 
     @POST("admin/restaurante_toggle.php")
     suspend fun toggleRestaurante(@Body body: Map<String, String>): ApiResponse
+
+    @POST("admin/usuario_cambiar_rol.php")
+    suspend fun cambiarRolUsuario(@Body body: Map<String, String>): ApiResponse
+
+    @POST("admin/usuario_eliminar.php")
+    suspend fun eliminarUsuario(@Body body: Map<String, String>): ApiResponse
 }
 
 // ─── CLIENTE RETROFIT ─────────────────────────────────────────────────────────

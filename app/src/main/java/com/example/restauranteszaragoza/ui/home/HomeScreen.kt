@@ -1,5 +1,6 @@
 package com.example.restauranteszaragoza.ui.home
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -32,6 +33,21 @@ private val BG_BOT  = Color(0xFF2C5364)
 private val ACCENT  = Color(0xFF00E5FF)
 private val CARD_BG = Color(0xFF1A2733)
 
+// ── Categorías disponibles ────────────────────────────────────────────────────
+private val CATEGORIAS = listOf(
+    "Todas", "Parrilla", "Sushi", "Pasta", "Alta cocina",
+    "Mariscos", "Mexicana", "Vegana", "Americana", "Fusión", "Sidreria", "Kebab"
+)
+
+// ── Opciones de ordenación ────────────────────────────────────────────────────
+private enum class OrdenOpcion(val label: String) {
+    NINGUNO("Relevancia"),
+    RATING_DESC("Mejor valorados"),
+    PRECIO_ASC("Precio: menor a mayor"),
+    PRECIO_DESC("Precio: mayor a menor"),
+    NOMBRE_ASC("Nombre A-Z")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -40,12 +56,16 @@ fun HomeScreen(
     onPerfil: () -> Unit
 ) {
     val scope    = rememberCoroutineScope()
-    var restaurantes       by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
-    var misReservas        by remember { mutableStateOf<List<Reserva>>(emptyList()) }
-    var loading            by remember { mutableStateOf(true) }
-    var searchQuery        by remember { mutableStateOf("") }
-    var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
-    var tabSeleccionado    by remember { mutableStateOf(0) }
+    var restaurantes          by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
+    var misReservas           by remember { mutableStateOf<List<Reserva>>(emptyList()) }
+    var loading               by remember { mutableStateOf(true) }
+    var searchQuery           by remember { mutableStateOf("") }
+    var categoriaSeleccionada by remember { mutableStateOf("Todas") }
+    var tabSeleccionado       by remember { mutableStateOf(0) }
+    var ordenSeleccionado     by remember { mutableStateOf(OrdenOpcion.NINGUNO) }
+    var mostrarOrden          by remember { mutableStateOf(false) }
+    // ── Favoritos (persistidos en memoria de sesión) ───────────────────────
+    var favoritos             by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
     val usuario = SessionManager.usuarioActual
 
@@ -62,11 +82,25 @@ fun HomeScreen(
         }
     }
 
-    val restaurantesFiltrados = restaurantes.filter {
-        val matchBusqueda  = it.nombre.contains(searchQuery, true) || it.categoria.contains(searchQuery, true)
-        val matchCategoria = categoriaSeleccionada == null || it.categoria == categoriaSeleccionada
-        matchBusqueda && matchCategoria
-    }
+    // ── Filtrado + ordenación ─────────────────────────────────────────────────
+    val restaurantesFiltrados = restaurantes
+        .filter { r ->
+            val matchBusqueda  = r.nombre.contains(searchQuery, true) ||
+                    r.categoria.contains(searchQuery, true) ||
+                    r.direccion.contains(searchQuery, true)
+            val matchCategoria = categoriaSeleccionada == "Todas" ||
+                    r.categoria.contains(categoriaSeleccionada, true)
+            matchBusqueda && matchCategoria
+        }
+        .let { lista ->
+            when (ordenSeleccionado) {
+                OrdenOpcion.RATING_DESC  -> lista.sortedByDescending { it.ratingGlobal }
+                OrdenOpcion.PRECIO_ASC   -> lista.sortedBy { it.precioMedio.replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0 }
+                OrdenOpcion.PRECIO_DESC  -> lista.sortedByDescending { it.precioMedio.replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0 }
+                OrdenOpcion.NOMBRE_ASC   -> lista.sortedBy { it.nombre }
+                else                     -> lista
+            }
+        }
 
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(BG_TOP, BG_MID, BG_BOT)))) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -109,72 +143,282 @@ fun HomeScreen(
                         color = if (tabSeleccionado == 0) ACCENT else Color.Gray)
                 }
                 Tab(selected = tabSeleccionado == 1, onClick = { tabSeleccionado = 1 }) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(12.dp)) {
+                        Text("Favoritos", color = if (tabSeleccionado == 1) ACCENT else Color.Gray)
+                        if (favoritos.isNotEmpty()) {
+                            Spacer(Modifier.width(6.dp))
+                            Surface(color = ACCENT, shape = CircleShape, modifier = Modifier.size(18.dp)) {
+                                Box(Alignment.Center as Modifier) {
+                                    Text(favoritos.size.toString(), color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+                }
+                Tab(selected = tabSeleccionado == 2, onClick = { tabSeleccionado = 2 }) {
                     Text("Mis Reservas", modifier = Modifier.padding(12.dp),
-                        color = if (tabSeleccionado == 1) ACCENT else Color.Gray)
+                        color = if (tabSeleccionado == 2) ACCENT else Color.Gray)
                 }
             }
 
-            if (tabSeleccionado == 0) {
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    item {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Buscar restaurantes...", color = Color.Gray) },
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                            shape = RoundedCornerShape(18.dp),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor   = CARD_BG,
-                                unfocusedContainerColor = CARD_BG,
-                                focusedTextColor        = Color.White,
-                                unfocusedTextColor      = Color.White
-                            )
-                        )
-                    }
-                    if (loading) {
+            when (tabSeleccionado) {
+                // ─────────────── TAB RESTAURANTES ────────────────────────────
+                0 -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // ── Barra de búsqueda ────────────────────────────────
                         item {
-                            Box(Modifier.fillMaxWidth().padding(48.dp), Alignment.Center) {
-                                CircularProgressIndicator(color = ACCENT)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    placeholder = { Text("Buscar por nombre, categoría, zona...", color = Color.Gray) },
+                                    modifier = Modifier.weight(1f).padding(vertical = 8.dp),
+                                    shape = RoundedCornerShape(18.dp),
+                                    singleLine = true,
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Search, null, tint = ACCENT, modifier = Modifier.size(18.dp))
+                                    },
+                                    trailingIcon = {
+                                        if (searchQuery.isNotEmpty()) {
+                                            IconButton(onClick = { searchQuery = "" }) {
+                                                Icon(Icons.Default.Close, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                            }
+                                        }
+                                    },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedContainerColor   = CARD_BG,
+                                        unfocusedContainerColor = CARD_BG,
+                                        focusedTextColor        = Color.White,
+                                        unfocusedTextColor      = Color.White,
+                                        focusedBorderColor      = ACCENT,
+                                        unfocusedBorderColor    = Color(0xFF2A3F4F)
+                                    )
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                // Botón ordenar
+                                Box {
+                                    IconButton(
+                                        onClick = { mostrarOrden = true },
+                                        modifier = Modifier
+                                            .background(
+                                                if (ordenSeleccionado != OrdenOpcion.NINGUNO) ACCENT.copy(0.2f) else CARD_BG,
+                                                RoundedCornerShape(12.dp)
+                                            )
+                                            .size(48.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Sort, "Ordenar",
+                                            tint = if (ordenSeleccionado != OrdenOpcion.NINGUNO) ACCENT else Color.Gray,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    DropdownMenu(
+                                        expanded = mostrarOrden,
+                                        onDismissRequest = { mostrarOrden = false },
+                                        containerColor = Color(0xFF1A2733)
+                                    ) {
+                                        Text(
+                                            "Ordenar por", color = Color.Gray, fontSize = 11.sp,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                        )
+                                        OrdenOpcion.entries.forEach { opcion ->
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                        if (ordenSeleccionado == opcion) {
+                                                            Icon(Icons.Default.Check, null, tint = ACCENT, modifier = Modifier.size(14.dp))
+                                                            Spacer(Modifier.width(6.dp))
+                                                        } else Spacer(Modifier.width(20.dp))
+                                                        Text(opcion.label, color = Color.White, fontSize = 14.sp)
+                                                    }
+                                                },
+                                                onClick = { ordenSeleccionado = opcion; mostrarOrden = false }
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
-                    } else if (restaurantesFiltrados.isEmpty()) {
+
+                        // ── Chips de categoría ───────────────────────────────
                         item {
-                            Box(Modifier.fillMaxWidth().padding(48.dp), Alignment.Center) {
-                                Text("Sin restaurantes disponibles", color = Color.Gray)
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                contentPadding = PaddingValues(vertical = 4.dp)
+                            ) {
+                                items(CATEGORIAS) { cat ->
+                                    val seleccionado = categoriaSeleccionada == cat
+                                    FilterChip(
+                                        selected = seleccionado,
+                                        onClick  = { categoriaSeleccionada = cat },
+                                        label    = { Text(cat, fontSize = 12.sp) },
+                                        leadingIcon = if (cat == "Todas") ({
+                                            Icon(Icons.Default.GridView, null, modifier = Modifier.size(14.dp))
+                                        }) else null,
+                                        shape = RoundedCornerShape(20.dp),
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor    = ACCENT,
+                                            selectedLabelColor        = Color.Black,
+                                            selectedLeadingIconColor  = Color.Black,
+                                            containerColor            = CARD_BG,
+                                            labelColor                = Color.LightGray
+                                        ),
+                                        border = FilterChipDefaults.filterChipBorder(
+                                            enabled         = true,
+                                            selected        = seleccionado,
+                                            selectedBorderColor = Color.Transparent,
+                                            borderColor         = Color(0xFF2A3F4F)
+                                        )
+                                    )
+                                }
                             }
                         }
-                    } else {
-                        items(restaurantesFiltrados) { r ->
-                            RestauranteCard(restaurante = r, onClick = { onRestauranteClick(r) })
+
+                        // ── Contador de resultados + indicador de filtro activo ──
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "${restaurantesFiltrados.size} restaurante${if (restaurantesFiltrados.size != 1) "s" else ""}",
+                                    color = Color.Gray, fontSize = 12.sp
+                                )
+                                // Chip activo de filtro
+                                val filtrosActivos = buildList {
+                                    if (categoriaSeleccionada != "Todas") add(categoriaSeleccionada)
+                                    if (ordenSeleccionado != OrdenOpcion.NINGUNO) add(ordenSeleccionado.label)
+                                }
+                                if (filtrosActivos.isNotEmpty()) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .background(ACCENT.copy(0.1f), RoundedCornerShape(12.dp))
+                                            .clickable {
+                                                categoriaSeleccionada = "Todas"
+                                                ordenSeleccionado = OrdenOpcion.NINGUNO
+                                                searchQuery = ""
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(Icons.Default.FilterAltOff, null, tint = ACCENT, modifier = Modifier.size(12.dp))
+                                        Spacer(Modifier.width(4.dp))
+                                        Text("Limpiar filtros", color = ACCENT, fontSize = 11.sp)
+                                    }
+                                }
+                            }
+                        }
+
+                        // ── Lista de restaurantes ────────────────────────────
+                        if (loading) {
+                            item {
+                                Box(Modifier.fillMaxWidth().padding(48.dp), Alignment.Center) {
+                                    CircularProgressIndicator(color = ACCENT)
+                                }
+                            }
+                        } else if (restaurantesFiltrados.isEmpty()) {
+                            item {
+                                Column(
+                                    Modifier.fillMaxWidth().padding(48.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(Icons.Default.SearchOff, null, tint = Color.Gray, modifier = Modifier.size(48.dp))
+                                    Spacer(Modifier.height(12.dp))
+                                    Text("Sin resultados", color = Color.Gray, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("Prueba con otro nombre o categoría", color = Color.DarkGray, fontSize = 13.sp)
+                                }
+                            }
+                        } else {
+                            items(restaurantesFiltrados) { r ->
+                                RestauranteCard(
+                                    restaurante = r,
+                                    esFavorito  = r.id in favoritos,
+                                    onFavoritoToggle = {
+                                        favoritos = if (r.id in favoritos)
+                                            favoritos - r.id
+                                        else
+                                            favoritos + r.id
+                                    },
+                                    onClick = { onRestauranteClick(r) }
+                                )
+                            }
                         }
                     }
                 }
-            } else {
-                MisReservasTab(
-                    reservas = misReservas,
-                    onCancelar = { reservaId ->
-                        scope.launch {
-                            try {
-                                RetrofitClient.instancia.cancelarReserva(mapOf("reserva_id" to reservaId.toString()))
-                                misReservas = RetrofitClient.instancia.misReservas(SessionManager.usuarioId)
-                            } catch (_: Exception) {}
+
+                // ─────────────── TAB FAVORITOS ───────────────────────────────
+                1 -> {
+                    val favoritosList = restaurantes.filter { it.id in favoritos }
+                    if (favoritosList.isEmpty()) {
+                        Box(Modifier.fillMaxSize(), Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+                                Icon(Icons.Default.FavoriteBorder, null, tint = Color.Gray, modifier = Modifier.size(64.dp))
+                                Spacer(Modifier.height(16.dp))
+                                Text("Aún no tienes favoritos", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Spacer(Modifier.height(8.dp))
+                                Text("Pulsa el ❤️ en cualquier restaurante para guardarlo aquí.", color = Color.Gray, fontSize = 14.sp)
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            item {
+                                Text(
+                                    "${favoritosList.size} favorito${if (favoritosList.size != 1) "s" else ""}",
+                                    color = Color.Gray, fontSize = 12.sp,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                            }
+                            items(favoritosList) { r ->
+                                RestauranteCard(
+                                    restaurante = r,
+                                    esFavorito  = true,
+                                    onFavoritoToggle = { favoritos = favoritos - r.id },
+                                    onClick = { onRestauranteClick(r) }
+                                )
+                            }
                         }
                     }
-                )
+                }
+
+                // ─────────────── TAB MIS RESERVAS ────────────────────────────
+                2 -> {
+                    MisReservasTab(
+                        reservas = misReservas,
+                        onCancelar = { reservaId ->
+                            scope.launch {
+                                try {
+                                    RetrofitClient.instancia.cancelarReserva(mapOf("reserva_id" to reservaId.toString()))
+                                    misReservas = RetrofitClient.instancia.misReservas(SessionManager.usuarioId)
+                                } catch (_: Exception) {}
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Card de restaurante
+// Card de restaurante (con botón favorito)
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
-private fun RestauranteCard(restaurante: Restaurante, onClick: () -> Unit) {
+private fun RestauranteCard(
+    restaurante: Restaurante,
+    esFavorito: Boolean,
+    onFavoritoToggle: () -> Unit,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape    = RoundedCornerShape(20.dp),
@@ -184,11 +428,11 @@ private fun RestauranteCard(restaurante: Restaurante, onClick: () -> Unit) {
             Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
                 Image(
                     painter = painterResource(id = imageParaRestaurante(restaurante.categoria)),
-                    contentDescription = null,
+                    contentDescription = restaurante.nombre,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                // Badge de rating si está disponible
+                // Badge rating
                 if (restaurante.ratingGlobal > 0.0) {
                     Surface(
                         color = Color.Black.copy(alpha = 0.65f),
@@ -205,13 +449,28 @@ private fun RestauranteCard(restaurante: Restaurante, onClick: () -> Unit) {
                         }
                     }
                 }
+                // Botón favorito
+                IconButton(
+                    onClick = onFavoritoToggle,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp)
+                        .background(Color.Black.copy(0.5f), CircleShape)
+                        .size(34.dp)
+                ) {
+                    Icon(
+                        imageVector = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (esFavorito) "Quitar de favoritos" else "Añadir a favoritos",
+                        tint = if (esFavorito) Color(0xFFEF5350) else Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(restaurante.nombre, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
                 Spacer(Modifier.height(4.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(restaurante.categoria.ifBlank { "General" }, color = ACCENT, fontSize = 13.sp)
-                    // precioMedio ya viene como String "15€" desde la API
                     Text(restaurante.precioMedio, color = Color(0xFF66BB6A), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(4.dp))
@@ -234,7 +493,7 @@ private fun RestauranteCard(restaurante: Restaurante, onClick: () -> Unit) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tab de mis reservas
+// Tab de mis reservas (sin cambios)
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun MisReservasTab(reservas: List<Reserva>, onCancelar: (Int) -> Unit) {
@@ -257,9 +516,6 @@ private fun MisReservasTab(reservas: List<Reserva>, onCancelar: (Int) -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Card de reserva
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun ReservaCard(reserva: Reserva, onCancelar: () -> Unit) {
     val (estadoColor, estadoIcon) = when (reserva.estado) {
@@ -286,10 +542,7 @@ private fun ReservaCard(reserva: Reserva, onCancelar: () -> Unit) {
         )
     }
 
-    Card(
-        shape  = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = CARD_BG)
-    ) {
+    Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                 Text(
@@ -305,10 +558,7 @@ private fun ReservaCard(reserva: Reserva, onCancelar: () -> Unit) {
                 ) {
                     Icon(estadoIcon, null, tint = estadoColor, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text(
-                        reserva.estado.replaceFirstChar { it.uppercase() },
-                        color = estadoColor, fontSize = 12.sp, fontWeight = FontWeight.Medium
-                    )
+                    Text(reserva.estado.replaceFirstChar { it.uppercase() }, color = estadoColor, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 }
             }
             Spacer(Modifier.height(10.dp))
@@ -353,7 +603,14 @@ fun imageParaRestaurante(categoria: String): Int {
         categoria.contains("Parrilla", true) || categoria.contains("española", true) -> R.drawable.parrilla
         categoria.contains("Sushi",    true) || categoria.contains("japonesa", true)  -> R.drawable.sushi
         categoria.contains("Pasta",    true) || categoria.contains("italiana", true)  -> R.drawable.pasta
-        categoria.contains("Alta",     true)                                           -> R.drawable.alta_cocina
+        categoria.contains("Alta",     true) -> R.drawable.alta_cocina
+        categoria.contains("Mariscos",    true) -> R.drawable.marisco
+        categoria.contains("Mexicana",      true) -> R.drawable.mexicana
+        categoria.contains("Vegana",         true) -> R.drawable.vegana
+        categoria.contains("Americana",          true) -> R.drawable.americana
+        categoria.contains("Fusión",          true) -> R.drawable.fusion
+        categoria.contains("Sidreria",          true) -> R.drawable.sidreria
+        categoria.contains("Kebab",          true) -> R.drawable.kebab
         else -> R.drawable.modern_eats
     }
 }

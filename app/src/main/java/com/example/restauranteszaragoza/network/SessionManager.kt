@@ -14,7 +14,7 @@ object SessionManager {
     val esAdmin get() = rolActual == "admin"
     val esRestaurante get() = rolActual == "restaurante"
     val esUsuario get() = rolActual == "usuario"
-    val usuarioId get() = usuarioActual?.id ?: 0
+    val usuarioId get() = usuarioActual?.id?.takeIf { it > 0 } ?: 0
 
     fun cerrarSesion() { usuarioActual = null }
 }

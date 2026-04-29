@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 // ─── USUARIO ─────────────────────────────────────────────────────────────────
 data class Usuario(
-    val id: Int? = null,
+    val id: Int = 0,
     val nombre: String = "",
     val apellidos: String = "",
     @SerializedName("nombreUsuario") val nombreUsuario: String = "",
@@ -139,3 +139,29 @@ data class ApiResponse(
     val success: Boolean,
     val message: String = ""
 )
+
+// ─── MENÚ RESPUESTA LISTAR ───────────────────────────────────────────────────
+data class MenuCategoria(
+    val id: Int = 0,
+    val nombre: String = "",
+    val orden: Int = 0
+)
+
+data class MenuResponse(
+    val success: Boolean = false,
+    val categorias: List<MenuCategoria> = emptyList(),
+    val platos: List<PlatoDetalle> = emptyList()
+)
+
+data class PlatoDetalle(
+    val id: Int = 0,
+    @SerializedName("categoria_id")     val categoriaId: Int = 0,
+    @SerializedName("categoria_nombre") val categoriaNombre: String = "",
+    val nombre: String = "",
+    val descripcion: String = "",
+    val precio: Double = 0.0,
+    @SerializedName("foto_url") val fotoUrl: String = "",
+    val alergenos: String = "",
+    val disponible: Boolean = true
+)
+
