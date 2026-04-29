@@ -14,7 +14,7 @@ $busqueda  = trim($_GET['q']         ?? '');
 
 $sql = "
     SELECT
-        r.id                                        AS id,
+        r.id                                        AS restaurante_id,
         r.nombre,
         r.descripcion,
         r.direccion,
@@ -53,7 +53,7 @@ $stmt->execute($params);
 $restaurantes = $stmt->fetchAll();
 
 foreach ($restaurantes as &$r) {
-    $r['id']               = (int)   $r['id'];
+    $r['restaurante_id']   = (int)   $r['restaurante_id'];
     $r['precio_medio']     = (float) $r['precio_medio'];
     $r['rating_global']    = (float) $r['rating_global'];
     $r['num_valoraciones'] = (int)   $r['num_valoraciones'];

@@ -1,5 +1,6 @@
 package com.example.restauranteszaragoza.ui.login
 
+import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,11 +27,33 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
-    var email     by remember { mutableStateOf("") }
-    var password  by remember { mutableStateOf("") }
+    val context   = LocalContext.current
+    val prefs     = remember { context.getSharedPreferences("restaurantes_prefs", Context.MODE_PRIVATE) }
+    var email     by remember { mutableStateOf(prefs.getString("saved_email", "") ?: "") }
+    var password  by remember { mutableStateOf(prefs.getString("saved_password", "") ?: "") }
+    var recuerdame by remember { mutableStateOf(prefs.getBoolean("recuerdame", false)) }
     var errorMsg  by remember { mutableStateOf<String?>(null) }
     var loading   by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    // Auto-login si Recuérdame estaba activo
+    LaunchedEffect(Unit) {
+        if (recuerdame && email.isNotBlank() && password.isNotBlank()) {
+            loading = true
+            try {
+                val resp = RetrofitClient.instancia.login(
+                    mapOf("email" to email, "contrasena" to password)
+                )
+                if (resp.success && resp.usuario != null) {
+                    SessionManager.usuarioActual = resp.usuario
+                    onLoginSuccess()
+                }
+            } catch (_: Exception) {
+            } finally {
+                loading = false
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -103,7 +127,25 @@ fun LoginScreen(
                     colors = textFieldColors()
                 )
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(12.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(
+                        checked = recuerdame,
+                        onCheckedChange = { recuerdame = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Color(0xFF00E5FF),
+                            uncheckedColor = Color.Gray,
+                            checkmarkColor = Color.Black
+                        )
+                    )
+                    Text("Recuérdame", color = Color.LightGray)
+                }
+
+                Spacer(Modifier.height(12.dp))
 
                 Button(
                     onClick = {
@@ -119,6 +161,19 @@ fun LoginScreen(
                                 )
                                 if (resp.success && resp.usuario != null) {
                                     SessionManager.usuarioActual = resp.usuario
+                                    if (recuerdame) {
+                                        prefs.edit()
+                                            .putBoolean("recuerdame", true)
+                                            .putString("saved_email", email)
+                                            .putString("saved_password", password)
+                                            .apply()
+                                    } else {
+                                        prefs.edit()
+                                            .remove("recuerdame")
+                                            .remove("saved_email")
+                                            .remove("saved_password")
+                                            .apply()
+                                    }
                                     onLoginSuccess()
                                 } else {
                                     errorMsg = resp.message ?: "Credenciales incorrectas"

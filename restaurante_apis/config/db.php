@@ -4,7 +4,7 @@
 //  Ruta: restaurantes_api/config/db.php
 // ============================================================
 
-define('DB_HOST', 'localhost');
+define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'root');         // Cambia por tu usuario MySQL
 define('DB_PASS', '');             // Cambia por tu contraseña MySQL
 define('DB_NAME', 'restaurantes_zaragoza');

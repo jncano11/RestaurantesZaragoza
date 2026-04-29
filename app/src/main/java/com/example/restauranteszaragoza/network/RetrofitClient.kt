@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 // ─── URLs DE LA API ───────────────────────────────────────────────────────────
 object Api {
-    const val BASE_URL = "http://10.0.2.2/restaurantes_api/"
+    const val BASE_URL = "http://192.168.1.72/restaurantes_api/"
     // Usuarios
     const val LOGIN    = "${BASE_URL}usuarios/login.php"
     const val REGISTER = "${BASE_URL}usuarios/register.php"

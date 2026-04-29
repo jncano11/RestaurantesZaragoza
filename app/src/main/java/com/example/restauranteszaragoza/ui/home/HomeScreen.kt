@@ -1,5 +1,6 @@
 package com.example.restauranteszaragoza.ui.home
 
+import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,6 +58,8 @@ fun HomeScreen(
     onPerfil: () -> Unit
 ) {
     val scope    = rememberCoroutineScope()
+    val context  = LocalContext.current
+    val prefs    = remember { context.getSharedPreferences("restaurantes_prefs", Context.MODE_PRIVATE) }
     var restaurantes          by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
     var misReservas           by remember { mutableStateOf<List<Reserva>>(emptyList()) }
     var loading               by remember { mutableStateOf(true) }
@@ -64,10 +68,24 @@ fun HomeScreen(
     var tabSeleccionado       by remember { mutableStateOf(0) }
     var ordenSeleccionado     by remember { mutableStateOf(OrdenOpcion.NINGUNO) }
     var mostrarOrden          by remember { mutableStateOf(false) }
-    // ── Favoritos (persistidos en memoria de sesión) ───────────────────────
-    var favoritos             by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var favoritos             by remember {
+        mutableStateOf<Set<Int>>(
+            prefs.getStringSet("favoritos", emptySet())!!.mapNotNull { it.toIntOrNull() }.toSet()
+        )
+    }
+
+    LaunchedEffect(favoritos) {
+        prefs.edit().putStringSet("favoritos", favoritos.map { it.toString() }.toSet()).apply()
+    }
 
     val usuario = SessionManager.usuarioActual
+
+    LaunchedEffect(restaurantes) {
+        if (restaurantes.isNotEmpty()) {
+            val idsValidos = restaurantes.map { it.id }.toSet()
+            favoritos = favoritos.intersect(idsValidos)
+        }
+    }
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -148,7 +166,7 @@ fun HomeScreen(
                         if (favoritos.isNotEmpty()) {
                             Spacer(Modifier.width(6.dp))
                             Surface(color = ACCENT, shape = CircleShape, modifier = Modifier.size(18.dp)) {
-                                Box(Alignment.Center as Modifier) {
+                                Box(contentAlignment = Alignment.Center) {
                                     Text(favoritos.size.toString(), color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 }
                             }

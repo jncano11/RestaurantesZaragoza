@@ -1,0 +1,55 @@
+CONFIGURACIÓN PARA EJECUTAR EN DISPOSITIVO FÍSICO
+==================================================
+
+1. CAMBIAR LA URL BASE EN RetrofitClient.kt
+-------------------------------------------
+El emulador usa 10.0.2.2 para acceder al PC host.
+En dispositivo físico hay que usar la IP real del PC en la red local.
+
+Archivo: app/src/main/java/com/example/restauranteszaragoza/network/RetrofitClient.kt
+
+  Dispositivo físico:   const val BASE_URL = "http://192.168.1.72/restaurantes_api/"
+  Emulador:             const val BASE_URL = "http://10.0.2.2/restaurantes_api/"
+
+IMPORTANTE: el móvil y el PC deben estar en la misma red WiFi.
+Si la IP del PC cambia (DHCP), hay que actualizarla aquí.
+
+
+2. ABRIR EL PUERTO 80 EN WINDOWS FIREWALL
+------------------------------------------
+Por defecto Windows Firewall bloquea las conexiones entrantes al puerto 80
+desde la red local (incluyendo el móvil).
+
+Pasos:
+  1. Inicio → buscar "Windows Defender Firewall" → Configuración avanzada
+  2. Reglas de entrada → Nueva regla
+  3. Tipo: Puerto → TCP → Puerto específico: 80
+  4. Acción: Permitir la conexión
+  5. Perfiles: marcar Dominio, Privado y Público
+  6. Nombre: XAMPP Apache Android
+
+Solo hay que hacerlo una vez. La regla persiste entre reinicios.
+
+
+3. TENER XAMPP ARRANCADO
+-------------------------
+Antes de lanzar la app, asegurarse de que en el panel de XAMPP2 están
+en verde tanto Apache como MySQL.
+
+  Apache sirve la API en:  C:\xampp2\htdocs\restaurantes_api\
+  MySQL usa la BD:          restaurantes_zaragoza
+
+
+4. COMPILAR E INSTALAR
+-----------------------
+Con el móvil conectado por USB y la depuración USB activada:
+
+  ./gradlew installDebug
+
+
+5. VOLVER AL EMULADOR
+----------------------
+Cuando se quiera usar el emulador en lugar del dispositivo físico,
+revertir el BASE_URL en RetrofitClient.kt:
+
+  const val BASE_URL = "http://10.0.2.2/restaurantes_api/"
