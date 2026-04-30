@@ -40,8 +40,10 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
     var usuarios     by remember { mutableStateOf<List<Usuario>>(emptyList()) }
     var restaurantes by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
     var reservas     by remember { mutableStateOf<List<Reserva>>(emptyList()) }
-    var snackMsg     by remember { mutableStateOf<String?>(null) }
-    val snackState   = remember { SnackbarHostState() }
+    var snackMsg              by remember { mutableStateOf<String?>(null) }
+    val snackState            = remember { SnackbarHostState() }
+    var filtroRestauranteId   by remember { mutableStateOf<Int?>(null) }
+    var dropdownReservaAbierto by remember { mutableStateOf(false) }
 
     fun recargar() {
         scope.launch {
@@ -167,9 +169,66 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                     }
 
                     // ── Reservas ──────────────────────────────────────────────
-                    2 -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(reservas) { r -> AdminReservaCard(reserva = r) }
-                        item { Spacer(Modifier.height(24.dp)) }
+                    2 -> {
+                        val reservasFiltradas = if (filtroRestauranteId == null) reservas
+                                                else reservas.filter { it.restauranteId == filtroRestauranteId }
+                        val nombreFiltro = restaurantes.find { it.id == filtroRestauranteId }?.nombre ?: "Todos los restaurantes"
+
+                        Column {
+                            // Dropdown filtro
+                            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                OutlinedButton(
+                                    onClick = { dropdownReservaAbierto = true },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, ACCENT.copy(0.5f)),
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                                ) {
+                                    Icon(Icons.Default.FilterList, null, tint = ACCENT, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(nombreFiltro, color = Color.White, modifier = Modifier.weight(1f), fontSize = 13.sp)
+                                    Icon(Icons.Default.ArrowDropDown, null, tint = ACCENT)
+                                }
+                                DropdownMenu(
+                                    expanded = dropdownReservaAbierto,
+                                    onDismissRequest = { dropdownReservaAbierto = false },
+                                    containerColor = Color(0xFF1E1B2E),
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Todos los restaurantes", color = Color.White) },
+                                        onClick = { filtroRestauranteId = null; dropdownReservaAbierto = false },
+                                        leadingIcon = {
+                                            if (filtroRestauranteId == null)
+                                                Icon(Icons.Default.Check, null, tint = ACCENT, modifier = Modifier.size(16.dp))
+                                        }
+                                    )
+                                    restaurantes.forEach { r ->
+                                        DropdownMenuItem(
+                                            text = { Text(r.nombre, color = Color.LightGray, fontSize = 13.sp) },
+                                            onClick = { filtroRestauranteId = r.id; dropdownReservaAbierto = false },
+                                            leadingIcon = {
+                                                if (filtroRestauranteId == r.id)
+                                                    Icon(Icons.Default.Check, null, tint = ACCENT, modifier = Modifier.size(16.dp))
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                if (reservasFiltradas.isEmpty()) {
+                                    item {
+                                        Box(Modifier.fillMaxWidth().padding(top = 40.dp), Alignment.Center) {
+                                            Text("No hay reservas para este restaurante", color = Color.Gray, fontSize = 13.sp)
+                                        }
+                                    }
+                                } else {
+                                    items(reservasFiltradas) { r -> AdminReservaCard(reserva = r) }
+                                }
+                                item { Spacer(Modifier.height(24.dp)) }
+                            }
+                        }
                     }
                 }
             }

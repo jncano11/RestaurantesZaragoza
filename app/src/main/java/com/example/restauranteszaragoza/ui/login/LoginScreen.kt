@@ -18,8 +18,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.restauranteszaragoza.R
+import com.example.restauranteszaragoza.model.LoginResponse
 import com.example.restauranteszaragoza.network.RetrofitClient
 import com.example.restauranteszaragoza.network.SessionManager
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,10 +43,12 @@ fun LoginScreen(
         if (recuerdame && email.isNotBlank() && password.isNotBlank()) {
             loading = true
             try {
-                val resp = RetrofitClient.instancia.login(
+                val httpResp = RetrofitClient.instancia.login(
                     mapOf("email" to email, "contrasena" to password)
                 )
-                if (resp.success && resp.usuario != null) {
+                val resp = if (httpResp.isSuccessful) httpResp.body() else
+                    httpResp.errorBody()?.string()?.let { Gson().fromJson(it, LoginResponse::class.java) }
+                if (resp?.success == true && resp.usuario != null) {
                     SessionManager.usuarioActual = resp.usuario
                     onLoginSuccess()
                 }
@@ -156,10 +160,12 @@ fun LoginScreen(
                         loading = true
                         scope.launch {
                             try {
-                                val resp = RetrofitClient.instancia.login(
+                                val httpResp = RetrofitClient.instancia.login(
                                     mapOf("email" to email, "contrasena" to password)
                                 )
-                                if (resp.success && resp.usuario != null) {
+                                val resp = if (httpResp.isSuccessful) httpResp.body() else
+                                    httpResp.errorBody()?.string()?.let { Gson().fromJson(it, LoginResponse::class.java) }
+                                if (resp?.success == true && resp.usuario != null) {
                                     SessionManager.usuarioActual = resp.usuario
                                     if (recuerdame) {
                                         prefs.edit()
@@ -176,7 +182,7 @@ fun LoginScreen(
                                     }
                                     onLoginSuccess()
                                 } else {
-                                    errorMsg = resp.message ?: "Credenciales incorrectas"
+                                    errorMsg = resp?.message ?: "Credenciales incorrectas"
                                 }
                             } catch (e: Exception) {
                                 errorMsg = "Error de conexión. Comprueba el servidor."
