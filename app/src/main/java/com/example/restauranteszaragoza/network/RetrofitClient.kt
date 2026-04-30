@@ -54,6 +54,21 @@ interface ApiService {
     @POST("usuarios/register.php")
     suspend fun registrar(@Body body: Map<String, String>): ApiResponse
 
+    @POST("restaurantes/register_restaurante.php")
+    suspend fun registrarRestaurante(@Body body: Map<String, String>): ApiResponse
+
+    @POST("restaurantes/completar_restaurante.php")
+    suspend fun completarRestaurante(@Body body: Map<String, String>): ApiResponse
+
+    @POST("restaurantes/solicitar_aprobacion.php")
+    suspend fun solicitarAprobacion(@Body body: Map<String, String>): ApiResponse
+
+    @GET("admin/restaurantes_pendientes.php")
+    suspend fun restaurantesPendientes(): List<RestaurantePendiente>
+
+    @POST("admin/restaurante_aprobar.php")
+    suspend fun aprobarRechazarRestaurante(@Body body: Map<String, String>): ApiResponse
+
     // ── Restaurantes ──
     @GET("restaurantes/listar.php")
     suspend fun listarRestaurantes(

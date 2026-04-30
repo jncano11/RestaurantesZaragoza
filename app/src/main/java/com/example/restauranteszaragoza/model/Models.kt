@@ -47,6 +47,9 @@ data class Restaurante(
     @SerializedName("usuario_id") val usuarioId: Int = 0,
 
     val activo: Int = 1,
+    val solicitado: Int = 0,
+    val aprobado: Int = 0,
+    @SerializedName("aprobado_por") val aprobadoPor: Int? = null,
 
     // Campos extra que devuelve detalle.php
     val horarios: List<Horario> = emptyList(),
@@ -132,6 +135,19 @@ data class EstadisticasAdmin(
     @SerializedName("total_reservas") val totalReservas: Int = 0,
     @SerializedName("reservas_hoy") val reservasHoy: Int = 0,
     @SerializedName("ingresos_propinas") val ingresosPropinas: Double = 0.0
+)
+
+// ─── RESTAURANTE PENDIENTE (admin) ───────────────────────────────────────────
+data class RestaurantePendiente(
+    @SerializedName("restaurante_id") val id: Int = 0,
+    val nombre: String = "",
+    val descripcion: String = "",
+    val direccion: String = "",
+    val categoria: String = "",
+    val telefono: String = "",
+    @SerializedName("usuario_id") val usuarioId: Int = 0,
+    @SerializedName("nombre_propietario") val nombrePropietario: String = "",
+    @SerializedName("email_propietario") val emailPropietario: String = ""
 )
 
 // ─── RESPUESTAS GENERICAS ─────────────────────────────────────────────────────

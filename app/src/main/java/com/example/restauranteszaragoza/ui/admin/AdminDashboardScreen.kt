@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.restauranteszaragoza.model.EstadisticasAdmin
 import com.example.restauranteszaragoza.model.Reserva
 import com.example.restauranteszaragoza.model.Restaurante
+import com.example.restauranteszaragoza.model.RestaurantePendiente
 import com.example.restauranteszaragoza.model.Usuario
 import com.example.restauranteszaragoza.network.RetrofitClient
 import com.example.restauranteszaragoza.network.SessionManager
@@ -40,6 +41,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
     var usuarios     by remember { mutableStateOf<List<Usuario>>(emptyList()) }
     var restaurantes by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
     var reservas     by remember { mutableStateOf<List<Reserva>>(emptyList()) }
+    var pendientes   by remember { mutableStateOf<List<RestaurantePendiente>>(emptyList()) }
     var snackMsg              by remember { mutableStateOf<String?>(null) }
     val snackState            = remember { SnackbarHostState() }
     var filtroRestauranteId   by remember { mutableStateOf<Int?>(null) }
@@ -52,6 +54,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                 usuarios     = RetrofitClient.instancia.listarUsuarios()
                 restaurantes = RetrofitClient.instancia.listarRestaurantesAdmin()
                 reservas     = RetrofitClient.instancia.todasReservas()
+                pendientes   = RetrofitClient.instancia.restaurantesPendientes()
             } catch (_: Exception) {
                 stats = EstadisticasAdmin(totalUsuarios=12, totalRestaurantes=8, totalReservas=47, reservasHoy=5, ingresosPropinas=138.50)
             }
@@ -100,11 +103,22 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                 }
 
                 // ── Tabs ──────────────────────────────────────────────────────
-                val tabs = listOf("Usuarios", "Restaurantes", "Reservas")
+                val tabs = listOf("Usuarios", "Restaurantes", "Reservas", "Pendientes")
                 TabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT) {
                     tabs.forEachIndexed { i, label ->
                         Tab(selected = tabIndex == i, onClick = { tabIndex = i }) {
-                            Text(label, modifier = Modifier.padding(10.dp), color = if (tabIndex == i) ACCENT else Color.Gray, fontSize = 13.sp)
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+                                Text(label, color = if (tabIndex == i) ACCENT else Color.Gray, fontSize = 13.sp)
+                                if (label == "Pendientes" && pendientes.isNotEmpty()) {
+                                    Spacer(Modifier.width(4.dp))
+                                    Box(
+                                        Modifier.size(18.dp).background(Color(0xFFEF5350), CircleShape),
+                                        Alignment.Center
+                                    ) {
+                                        Text(pendientes.size.toString(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -166,6 +180,55 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                             })
                         }
                         item { Spacer(Modifier.height(24.dp)) }
+                    }
+
+                    // ── Pendientes de aprobación ──────────────────────────────
+                    3 -> {
+                        if (pendientes.isEmpty()) {
+                            Box(Modifier.fillMaxSize().padding(top = 60.dp), Alignment.TopCenter) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Default.CheckCircle, null, tint = Color(0xFF43A047), modifier = Modifier.size(56.dp))
+                                    Spacer(Modifier.height(12.dp))
+                                    Text("No hay solicitudes pendientes", color = Color.Gray, fontSize = 14.sp)
+                                }
+                            }
+                        } else {
+                            LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                items(pendientes) { r ->
+                                    AdminRestaurantePendienteCard(
+                                        restaurante = r,
+                                        onAprobar = {
+                                            scope.launch {
+                                                try {
+                                                    RetrofitClient.instancia.aprobarRechazarRestaurante(mapOf(
+                                                        "restaurante_id" to r.id.toString(),
+                                                        "admin_id"       to SessionManager.usuarioId.toString(),
+                                                        "accion"         to "aprobar"
+                                                    ))
+                                                    pendientes   = RetrofitClient.instancia.restaurantesPendientes()
+                                                    restaurantes = RetrofitClient.instancia.listarRestaurantesAdmin()
+                                                    snackMsg = "✅ Restaurante aprobado"
+                                                } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                                            }
+                                        },
+                                        onRechazar = {
+                                            scope.launch {
+                                                try {
+                                                    RetrofitClient.instancia.aprobarRechazarRestaurante(mapOf(
+                                                        "restaurante_id" to r.id.toString(),
+                                                        "admin_id"       to SessionManager.usuarioId.toString(),
+                                                        "accion"         to "rechazar"
+                                                    ))
+                                                    pendientes = RetrofitClient.instancia.restaurantesPendientes()
+                                                    snackMsg = "Solicitud rechazada"
+                                                } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                                            }
+                                        }
+                                    )
+                                }
+                                item { Spacer(Modifier.height(24.dp)) }
+                            }
+                        }
                     }
 
                     // ── Reservas ──────────────────────────────────────────────
@@ -411,6 +474,93 @@ private fun AdminRestauranteCard(restaurante: Restaurante, onToggle: () -> Unit)
                     if (isActivo) Icons.Default.ToggleOn else Icons.Default.ToggleOff,
                     null, tint = if (isActivo) ACCENT else Color.Gray, modifier = Modifier.size(28.dp)
                 )
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+private fun AdminRestaurantePendienteCard(
+    restaurante: RestaurantePendiente,
+    onAprobar: () -> Unit,
+    onRechazar: () -> Unit
+) {
+    var showConfirmRechazar by remember { mutableStateOf(false) }
+
+    if (showConfirmRechazar) {
+        AlertDialog(
+            onDismissRequest = { showConfirmRechazar = false },
+            containerColor   = Color(0xFF13111E),
+            title = { Text("Rechazar solicitud", color = Color.White, fontWeight = FontWeight.Bold) },
+            text  = { Text("¿Rechazar la solicitud de \"${restaurante.nombre}\"? El propietario podrá corregirla y reenviarla.", color = Color.LightGray) },
+            confirmButton = {
+                TextButton(onClick = { showConfirmRechazar = false; onRechazar() }) {
+                    Text("Rechazar", color = Color(0xFFEF5350), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = { TextButton(onClick = { showConfirmRechazar = false }) { Text("Cancelar", color = Color.Gray) } }
+        )
+    }
+
+    Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG)) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(46.dp).background(Color(0xFF7C4DFF).copy(0.15f), CircleShape), Alignment.Center) {
+                    Icon(Icons.Default.Restaurant, null, tint = Color(0xFF7C4DFF), modifier = Modifier.size(22.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(restaurante.nombre, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(restaurante.categoria.ifBlank { "Sin categoría" }, color = Color.Gray, fontSize = 12.sp)
+                    Text(restaurante.direccion, color = Color.Gray, fontSize = 12.sp, maxLines = 1)
+                }
+                Surface(color = Color(0xFFFFA726).copy(0.15f), shape = RoundedCornerShape(8.dp)) {
+                    Text("PENDIENTE", color = Color(0xFFFFA726), fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                }
+            }
+
+            if (restaurante.descripcion.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                Text(restaurante.descripcion, color = Color.LightGray, fontSize = 12.sp, maxLines = 2)
+            }
+
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider(color = Color(0xFF2A2435), thickness = 0.5.dp)
+            Spacer(Modifier.height(8.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Person, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("${restaurante.nombrePropietario} · ${restaurante.emailPropietario}", color = Color.Gray, fontSize = 12.sp)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedButton(
+                    onClick = { showConfirmRechazar = true },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, Color(0xFFEF5350).copy(0.6f)),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
+                ) {
+                    Icon(Icons.Default.Close, null, tint = Color(0xFFEF5350), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Rechazar", color = Color(0xFFEF5350), fontSize = 13.sp)
+                }
+                Button(
+                    onClick = onAprobar,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047)),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
+                ) {
+                    Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Aprobar", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
     }

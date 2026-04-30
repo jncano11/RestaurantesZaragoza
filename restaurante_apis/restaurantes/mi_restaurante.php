@@ -15,26 +15,54 @@ if ($usuarioId <= 0) {
     jsonResponse(['success' => false, 'message' => 'usuario_id inválido'], 400);
 }
 
-$pdo  = getDB();
-$stmt = $pdo->prepare("
-    SELECT
-        r.id                                        AS restaurante_id,
-        r.nombre, r.descripcion, r.direccion,
-        r.latitud, r.longitud, r.telefono,
-        r.email_contacto,
-        r.categoria,
-        CONCAT(r.precio_medio, '€')                 AS precio_medio,
-        r.aforo_total, r.usuario_id, r.activo,
-        COALESCE(ROUND(AVG(v.puntuacion), 1), 0)    AS rating_global,
-        COUNT(DISTINCT v.id)                        AS num_valoraciones
-    FROM restaurantes r
-    LEFT JOIN valoraciones v ON v.restaurante_id = r.id
-    WHERE r.usuario_id = ?
-    GROUP BY r.id
-    LIMIT 1
-");
-$stmt->execute([$usuarioId]);
-$restaurante = $stmt->fetch();
+$pdo = getDB();
+
+try {
+    $stmt = $pdo->prepare("
+        SELECT
+            r.id                                        AS restaurante_id,
+            r.nombre, r.descripcion, r.direccion,
+            r.latitud, r.longitud, r.telefono,
+            r.email_contacto,
+            r.categoria,
+            CONCAT(r.precio_medio, '€')                 AS precio_medio,
+            r.aforo_total, r.usuario_id, r.activo,
+            COALESCE(r.solicitado, 0)                   AS solicitado,
+            COALESCE(r.aprobado,   0)                   AS aprobado,
+            r.aprobado_por,
+            COALESCE(ROUND(AVG(v.puntuacion), 1), 0)    AS rating_global,
+            COUNT(DISTINCT v.id)                        AS num_valoraciones
+        FROM restaurantes r
+        LEFT JOIN valoraciones v ON v.restaurante_id = r.id
+        WHERE r.usuario_id = ?
+        GROUP BY r.id
+        LIMIT 1
+    ");
+    $stmt->execute([$usuarioId]);
+    $restaurante = $stmt->fetch();
+} catch (PDOException $e) {
+    // Fallback sin columnas nuevas si aún no se ha ejecutado el ALTER TABLE
+    $stmt = $pdo->prepare("
+        SELECT
+            r.id                                        AS restaurante_id,
+            r.nombre, r.descripcion, r.direccion,
+            r.latitud, r.longitud, r.telefono,
+            r.email_contacto,
+            r.categoria,
+            CONCAT(r.precio_medio, '€')                 AS precio_medio,
+            r.aforo_total, r.usuario_id, r.activo,
+            0 AS solicitado, 0 AS aprobado, NULL AS aprobado_por,
+            COALESCE(ROUND(AVG(v.puntuacion), 1), 0)    AS rating_global,
+            COUNT(DISTINCT v.id)                        AS num_valoraciones
+        FROM restaurantes r
+        LEFT JOIN valoraciones v ON v.restaurante_id = r.id
+        WHERE r.usuario_id = ?
+        GROUP BY r.id
+        LIMIT 1
+    ");
+    $stmt->execute([$usuarioId]);
+    $restaurante = $stmt->fetch();
+}
 
 if (!$restaurante) {
     jsonResponse(['success' => false, 'message' => 'No tienes ningún restaurante registrado'], 404);
@@ -45,5 +73,8 @@ $restaurante['aforo_total']      = (int)$restaurante['aforo_total'];
 $restaurante['usuario_id']       = (int)$restaurante['usuario_id'];
 $restaurante['rating_global']    = (float)$restaurante['rating_global'];
 $restaurante['num_valoraciones'] = (int)$restaurante['num_valoraciones'];
+$restaurante['solicitado']       = (int)$restaurante['solicitado'];
+$restaurante['aprobado']         = (int)$restaurante['aprobado'];
+$restaurante['aprobado_por']     = $restaurante['aprobado_por'] ? (int)$restaurante['aprobado_por'] : null;
 
 echo json_encode($restaurante, JSON_UNESCAPED_UNICODE);

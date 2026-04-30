@@ -36,7 +36,7 @@ $sql = "
           LIMIT 1)                                  AS imagen_url
     FROM restaurantes r
     LEFT JOIN valoraciones v ON v.restaurante_id = r.id
-    WHERE r.activo = 1
+    WHERE r.activo = 1 AND r.aprobado = 1
 ";
 
 $params = [];

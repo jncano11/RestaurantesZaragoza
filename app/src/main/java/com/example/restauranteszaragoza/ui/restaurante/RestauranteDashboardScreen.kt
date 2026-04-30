@@ -24,6 +24,7 @@ import com.example.restauranteszaragoza.model.Restaurante
 import com.example.restauranteszaragoza.network.RetrofitClient
 import com.example.restauranteszaragoza.network.SessionManager
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 private val ACCENT    = Color(0xFFFFA726)
 private val CARD_BG   = Color(0xFF1E1A14)
@@ -56,23 +57,32 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     fun cargarDatos() {
         loading = true; errorMsg = null; sinRestaurante = null
         scope.launch {
+            // Cargar el restaurante — solo aquí se decide si tiene o no restaurante
+            val r = try {
+                RetrofitClient.instancia.miRestaurante(SessionManager.usuarioId)
+            } catch (e: HttpException) {
+                if (e.code() == 404) sinRestaurante = true
+                else errorMsg = "Error del servidor (${e.code()}). Comprueba la conexión."
+                loading = false
+                return@launch
+            } catch (e: Exception) {
+                errorMsg = "No se pudo cargar tu restaurante.\nComprueba la conexión."
+                loading = false
+                return@launch
+            }
+
+            miRestaurante = r
+            sinRestaurante = false
+
+            // El resto de llamadas fallan en silencio — no afectan al estado del restaurante
+            try { reservas = RetrofitClient.instancia.reservasPorRestaurante(r.id) } catch (_: Exception) {}
             try {
-                val r = RetrofitClient.instancia.miRestaurante(SessionManager.usuarioId)
-                miRestaurante = r
-                sinRestaurante = false
-                reservas = RetrofitClient.instancia.reservasPorRestaurante(r.id)
                 val menuResp = RetrofitClient.instancia.listarMenu(r.id)
                 platos = menuResp.platos
-                categorias = RetrofitClient.instancia.listarCategorias()
-            } catch (e: Exception) {
-                val msg = e.message ?: ""
-                if (msg.contains("404") || msg.contains("No tienes ningún restaurante", true)) {
-                    sinRestaurante = true   // BUG FIX: no tiene restaurante → mostrar formulario
-                } else {
-                    errorMsg = "No se pudo cargar tu restaurante.\nComprueba la conexión."
-                }
-                android.util.Log.e("RestauranteDashboard", "Error", e)
-            } finally { loading = false }
+            } catch (_: Exception) {}
+            try { categorias = RetrofitClient.instancia.listarCategorias() } catch (_: Exception) {}
+
+            loading = false
         }
     }
 
@@ -159,6 +169,72 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.Star, null, tint = Color(0xFFFFB300), modifier = Modifier.size(14.dp))
                                         Text(" ${rest.ratingGlobal}", color = Color.LightGray, fontSize = 13.sp)
+                                    }
+                                }
+                            }
+                        }
+
+                        // ── Banner estado aprobación ──────────────────────────
+                        miRestaurante?.let { rest ->
+                            when {
+                                rest.aprobado == 1 -> { /* aprobado: no mostrar nada */ }
+                                rest.solicitado == 1 -> {
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                                        shape = RoundedCornerShape(14.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2200))
+                                    ) {
+                                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Default.HourglassTop, null, tint = Color(0xFFFFA726), modifier = Modifier.size(22.dp))
+                                            Spacer(Modifier.width(10.dp))
+                                            Column(Modifier.weight(1f)) {
+                                                Text("Pendiente de aprobación", color = Color(0xFFFFA726), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                                Text("Un administrador revisará tu solicitud pronto.", color = Color.Gray, fontSize = 12.sp)
+                                            }
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                                        shape = RoundedCornerShape(14.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E))
+                                    ) {
+                                        Column(Modifier.padding(14.dp)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(Icons.Default.Info, null, tint = Color(0xFF7C4DFF), modifier = Modifier.size(22.dp))
+                                                Spacer(Modifier.width(10.dp))
+                                                Column(Modifier.weight(1f)) {
+                                                    Text("Restaurante en borrador", color = Color(0xFF7C4DFF), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                                    Text("Tu restaurante no es visible para los usuarios. Completa los datos y envía la solicitud.", color = Color.Gray, fontSize = 12.sp)
+                                                }
+                                            }
+                                            Spacer(Modifier.height(10.dp))
+                                            Button(
+                                                onClick = {
+                                                    scope.launch {
+                                                        try {
+                                                            val resp = RetrofitClient.instancia.solicitarAprobacion(
+                                                                mapOf("restaurante_id" to rest.id.toString())
+                                                            )
+                                                            if (resp.success) {
+                                                                snackMsg = "✅ Solicitud enviada al administrador"
+                                                                cargarDatos()
+                                                            } else {
+                                                                snackMsg = "❌ ${resp.message}"
+                                                            }
+                                                        } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                                                    }
+                                                },
+                                                modifier = Modifier.fillMaxWidth(),
+                                                shape = RoundedCornerShape(10.dp),
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C4DFF))
+                                            ) {
+                                                Icon(Icons.Default.Send, null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                                Spacer(Modifier.width(8.dp))
+                                                Text("Enviar petición al administrador", color = Color.White, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -273,19 +349,12 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Pantalla de creación de restaurante (BUG FIX)
 // ─────────────────────────────────────────────────────────────────────────────
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CrearRestauranteScreen(onCreado: () -> Unit) {
     val scope       = rememberCoroutineScope()
-    var nombre      by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
-    var direccion   by remember { mutableStateOf("") }
-    var telefono    by remember { mutableStateOf("") }
     var email       by remember { mutableStateOf("") }
-    var categoria   by remember { mutableStateOf("") }
     var precioMedio by remember { mutableStateOf("") }
     var aforo       by remember { mutableStateOf("") }
-    var categoriaExpanded by remember { mutableStateOf(false) }
     var loading     by remember { mutableStateOf(false) }
     var error       by remember { mutableStateOf<String?>(null) }
 
@@ -293,109 +362,46 @@ private fun CrearRestauranteScreen(onCreado: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 24.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Icono + título
         Box(
-            modifier = Modifier
-                .size(80.dp)
-                .background(ACCENT.copy(0.15f), CircleShape),
+            modifier = Modifier.size(80.dp).background(ACCENT.copy(0.15f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Default.AddBusiness, null, tint = ACCENT, modifier = Modifier.size(40.dp))
         }
         Spacer(Modifier.height(16.dp))
-        Text("Crea tu restaurante", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+        Text("¡Solo faltan algunos pasos!", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
         Text(
-            "Todavía no tienes un restaurante asociado a tu cuenta.\nRellena los datos para empezar a gestionar reservas.",
+            "Tu restaurante ya está registrado. Rellena los siguientes campos para completar el perfil.",
             color = Color.Gray, fontSize = 13.sp, textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+            modifier = Modifier.padding(top = 8.dp, bottom = 28.dp)
         )
 
-        // ── Campos del formulario ─────────────────────────────────────────────
         OutlinedTextField(
-            value = nombre, onValueChange = { nombre = it; error = null },
-            label = { Text("Nombre del restaurante *") },
-            modifier = Modifier.fillMaxWidth(), singleLine = true,
-            shape = RoundedCornerShape(12.dp), colors = fieldColors()
-        )
-        Spacer(Modifier.height(12.dp))
-
-        // Categoría dropdown
-        ExposedDropdownMenuBox(expanded = categoriaExpanded, onExpandedChange = { categoriaExpanded = it }) {
-            OutlinedTextField(
-                value = categoria.ifBlank { "Selecciona categoría *" },
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Categoría *") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoriaExpanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                shape = RoundedCornerShape(12.dp), colors = fieldColors()
-            )
-            ExposedDropdownMenu(
-                expanded = categoriaExpanded,
-                onDismissRequest = { categoriaExpanded = false },
-                containerColor = Color(0xFF1E1A14)
-            ) {
-                CATEGORIAS_REST.forEach { cat ->
-                    DropdownMenuItem(
-                        text = { Text(cat, color = Color.White) },
-                        onClick = { categoria = cat; categoriaExpanded = false }
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = descripcion, onValueChange = { descripcion = it },
-            label = { Text("Descripción") }, maxLines = 3,
+            value = aforo, onValueChange = { aforo = it; error = null },
+            label = { Text("Aforo (número de comensales)") }, singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp), colors = fieldColors()
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(14.dp))
 
         OutlinedTextField(
-            value = direccion, onValueChange = { direccion = it; error = null },
-            label = { Text("Dirección *") }, singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp), colors = fieldColors()
-        )
-        Spacer(Modifier.height(12.dp))
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(
-                value = telefono, onValueChange = { telefono = it },
-                label = { Text("Teléfono") }, singleLine = true,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp), colors = fieldColors()
-            )
-            OutlinedTextField(
-                value = aforo, onValueChange = { aforo = it },
-                label = { Text("Aforo") }, singleLine = true,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp), colors = fieldColors()
-            )
-        }
-        Spacer(Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = email, onValueChange = { email = it },
+            value = email, onValueChange = { email = it; error = null },
             label = { Text("Email de contacto") }, singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp), colors = fieldColors()
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(14.dp))
 
         OutlinedTextField(
-            value = precioMedio, onValueChange = { precioMedio = it },
+            value = precioMedio, onValueChange = { precioMedio = it; error = null },
             label = { Text("Precio medio (€, ej: 15)") }, singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp), colors = fieldColors()
         )
 
-        // Error
         error?.let {
             Spacer(Modifier.height(12.dp))
             Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1A1A))) {
@@ -407,35 +413,25 @@ private fun CrearRestauranteScreen(onCreado: () -> Unit) {
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(28.dp))
 
         Button(
             onClick = {
-                when {
-                    nombre.isBlank()    -> { error = "El nombre es obligatorio"; return@Button }
-                    categoria.isBlank() -> { error = "Selecciona una categoría"; return@Button }
-                    direccion.isBlank() -> { error = "La dirección es obligatoria"; return@Button }
+                if (aforo.toIntOrNull() == null || aforo.toIntOrNull()!! <= 0) {
+                    error = "Introduce un aforo válido"; return@Button
                 }
                 loading = true
                 scope.launch {
                     try {
-                        val body = buildMap {
-                            put("usuario_id",   SessionManager.usuarioId.toString())
-                            put("nombre",       nombre)
-                            put("categoria",    categoria)
-                            put("descripcion",  descripcion)
-                            put("direccion",    direccion)
-                            put("ciudad",       "Zaragoza")
-                            put("telefono",     telefono)
-                            put("email_contacto", email)
-                            put("precio_medio", precioMedio.toIntOrNull()?.toString() ?: "0")
-                            put("aforo_total",  aforo.toIntOrNull()?.toString() ?: "0")
-                        }
-                        val resp = RetrofitClient.instancia.crearRestaurante(body)
-                        if (resp.success) onCreado()
-                        else error = resp.message.ifBlank { "No se pudo crear el restaurante" }
+                        val resp = RetrofitClient.instancia.completarRestaurante(mapOf(
+                            "usuario_id"     to SessionManager.usuarioId.toString(),
+                            "aforo_total"    to (aforo.toIntOrNull() ?: 0).toString(),
+                            "email_contacto" to email,
+                            "precio_medio"   to (precioMedio.toFloatOrNull() ?: 0f).toString()
+                        ))
+                        onCreado()
                     } catch (e: Exception) {
-                        error = "Error de conexión: ${e.message}"
+                        error = "Error de conexión"
                     } finally { loading = false }
                 }
             },
@@ -446,9 +442,9 @@ private fun CrearRestauranteScreen(onCreado: () -> Unit) {
         ) {
             if (loading) CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.Black, strokeWidth = 2.dp)
             else {
-                Icon(Icons.Default.AddBusiness, null, tint = Color.Black, modifier = Modifier.size(22.dp))
+                Icon(Icons.Default.Check, null, tint = Color.Black, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("Crear mi restaurante", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Completar mi restaurante", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
         Spacer(Modifier.height(32.dp))
