@@ -1,9 +1,11 @@
 package com.example.restauranteszaragoza
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import com.example.restauranteszaragoza.model.Restaurante
 import com.example.restauranteszaragoza.network.SessionManager
 import com.example.restauranteszaragoza.ui.admin.AdminDashboardScreen
@@ -28,8 +30,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavigation() {
+    val context             = LocalContext.current
     var screen             by remember { mutableStateOf("login") }
     var selectedRestaurante by remember { mutableStateOf<Restaurante?>(null) }
+
+    fun logout() {
+        context.getSharedPreferences("restaurantes_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .remove("recuerdame")
+            .remove("saved_email")
+            .remove("saved_password")
+            .apply()
+        SessionManager.cerrarSesion()
+        screen = "login"
+    }
 
     when (screen) {
 
@@ -54,7 +68,7 @@ fun AppNavigation() {
             if (selectedRestaurante == null) {
                 HomeScreen(
                     onRestauranteClick = { r -> selectedRestaurante = r },
-                    onLogout = { SessionManager.cerrarSesion(); screen = "login" },
+                    onLogout = { logout() },
                     onPerfil = { screen = "perfil" }
                 )
             } else {
@@ -71,12 +85,12 @@ fun AppNavigation() {
 
         // ── ROL: restaurante ──────────────────────────────────────────────────
         "restaurante_dashboard" -> RestauranteDashboardScreen(
-            onLogout = { SessionManager.cerrarSesion(); screen = "login" }
+            onLogout = { logout() }
         )
 
         // ── ROL: admin ────────────────────────────────────────────────────────
         "admin_dashboard" -> AdminDashboardScreen(
-            onLogout = { SessionManager.cerrarSesion(); screen = "login" }
+            onLogout = { logout() }
         )
     }
 }
