@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.restauranteszaragoza.model.CategoriaResponse
 import com.example.restauranteszaragoza.model.MenuCategoria
 import com.example.restauranteszaragoza.model.PlatoDetalle
 import com.example.restauranteszaragoza.model.Reserva
@@ -80,7 +81,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                 val menuResp = RetrofitClient.instancia.listarMenu(r.id)
                 platos = menuResp.platos
             } catch (_: Exception) {}
-            try { categorias = RetrofitClient.instancia.listarCategorias() } catch (_: Exception) {}
+            try { categorias = RetrofitClient.instancia.listarCategorias(r.id) } catch (_: Exception) {}
 
             loading = false
         }
@@ -285,10 +286,15 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                                 },
                                 onPlatoCreado = {
                                     scope.launch {
-                                        val menuResp = RetrofitClient.instancia.listarMenu(miRestaurante?.id ?: 0)
+                                        val rid = miRestaurante?.id ?: 0
+                                        val menuResp = RetrofitClient.instancia.listarMenu(rid)
                                         platos = menuResp.platos
+                                        try { categorias = RetrofitClient.instancia.listarCategorias(rid) } catch (_: Exception) {}
                                         snackMsg = "✅ Plato añadido al menú"
                                     }
+                                },
+                                onCategoriaCreada = { nueva ->
+                                    categorias = categorias + nueva
                                 }
                             )
                         } else {
@@ -461,9 +467,9 @@ private fun MenuTab(
     platos: List<PlatoDetalle>,
     categorias: List<MenuCategoria>,
     onPlatoEliminado: (Int) -> Unit,
-    onPlatoCreado: () -> Unit
+    onPlatoCreado: () -> Unit,
+    onCategoriaCreada: (MenuCategoria) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     var showAddSheet by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
@@ -512,7 +518,8 @@ private fun MenuTab(
             restauranteId = restauranteId,
             categorias = categorias,
             onDismiss = { showAddSheet = false },
-            onSuccess = { showAddSheet = false; onPlatoCreado() }
+            onSuccess = { showAddSheet = false; onPlatoCreado() },
+            onCategoriaCreada = onCategoriaCreada
         )
     }
 }
@@ -557,7 +564,8 @@ private fun AñadirPlatoSheet(
     restauranteId: Int,
     categorias: List<MenuCategoria>,
     onDismiss: () -> Unit,
-    onSuccess: () -> Unit
+    onSuccess: () -> Unit,
+    onCategoriaCreada: (MenuCategoria) -> Unit
 ) {
     val scope       = rememberCoroutineScope()
     var nombre      by remember { mutableStateOf("") }
@@ -570,6 +578,78 @@ private fun AñadirPlatoSheet(
     var loading      by remember { mutableStateOf(false) }
     var error        by remember { mutableStateOf<String?>(null) }
 
+    // Estado local de categorías para reflejar las recién creadas sin cerrar el sheet
+    var categoriasLocales by remember(categorias) { mutableStateOf(categorias) }
+
+    // Dialog de nueva categoría
+    var showNuevaCat     by remember { mutableStateOf(false) }
+    var nuevaCatNombre   by remember { mutableStateOf("") }
+    var nuevaCatLoading  by remember { mutableStateOf(false) }
+    var nuevaCatError    by remember { mutableStateOf<String?>(null) }
+
+    if (showNuevaCat) {
+        AlertDialog(
+            onDismissRequest = { showNuevaCat = false; nuevaCatNombre = ""; nuevaCatError = null },
+            containerColor = Color(0xFF1E1A14),
+            title = { Text("Nueva categoría", color = Color.White, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = nuevaCatNombre,
+                        onValueChange = { nuevaCatNombre = it; nuevaCatError = null },
+                        label = { Text("Nombre de la categoría") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = fieldColors()
+                    )
+                    nuevaCatError?.let {
+                        Spacer(Modifier.height(8.dp))
+                        Text(it, color = Color(0xFFEF5350), fontSize = 12.sp)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (nuevaCatNombre.isBlank()) { nuevaCatError = "El nombre es obligatorio"; return@TextButton }
+                        nuevaCatLoading = true
+                        scope.launch {
+                            try {
+                                val resp = RetrofitClient.instancia.crearCategoria(mapOf(
+                                    "restaurante_id" to restauranteId.toString(),
+                                    "nombre"         to nuevaCatNombre.trim()
+                                ))
+                                if (resp.success) {
+                                    val nueva = MenuCategoria(id = resp.id, nombre = resp.nombre, orden = resp.orden)
+                                    categoriasLocales = categoriasLocales + nueva
+                                    onCategoriaCreada(nueva)
+                                    categoriaId  = nueva.id
+                                    categoriaNom = nueva.nombre
+                                    showNuevaCat = false
+                                    nuevaCatNombre = ""
+                                } else {
+                                    nuevaCatError = resp.message.ifBlank { "Error al crear la categoría" }
+                                }
+                            } catch (_: Exception) {
+                                nuevaCatError = "Error de conexión"
+                            } finally { nuevaCatLoading = false }
+                        }
+                    },
+                    enabled = !nuevaCatLoading
+                ) {
+                    if (nuevaCatLoading) CircularProgressIndicator(modifier = Modifier.size(16.dp), color = ACCENT, strokeWidth = 2.dp)
+                    else Text("Crear", color = ACCENT, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNuevaCat = false; nuevaCatNombre = ""; nuevaCatError = null }) {
+                    Text("Cancelar", color = Color.Gray)
+                }
+            }
+        )
+    }
+
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Color(0xFF1A1408), dragHandle = { BottomSheetDefaults.DragHandle(color = ACCENT.copy(0.5f)) }) {
         Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 32.dp)) {
             Text("Añadir plato al menú", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
@@ -579,7 +659,23 @@ private fun AñadirPlatoSheet(
             ExposedDropdownMenuBox(expanded = expandedCat, onExpandedChange = { expandedCat = it }) {
                 OutlinedTextField(value = categoriaNom, onValueChange = {}, readOnly = true, label = { Text("Categoría *") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCat) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
                 ExposedDropdownMenu(expanded = expandedCat, onDismissRequest = { expandedCat = false }, containerColor = Color(0xFF1E1A14)) {
-                    categorias.forEach { cat -> DropdownMenuItem(text = { Text(cat.nombre, color = Color.White) }, onClick = { categoriaId = cat.id; categoriaNom = cat.nombre; expandedCat = false }) }
+                    categoriasLocales.forEach { cat ->
+                        DropdownMenuItem(
+                            text = { Text(cat.nombre, color = Color.White) },
+                            onClick = { categoriaId = cat.id; categoriaNom = cat.nombre; expandedCat = false }
+                        )
+                    }
+                    HorizontalDivider(color = Color(0xFF3A2E1A))
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Add, null, tint = ACCENT, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text("Nueva categoría", color = ACCENT, fontWeight = FontWeight.Medium)
+                            }
+                        },
+                        onClick = { expandedCat = false; showNuevaCat = true }
+                    )
                 }
             }
             Spacer(Modifier.height(12.dp))

@@ -169,6 +169,14 @@ data class MenuResponse(
     val platos: List<PlatoDetalle> = emptyList()
 )
 
+data class CategoriaResponse(
+    val success: Boolean = false,
+    val id: Int = 0,
+    val nombre: String = "",
+    val orden: Int = 0,
+    val message: String = ""
+)
+
 data class PlatoDetalle(
     val id: Int = 0,
     @SerializedName("categoria_id")     val categoriaId: Int = 0,

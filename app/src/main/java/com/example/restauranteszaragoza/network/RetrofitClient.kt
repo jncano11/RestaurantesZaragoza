@@ -91,7 +91,10 @@ interface ApiService {
     suspend fun listarMenu(@Query("restaurante_id") restauranteId: Int): MenuResponse
 
     @GET("menu/listar_categorias.php")
-    suspend fun listarCategorias(): List<MenuCategoria>
+    suspend fun listarCategorias(@Query("restaurante_id") restauranteId: Int): List<MenuCategoria>
+
+    @POST("menu/crear_categoria.php")
+    suspend fun crearCategoria(@Body body: Map<String, String>): CategoriaResponse
 
     @POST("menu/crear_plato.php")
     suspend fun crearPlato(@Body body: Map<String, String>): ApiResponse
