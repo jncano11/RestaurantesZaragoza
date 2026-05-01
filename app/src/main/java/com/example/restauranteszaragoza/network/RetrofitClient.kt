@@ -2,6 +2,11 @@ package com.example.restauranteszaragoza.network
 
 import com.example.restauranteszaragoza.model.*
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -87,8 +92,8 @@ interface ApiService {
     suspend fun perfilStats(@Query("usuario_id") usuarioId: Int): PerfilStats
 
     // ── Menú ──
-    @GET("menu/listar.php")
-    suspend fun listarMenu(@Query("restaurante_id") restauranteId: Int): MenuResponse
+    @GET("menu/platos.php")
+    suspend fun listarMenu(@Query("restaurante_id") restauranteId: Int): List<PlatoDetalle>
 
     @GET("menu/listar_categorias.php")
     suspend fun listarCategorias(@Query("restaurante_id") restauranteId: Int): List<MenuCategoria>
@@ -96,10 +101,10 @@ interface ApiService {
     @POST("menu/crear_categoria.php")
     suspend fun crearCategoria(@Body body: Map<String, String>): CategoriaResponse
 
-    @POST("menu/crear_plato.php")
+    @POST("menu/plato_crear.php")
     suspend fun crearPlato(@Body body: Map<String, String>): ApiResponse
 
-    @POST("menu/eliminar_plato.php")
+    @POST("menu/plato_eliminar.php")
     suspend fun eliminarPlato(@Body body: Map<String, String>): ApiResponse
 
     @POST("restaurantes/crear.php")
@@ -157,6 +162,18 @@ interface ApiService {
     suspend fun eliminarUsuario(@Body body: Map<String, String>): ApiResponse
 }
 
+// Acepta 0/1 además de true/false para campos Boolean de MySQL
+private val booleanAdapter = object : TypeAdapter<Boolean>() {
+    override fun write(out: JsonWriter, value: Boolean?) { out.value(value) }
+    override fun read(reader: JsonReader): Boolean {
+        return when (reader.peek()) {
+            JsonToken.BOOLEAN -> reader.nextBoolean()
+            JsonToken.NUMBER  -> reader.nextInt() != 0
+            else              -> { reader.skipValue(); false }
+        }
+    }
+}
+
 // ─── CLIENTE RETROFIT ─────────────────────────────────────────────────────────
 object RetrofitClient {
     val instancia: ApiService by lazy {
@@ -169,10 +186,15 @@ object RetrofitClient {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
 
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Boolean::class.java, booleanAdapter)
+            .registerTypeAdapter(Boolean::class.javaPrimitiveType, booleanAdapter)
+            .create()
+
         Retrofit.Builder()
             .baseUrl(Api.BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService::class.java)
     }

@@ -77,10 +77,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
 
             // El resto de llamadas fallan en silencio — no afectan al estado del restaurante
             try { reservas = RetrofitClient.instancia.reservasPorRestaurante(r.id) } catch (_: Exception) {}
-            try {
-                val menuResp = RetrofitClient.instancia.listarMenu(r.id)
-                platos = menuResp.platos
-            } catch (_: Exception) {}
+            try { platos = RetrofitClient.instancia.listarMenu(r.id) } catch (_: Exception) {}
             try { categorias = RetrofitClient.instancia.listarCategorias(r.id) } catch (_: Exception) {}
 
             loading = false
@@ -278,8 +275,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                                                 "plato_id"       to platoId.toString(),
                                                 "restaurante_id" to (miRestaurante?.id ?: 0).toString()
                                             ))
-                                            val menuResp = RetrofitClient.instancia.listarMenu(miRestaurante?.id ?: 0)
-                                            platos = menuResp.platos
+                                            platos = RetrofitClient.instancia.listarMenu(miRestaurante?.id ?: 0)
                                             snackMsg = "🗑️ Plato eliminado"
                                         } catch (_: Exception) { snackMsg = "❌ Error al eliminar" }
                                     }
@@ -287,8 +283,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                                 onPlatoCreado = {
                                     scope.launch {
                                         val rid = miRestaurante?.id ?: 0
-                                        val menuResp = RetrofitClient.instancia.listarMenu(rid)
-                                        platos = menuResp.platos
+                                        platos = RetrofitClient.instancia.listarMenu(rid)
                                         try { categorias = RetrofitClient.instancia.listarCategorias(rid) } catch (_: Exception) {}
                                         snackMsg = "✅ Plato añadido al menú"
                                     }

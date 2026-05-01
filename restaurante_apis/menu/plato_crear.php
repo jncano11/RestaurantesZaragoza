@@ -21,6 +21,7 @@ if (!$nombre || !$restaurante_id || !$categoria_id) {
     echo json_encode(['success' => false, 'message' => 'Faltan campos']); exit;
 }
 
+$pdo  = getDB();
 $stmt = $pdo->prepare("INSERT INTO menu_platos (categoria_id, restaurante_id, nombre, descripcion, precio, alergenos) VALUES (?, ?, ?, ?, ?, ?)");
 $ok   = $stmt->execute([$categoria_id, $restaurante_id, $nombre, $descripcion, $precio, $alergenos]);
 echo json_encode(['success' => $ok]);

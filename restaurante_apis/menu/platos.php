@@ -11,6 +11,7 @@ require_once '../config/db.php';
 $restaurante_id = intval($_GET['restaurante_id'] ?? 0);
 if (!$restaurante_id) { echo json_encode([]); exit; }
 
+$pdo  = getDB();
 $stmt = $pdo->prepare("
     SELECT p.*, COALESCE(mc.nombre,'Otros') AS categoria_nombre
     FROM menu_platos p

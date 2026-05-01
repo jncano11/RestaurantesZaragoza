@@ -12,6 +12,7 @@ $data     = json_decode(file_get_contents("php://input"), true);
 $plato_id = intval($data['plato_id'] ?? 0);
 if (!$plato_id) { echo json_encode(['success'=>false]); exit; }
 
+$pdo  = getDB();
 $stmt = $pdo->prepare("DELETE FROM menu_platos WHERE id=?");
-$ok = $stmt->execute([$plato_id]);
-echo json_encode(['success'=>$ok]);
+$ok   = $stmt->execute([$plato_id]);
+echo json_encode(['success' => $ok]);
