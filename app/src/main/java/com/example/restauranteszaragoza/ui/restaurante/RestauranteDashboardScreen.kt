@@ -239,7 +239,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                         }
 
                         val pendientes  = reservas.count { it.estado == "pendiente" }
-                        val confirmadas = reservas.count { it.estado == "confirmada" }
+                        val confirmadas = reservas.count { it.estado == "confirmada" || it.estado == "esperando_usuario" }
                         val hoy         = reservas.count { it.fecha == java.time.LocalDate.now().toString() }
 
                         Row(
@@ -739,10 +739,11 @@ private fun StatCard(label: String, value: String, icon: androidx.compose.ui.gra
 @Composable
 private fun ReservaRestauranteCard(reserva: Reserva, onConfirmar: () -> Unit, onCancelar: () -> Unit) {
     val (statusColor, statusIcon) = when (reserva.estado) {
-        "confirmada" -> Color(0xFF43A047) to Icons.Default.CheckCircle
-        "cancelada"  -> Color(0xFFE53935) to Icons.Default.Cancel
-        "completada" -> Color(0xFF1E88E5) to Icons.Default.TaskAlt
-        else         -> Color(0xFFFFA726) to Icons.Default.HourglassTop
+        "confirmada"        -> Color(0xFF43A047) to Icons.Default.CheckCircle
+        "cancelada"         -> Color(0xFFE53935) to Icons.Default.Cancel
+        "completada"        -> Color(0xFF1E88E5) to Icons.Default.TaskAlt
+        "esperando_usuario" -> Color(0xFF29B6F6) to Icons.Default.MarkEmailUnread
+        else                -> Color(0xFFFFA726) to Icons.Default.HourglassTop
     }
     Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG)) {
         Column(Modifier.padding(16.dp)) {
@@ -754,7 +755,14 @@ private fun ReservaRestauranteCard(reserva: Reserva, onConfirmar: () -> Unit, on
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(reserva.nombreUsuario.ifBlank { "Cliente #${reserva.usuarioId}" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        Text(reserva.estado.replaceFirstChar { it.uppercase() }, color = statusColor, fontSize = 12.sp)
+                        val etiqueta = when (reserva.estado) {
+                            "esperando_usuario" -> "Esperando usuario"
+                            "confirmada"        -> "Confirmada"
+                            "cancelada"         -> "Cancelada"
+                            "completada"        -> "Completada"
+                            else                -> "Pendiente"
+                        }
+                        Text(etiqueta, color = statusColor, fontSize = 12.sp)
                     }
                 }
                 Column(horizontalAlignment = Alignment.End) {

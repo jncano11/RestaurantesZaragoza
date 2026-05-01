@@ -298,10 +298,11 @@ private fun EstadoRow(label: String, count: Int, color: Color, icon: ImageVector
 @Composable
 private fun UltimaReservaCard(reserva: Reserva) {
     val (color, icon) = when (reserva.estado) {
-        "confirmada" -> Color(0xFF43A047) to Icons.Default.CheckCircle
-        "cancelada"  -> Color(0xFFEF5350) to Icons.Default.Cancel
-        "completada" -> Color(0xFF1E88E5) to Icons.Default.TaskAlt
-        else         -> Color(0xFFFFA726) to Icons.Default.HourglassTop
+        "confirmada"        -> Color(0xFF43A047) to Icons.Default.CheckCircle
+        "cancelada"         -> Color(0xFFEF5350) to Icons.Default.Cancel
+        "completada"        -> Color(0xFF1E88E5) to Icons.Default.TaskAlt
+        "esperando_usuario" -> Color(0xFF29B6F6) to Icons.Default.MarkEmailUnread
+        else                -> Color(0xFFFFA726) to Icons.Default.HourglassTop
     }
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG), modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -313,7 +314,14 @@ private fun UltimaReservaCard(reserva: Reserva) {
                 Text(reserva.nombreRestaurante, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text("${reserva.fecha} · ${reserva.hora} · ${reserva.numPersonas} pax", color = Color.Gray, fontSize = 12.sp)
             }
-            Text(reserva.estado.replaceFirstChar { it.uppercase() }, color = color, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            val etiqueta = when (reserva.estado) {
+                "esperando_usuario" -> "Confirmar asistencia"
+                "confirmada"        -> "Confirmada"
+                "cancelada"         -> "Cancelada"
+                "completada"        -> "Completada"
+                else                -> "Pendiente"
+            }
+            Text(etiqueta, color = color, fontSize = 12.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
