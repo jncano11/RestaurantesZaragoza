@@ -124,6 +124,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                     onRefresh = { isRefreshing = true; cargarDatos() },
                     modifier = Modifier.weight(1f)
                 ) {
+                Column(Modifier.fillMaxSize()) {
                 when {
                     loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -350,6 +351,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                         }
                     }
                 }
+                } // Column
                 } // PullToRefreshBox
             }
         }
