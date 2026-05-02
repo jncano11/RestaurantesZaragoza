@@ -6,6 +6,7 @@
 // ============================================================
 ini_set('display_errors', '0');
 error_reporting(0);
+header('Content-Type: text/html; charset=UTF-8');
 
 try {
     require_once '../config/db.php';
@@ -38,7 +39,7 @@ $pdo = getDB();
 $stmt = $pdo->prepare("
     SELECT res.id, res.estado, res.fecha, res.hora, res.num_personas, res.notas,
            r.nombre AS rNombre, r.direccion AS rDir, r.email_contacto AS rEmail,
-           CONCAT(u.nombre, ' ', u.apellidos) AS uNombre
+           CONCAT(u.nombre, ' ', COALESCE(u.apellidos,'')) AS uNombre
     FROM reservas res
     JOIN restaurantes r ON r.id = res.restaurante_id
     JOIN usuarios     u ON u.id = res.usuario_id
@@ -71,7 +72,7 @@ if (!empty($reserva['rEmail'])) {
         <h1 style='color:#fff;margin:0;font-size:20px'>⚠️ Reserva cancelada por el usuario</h1>
       </div>
       <div style='padding:20px'>
-        <p><strong>" . htmlspecialchars($reserva['uNombre']) . "</strong> ha rechazado la reserva:</p>
+        <p><strong>" . htmlspecialchars((string)$reserva['uNombre']) . "</strong> ha rechazado la reserva:</p>
         <table style='width:100%;border-collapse:collapse'>
           <tr style='background:#fff3e0'><td style='padding:8px;font-weight:bold;color:#e65100'>📅 Fecha</td><td style='padding:8px'>{$fechaF}</td></tr>
           <tr><td style='padding:8px;font-weight:bold;color:#e65100'>🕐 Hora</td><td style='padding:8px'>{$horaF}</td></tr>

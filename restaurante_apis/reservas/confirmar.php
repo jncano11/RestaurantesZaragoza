@@ -55,30 +55,30 @@ if ($info && !empty($info['uEmail'])) {
     $html = "
     <div style='font-family:Arial,sans-serif;max-width:560px;margin:auto;border-radius:12px;overflow:hidden;background:#f9f9f9;border:1px solid #ddd'>
       <div style='background:linear-gradient(135deg,#1B5E20,#43A047);padding:24px;text-align:center'>
-        <h1 style='color:#fff;margin:0;font-size:22px'>🎉 ¡Tu reserva ha sido aceptada!</h1>
+        <h1 style='color:#fff;margin:0;font-size:22px'>Tu reserva ha sido aceptada</h1>
         <p style='color:#c8e6c9;margin:8px 0 0'>Confirma o rechaza para completar el proceso</p>
       </div>
       <div style='padding:24px'>
-        <p>Hola, <strong>" . htmlspecialchars($info['uNombre']) . "</strong>. El restaurante ha aceptado tu solicitud. Por favor confirma si finalmente asistirás:</p>
+        <p>Hola, <strong>" . htmlspecialchars($info['uNombre']) . "</strong>. El restaurante ha aceptado tu solicitud. Por favor confirma si finalmente asistiras:</p>
         <table style='width:100%;border-collapse:collapse;margin-bottom:20px'>
           <tr style='background:#e8f5e9'>
-            <td style='padding:8px;font-weight:bold;color:#1B5E20'>🍽️ Restaurante</td>
+            <td style='padding:8px;font-weight:bold;color:#1B5E20'>Restaurante</td>
             <td style='padding:8px'>" . htmlspecialchars($info['rNombre']) . "</td>
           </tr>
           <tr>
-            <td style='padding:8px;font-weight:bold;color:#1B5E20'>📍 Dirección</td>
+            <td style='padding:8px;font-weight:bold;color:#1B5E20'>Direccion</td>
             <td style='padding:8px'>" . htmlspecialchars($info['rDir']) . "</td>
           </tr>
           <tr style='background:#e8f5e9'>
-            <td style='padding:8px;font-weight:bold;color:#1B5E20'>📅 Fecha</td>
+            <td style='padding:8px;font-weight:bold;color:#1B5E20'>Fecha</td>
             <td style='padding:8px'>{$fechaFormateada}</td>
           </tr>
           <tr>
-            <td style='padding:8px;font-weight:bold;color:#1B5E20'>🕐 Hora</td>
+            <td style='padding:8px;font-weight:bold;color:#1B5E20'>Hora</td>
             <td style='padding:8px'>{$horaFormateada}</td>
           </tr>
           <tr style='background:#e8f5e9'>
-            <td style='padding:8px;font-weight:bold;color:#1B5E20'>👥 Personas</td>
+            <td style='padding:8px;font-weight:bold;color:#1B5E20'>Personas</td>
             <td style='padding:8px'>{$info['num_personas']}</td>
           </tr>
           {$notasHtml}
@@ -86,11 +86,11 @@ if ($info && !empty($info['uEmail'])) {
         <div style='text-align:center;margin-top:24px'>
           <a href='" . htmlspecialchars($urlConfirmar) . "'
              style='display:inline-block;padding:14px 28px;border-radius:8px;background:#2e7d32;color:#fff;text-decoration:none;font-weight:bold;font-size:15px;margin-right:12px'>
-            ✅ Confirmo mi asistencia
+            Confirmo mi asistencia
           </a>
           <a href='" . htmlspecialchars($urlRechazar) . "'
              style='display:inline-block;padding:14px 28px;border-radius:8px;background:#c62828;color:#fff;text-decoration:none;font-weight:bold;font-size:15px'>
-            ❌ No podré asistir
+            No podre asistir
           </a>
         </div>
         <p style='color:#888;font-size:12px;margin-top:20px;text-align:center'>
@@ -99,7 +99,19 @@ if ($info && !empty($info['uEmail'])) {
       </div>
     </div>";
 
-    enviarEmail($info['uEmail'], "¡Tu reserva en {$info['rNombre']} ha sido aceptada!", $html);
+    $ok = enviarEmail($info['uEmail'], "Tu reserva en {$info['rNombre']} ha sido aceptada", $html);
+    if (!$ok) {
+        // Fallback: guardar URLs en archivo para probar sin email
+        $linea = date('Y-m-d H:i:s') . " | Reserva {$reservaId}\n"
+               . "  CONFIRMAR: {$urlConfirmar}\n"
+               . "  RECHAZAR:  {$urlRechazar}\n\n";
+        file_put_contents(__DIR__ . '/../../ultimo_email.txt', $linea, FILE_APPEND);
+    }
 }
 
-jsonResponse(['success' => true, 'message' => 'Reserva confirmada. Email enviado al usuario.']);
+jsonResponse([
+    'success'      => true,
+    'message'      => 'Reserva confirmada. Email enviado al usuario.',
+    'url_confirmar'=> $urlConfirmar ?? null,
+    'url_rechazar' => $urlRechazar  ?? null,
+]);

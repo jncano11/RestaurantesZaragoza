@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Brush
@@ -45,10 +46,11 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     var miRestaurante by remember { mutableStateOf<Restaurante?>(null) }
     var platos        by remember { mutableStateOf<List<PlatoDetalle>>(emptyList()) }
     var categorias    by remember { mutableStateOf<List<MenuCategoria>>(emptyList()) }
-    var loading       by remember { mutableStateOf(true) }
+    var loading        by remember { mutableStateOf(true) }
+    var isRefreshing   by remember { mutableStateOf(false) }
     // null = aún no sabemos, true = no tiene restaurante, false = tiene restaurante
     var sinRestaurante by remember { mutableStateOf<Boolean?>(null) }
-    var errorMsg      by remember { mutableStateOf<String?>(null) }
+    var errorMsg       by remember { mutableStateOf<String?>(null) }
     var tabIndex      by remember { mutableStateOf(0) }
     var snackMsg      by remember { mutableStateOf<String?>(null) }
     val snackState    = remember { SnackbarHostState() }
@@ -81,6 +83,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
             try { categorias = RetrofitClient.instancia.listarCategorias(r.id) } catch (_: Exception) {}
 
             loading = false
+            isRefreshing = false
         }
     }
 
@@ -116,6 +119,11 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                     }
                 }
 
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = { isRefreshing = true; cargarDatos() },
+                    modifier = Modifier.weight(1f)
+                ) {
                 when {
                     loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -342,6 +350,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                         }
                     }
                 }
+                } // PullToRefreshBox
             }
         }
     }

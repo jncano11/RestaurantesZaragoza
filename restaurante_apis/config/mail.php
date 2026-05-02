@@ -23,8 +23,12 @@ if (file_exists($autoloadPath)) {
 
 // Cargar .env desde la raíz del proyecto
 if ($MAIL_DISPONIBLE && class_exists(\Dotenv\Dotenv::class)) {
-    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-    $dotenv->safeLoad();
+    try {
+        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+        $dotenv->safeLoad();
+    } catch (\Throwable $e) {
+        error_log('dotenv parse error: ' . $e->getMessage());
+    }
 }
 
 define('MAIL_HOST',      $_ENV['MAIL_HOST']       ?? 'sandbox.smtp.mailtrap.io');

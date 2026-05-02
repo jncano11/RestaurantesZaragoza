@@ -5,6 +5,7 @@
 // ============================================================
 ini_set('display_errors', '0');
 error_reporting(0);
+header('Content-Type: text/html; charset=UTF-8');
 
 require_once '../config/db.php';
 require_once '../config/tokens.php';

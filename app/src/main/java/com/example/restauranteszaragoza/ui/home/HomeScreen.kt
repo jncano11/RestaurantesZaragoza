@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
@@ -63,6 +64,7 @@ fun HomeScreen(
     var restaurantes          by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
     var misReservas           by remember { mutableStateOf<List<Reserva>>(emptyList()) }
     var loading               by remember { mutableStateOf(true) }
+    var isRefreshing          by remember { mutableStateOf(false) }
     var searchQuery           by remember { mutableStateOf("") }
     var categoriaSeleccionada by remember { mutableStateOf("Todas") }
     var tabSeleccionado       by remember { mutableStateOf(0) }
@@ -87,7 +89,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    fun cargarDatos() {
         scope.launch {
             try {
                 restaurantes = RetrofitClient.instancia.listarRestaurantes()
@@ -96,9 +98,12 @@ fun HomeScreen(
                 android.util.Log.e("HomeScreen", "Error cargando datos", e)
             } finally {
                 loading = false
+                isRefreshing = false
             }
         }
     }
+
+    LaunchedEffect(Unit) { cargarDatos() }
 
     // ── Filtrado + ordenación ─────────────────────────────────────────────────
     val restaurantesFiltrados = restaurantes
@@ -179,6 +184,11 @@ fun HomeScreen(
                 }
             }
 
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { isRefreshing = true; cargarDatos() },
+                modifier = Modifier.weight(1f)
+            ) {
             when (tabSeleccionado) {
                 // ─────────────── TAB RESTAURANTES ────────────────────────────
                 0 -> {
@@ -423,6 +433,7 @@ fun HomeScreen(
                     )
                 }
             }
+            } // PullToRefreshBox
         }
     }
 }
