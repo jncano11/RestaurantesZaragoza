@@ -82,28 +82,49 @@ Esto instala PHPMailer y phpdotenv en la carpeta `vendor/`.
 
 ---
 
-## 5. Crear el archivo .env
+## 5. Configurar ngrok
+
+Los emails de confirmación contienen links que Mailtrap pasa por sus servidores para rastrear clics. Si la URL apunta a una IP local, los botones del email no funcionan. Ngrok expone el servidor local con una URL pública.
+
+1. Crea una cuenta gratuita en https://ngrok.com e instala el ejecutable
+2. Autentica ngrok con tu token (solo la primera vez):
+   ```bash
+   ngrok config add-authtoken TU_TOKEN
+   ```
+3. Antes de cada sesión de desarrollo, lanza:
+   ```bash
+   ngrok http 80
+   ```
+4. Ngrok mostrará una URL tipo `https://xxxx.ngrok-free.app` — cópiala para el paso siguiente
+
+> La URL cambia cada vez que reinicias ngrok (plan gratuito). Actualiza `APP_BASE_URL` en `.env` en cada sesión.
+
+---
+
+## 6. Crear el archivo .env
 
 Crea un archivo `.env` en la raíz del proyecto con este contenido:
 
 ```env
-MAIL_HOST=sandbox.smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USER=tu_usuario_mailtrap
-MAIL_PASS=tu_contrasena_mailtrap
-MAIL_FROM=no-reply@restauranteszaragoza.test
+MAIL_HOST=live.smtp.mailtrap.io
+MAIL_PORT=587
+MAIL_USER=api
+MAIL_PASS=tu_token_de_mailtrap_email_sending
+MAIL_FROM=hello@demomailtrap.co
 MAIL_FROM_NAME="R-eats Zaragoza"
 
-APP_BASE_URL=http://TU_IP_LAN/restaurantes_api
+APP_BASE_URL=https://xxxx.ngrok-free.app/restaurantes_api
 ```
 
-**MAIL_USER y MAIL_PASS:** créate una cuenta gratuita en https://mailtrap.io → Inboxes → copia las credenciales SMTP del inbox que te creen por defecto.
+**MAIL_PASS:** en Mailtrap → Email Sending → SMTP credentials → copia el token (el usuario siempre es `api`).
 
-**APP_BASE_URL:** pon la IP local de tu PC (no `localhost`). Para saber tu IP ejecuta `ipconfig` en Windows y busca la IPv4 de tu adaptador WiFi. Ejemplo: `http://192.168.1.50/restaurantes_api`
+**MAIL_FROM:** usa el dominio demo que Mailtrap asignó a tu cuenta (visible en Email Sending → Sending Domains). El de este proyecto es `hello@demomailtrap.co`.
+
+**APP_BASE_URL:** la URL pública de ngrok del paso anterior, con `/restaurantes_api` al final y sin barra final.
 
 ---
 
-## 6. Configurar la app Android
+## 7. Configurar la app Android
 
 Abre el archivo:
 ```
@@ -121,7 +142,7 @@ const val BASE_URL = "http://192.168.1.XX/restaurantes_api/"   // Tu IP
 
 ---
 
-## 7. Ejecutar la app
+## 8. Ejecutar la app
 
 ### En emulador
 
@@ -146,7 +167,7 @@ Esto instala en todos los dispositivos conectados simultáneamente.
 
 ---
 
-## 8. Crear usuario administrador
+## 9. Crear usuario administrador
 
 La base de datos importada puede no tener usuarios. Crea uno desde phpMyAdmin ejecutando esta query en la tabla `usuarios`:
 
@@ -166,9 +187,10 @@ La contraseña es `password`. Cámbiala desde la app después del primer login.
 2. Importar SQL en phpMyAdmin
 3. Añadir Alias en httpd.conf y reiniciar Apache
 4. composer install
-5. Crear .env con credenciales Mailtrap y tu IP
-6. Cambiar IP en RetrofitClient.kt
-7. Run desde Android Studio
+5. Instalar ngrok y lanzar: ngrok http 80
+6. Crear .env con credenciales Mailtrap Email Sending y URL de ngrok
+7. Cambiar IP en RetrofitClient.kt
+8. Run desde Android Studio
 ```
 
 ---
@@ -179,6 +201,8 @@ La contraseña es `password`. Cámbiala desde la app después del primer login.
 
 **"No se pudo cargar"** → La IP en `RetrofitClient.kt` no es la correcta o Apache no está corriendo.
 
-**El email no llega** → Revisa las credenciales SMTP en `.env` y que `APP_BASE_URL` usa tu IP de LAN (no `localhost`).
+**El email no llega** → Revisa las credenciales en `.env` (MAIL_USER=`api`, MAIL_PASS=token de Email Sending) y que MAIL_FROM usa el dominio demo de tu cuenta Mailtrap.
+
+**Los botones del email no funcionan** → Ngrok no está corriendo o la URL de `APP_BASE_URL` en `.env` está desactualizada. Lanza `ngrok http 80` y actualiza la URL.
 
 **404 en la API** → El `Alias` de Apache no está bien configurado o Apache no se reinició después de editarlo.

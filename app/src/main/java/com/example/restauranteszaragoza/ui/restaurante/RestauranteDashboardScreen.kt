@@ -90,6 +90,27 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     LaunchedEffect(Unit) { cargarDatos() }
     LaunchedEffect(snackMsg) { snackMsg?.let { snackState.showSnackbar(it); snackMsg = null } }
 
+    // Polling silencioso: refresca reservas cada 30s para detectar confirmaciones del usuario
+    LaunchedEffect(miRestaurante?.id) {
+        val restauranteId = miRestaurante?.id ?: return@LaunchedEffect
+        while (true) {
+            kotlinx.coroutines.delay(30_000)
+            if (!loading && !isRefreshing) {
+                try {
+                    val actualizadas = RetrofitClient.instancia.reservasPorRestaurante(restauranteId)
+                    val nuevasConfirmadas = actualizadas.filter { nueva ->
+                        nueva.estado == "confirmada" &&
+                        reservas.any { it.id == nueva.id && it.estado == "esperando_usuario" }
+                    }
+                    reservas = actualizadas
+                    if (nuevasConfirmadas.isNotEmpty()) {
+                        snackMsg = "Reserva confirmada por el usuario"
+                    }
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackState) },
         containerColor = Color(0xFF1A0A00)
@@ -97,7 +118,6 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
         Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(BG_COLORS)).padding(padding)) {
             Column(Modifier.fillMaxSize()) {
 
-                // ── Header siempre visible ────────────────────────────────────
                 Box(
                     modifier = Modifier.fillMaxWidth()
                         .background(Brush.horizontalGradient(listOf(Color(0xFF7B3F00), Color(0xFFBF360C))))
@@ -134,7 +154,6 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                         }
                     }
 
-                    // ── BUG FIX: pantalla de creación de restaurante ──────────
                     sinRestaurante == true -> {
                         CrearRestauranteScreen(
                             onCreado = {
@@ -159,7 +178,6 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                     }
 
                     else -> {
-                        // ── Tarjeta info restaurante ──────────────────────────
                         miRestaurante?.let { rest ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
@@ -181,7 +199,6 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                             }
                         }
 
-                        // ── Banner estado aprobación ──────────────────────────
                         miRestaurante?.let { rest ->
                             when {
                                 rest.aprobado == 1 -> { /* aprobado: no mostrar nada */ }
@@ -358,9 +375,6 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Pantalla de creación de restaurante (BUG FIX)
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun CrearRestauranteScreen(onCreado: () -> Unit) {
     val scope       = rememberCoroutineScope()
@@ -463,9 +477,6 @@ private fun CrearRestauranteScreen(onCreado: () -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tab Menú, platos y resto de composables (sin cambios)
-// ─────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MenuTab(
