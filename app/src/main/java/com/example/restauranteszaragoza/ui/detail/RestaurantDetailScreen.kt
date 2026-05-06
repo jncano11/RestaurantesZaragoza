@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.restauranteszaragoza.R
 import com.example.restauranteszaragoza.model.Horario
-import com.example.restauranteszaragoza.model.PlatoMenu
+import com.example.restauranteszaragoza.model.PlatoDetalle
 import com.example.restauranteszaragoza.model.Restaurante
 import com.example.restauranteszaragoza.model.Valoracion
 import com.example.restauranteszaragoza.network.RetrofitClient
@@ -50,6 +50,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 
     var restauranteDetalle   by remember { mutableStateOf<Restaurante?>(null) }
     var valoraciones         by remember { mutableStateOf<List<Valoracion>>(emptyList()) }
+    var menuPlatos           by remember { mutableStateOf<List<PlatoDetalle>>(emptyList()) }
     var showReservaSheet     by remember { mutableStateOf(false) }
     var showValoracionDialog by remember { mutableStateOf(false) }
     var snackMsg             by remember { mutableStateOf<String?>(null) }
@@ -70,6 +71,12 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
             valoraciones = RetrofitClient.instancia.valoracionesRestaurante(restaurante.id)
         } catch (e: Exception) {
             android.util.Log.e("DetailScreen", "Error valoraciones: ${e.message}")
+        }
+        // Cargar menú del restaurante
+        try {
+            menuPlatos = RetrofitClient.instancia.listarMenu(restaurante.id)
+        } catch (e: Exception) {
+            android.util.Log.e("DetailScreen", "Error menú: ${e.message}")
         }
     }
 
@@ -198,7 +205,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 }
 
                 // ── Horarios ──────────────────────────────────────────────────
-                val horarios = rest.horarios  // rest = restauranteDetalle ?: restaurante
+                val horarios = rest.horarios
                 if (horarios.isNotEmpty()) {
                     Text("Horarios", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(10.dp))
@@ -208,16 +215,38 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            horarios.forEachIndexed { i, horario ->
-                                Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), Arrangement.SpaceBetween) {
-                                    Text(horario.nombreDia, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                                    if (horario.cerrado) {
+                            val horariosPorDia = horarios.groupBy { it.diaSemana }.entries.sortedBy { it.key }
+                            horariosPorDia.forEachIndexed { i, (_, turnos) ->
+                                val cerrado = turnos.all { it.cerrado }
+                                Row(
+                                    Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                                    Arrangement.SpaceBetween,
+                                    Alignment.Top
+                                ) {
+                                    Text(
+                                        turnos.first().nombreDia,
+                                        color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (cerrado) {
                                         Text("Cerrado", color = Color(0xFFEF5350), fontSize = 14.sp)
                                     } else {
-                                        Text("${horario.horaApertura} – ${horario.horaCierre}", color = ACCENT, fontSize = 14.sp)
+                                        Column(horizontalAlignment = Alignment.End) {
+                                            turnos.filter { !it.cerrado }.forEach { turno ->
+                                                val label = if (turno.horaApertura.substringBefore(":").toIntOrNull() ?: 0 < 15)
+                                                    "Mediodía" else "Noche"
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text("$label  ", color = Color.Gray, fontSize = 11.sp)
+                                                    Text(
+                                                        "${turno.horaApertura.take(5)} – ${turno.horaCierre.take(5)}",
+                                                        color = ACCENT, fontSize = 13.sp
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                                if (i < horarios.lastIndex) {
+                                if (i < horariosPorDia.lastIndex) {
                                     HorizontalDivider(color = Color(0xFF2E3A45), thickness = 0.5.dp)
                                 }
                             }
@@ -227,12 +256,10 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 }
 
                 // ── MENÚ ──────────────────────────────────────────────────────
-                val menu = rest.menu  // rest = restauranteDetalle ?: restaurante
-                if (menu.isNotEmpty()) {
-                    Text("Menú", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Spacer(Modifier.height(10.dp))
-
-                    val menuPorCategoria = menu.groupBy { it.categoriaNombre }
+                Text("Menú", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(Modifier.height(10.dp))
+                if (menuPlatos.isNotEmpty()) {
+                    val menuPorCategoria = menuPlatos.groupBy { it.categoriaNombre }
                     menuPorCategoria.forEach { (categoria, platos) ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -252,7 +279,6 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                             }
                             HorizontalDivider(modifier = Modifier.weight(1f), color = ACCENT.copy(0.3f))
                         }
-
                         platos.forEach { plato ->
                             PlatoCard(plato)
                             Spacer(Modifier.height(8.dp))
@@ -260,7 +286,6 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                         Spacer(Modifier.height(12.dp))
                     }
                 } else if (restauranteDetalle != null) {
-                    // El detalle cargó pero no hay menú configurado
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = CARD_BG),
@@ -275,8 +300,8 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                             Text("Menú no disponible aún", color = Color.Gray, fontSize = 14.sp)
                         }
                     }
-                    Spacer(Modifier.height(20.dp))
                 }
+                Spacer(Modifier.height(20.dp))
 
                 // ── Galería ───────────────────────────────────────────────────
                 Text("Galería", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -382,7 +407,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 // Card de plato del menú
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
-private fun PlatoCard(plato: PlatoMenu) {
+private fun PlatoCard(plato: PlatoDetalle) {
     Card(
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF111E28)),
@@ -436,21 +461,24 @@ private fun ReservaBottomSheet(
     // Generar horas disponibles a partir de los horarios del restaurante para el día seleccionado
     val horasDisponibles: List<String> = remember(fechaSeleccionada, horarios) {
         if (fechaSeleccionada == null) return@remember emptyList()
-        val diaSemana = fechaSeleccionada!!.dayOfWeek.value // 1=Lunes … 7=Domingo
-        val horarioDia = horarios.find { it.diaSemana == diaSemana }
-        if (horarioDia == null || horarioDia.cerrado) return@remember emptyList()
+        // DayOfWeek.value: 1=Lunes…7=Domingo → BD usa 0=Lunes…6=Domingo
+        val diaBd = fechaSeleccionada!!.dayOfWeek.value - 1
+        val turnosDelDia = horarios.filter { it.diaSemana == diaBd && !it.cerrado }
+        if (turnosDelDia.isEmpty()) return@remember emptyList()
 
-        // Generar slots cada 30 minutos entre apertura y cierre
         val slots = mutableListOf<String>()
-        try {
-            var h = horarioDia.horaApertura.split(":").let { it[0].toInt() * 60 + it[1].toInt() }
-            val hFin = horarioDia.horaCierre.split(":").let { it[0].toInt() * 60 + it[1].toInt() - 30 }
-            while (h <= hFin) {
-                slots.add("%02d:%02d".format(h / 60, h % 60))
-                h += 30
-            }
-        } catch (_: Exception) {}
-        slots
+        turnosDelDia.forEach { turno ->
+            try {
+                var h = turno.horaApertura.split(":").let { it[0].toInt() * 60 + it[1].toInt() }
+                val rawFin = turno.horaCierre.split(":").let { it[0].toInt() * 60 + it[1].toInt() }
+                val hFin = (if (rawFin == 0) 1440 else rawFin) - 30
+                while (h <= hFin) {
+                    slots.add("%02d:%02d".format(h / 60, h % 60))
+                    h += 30
+                }
+            } catch (_: Exception) {}
+        }
+        slots.sorted()
     }
 
     // Si no hay horarios configurados, generar horas genéricas 12:00–22:00
@@ -527,10 +555,9 @@ private fun ReservaBottomSheet(
                                     val fecha = mesActual.atDay(dia)
                                     val esPasado = fecha.isBefore(hoy)
                                     val esSeleccionado = fechaSeleccionada == fecha
-                                    // Verificar si ese día el restaurante abre
-                                    val diaSem = fecha.dayOfWeek.value
-                                    val horarioDia = horarios.find { it.diaSemana == diaSem }
-                                    val esCerrado = horarioDia?.cerrado == true
+                                    val diaBd = fecha.dayOfWeek.value - 1
+                                    val turnosDia = horarios.filter { it.diaSemana == diaBd }
+                                    val esCerrado = turnosDia.isNotEmpty() && turnosDia.all { it.cerrado }
 
                                     Box(
                                         modifier = Modifier

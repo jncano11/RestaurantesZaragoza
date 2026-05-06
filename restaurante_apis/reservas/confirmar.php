@@ -43,8 +43,8 @@ if ($info && !empty($info['uEmail'])) {
     $tokenC = generarTokenReserva($reservaId, 'confirmar');
     $tokenR = generarTokenReserva($reservaId, 'rechazar');
 
-    $urlConfirmar = APP_BASE_URL . "/reservas/confirmar_email.php?id={$reservaId}&token={$tokenC}";
-    $urlRechazar  = APP_BASE_URL . "/reservas/rechazar_email.php?id={$reservaId}&token={$tokenR}";
+    $urlConfirmar = APP_BASE_URL . "/reservas/confirmar_email.php?id={$reservaId}&token={$tokenC}&ngrok-skip-browser-warning=true";
+    $urlRechazar  = APP_BASE_URL . "/reservas/rechazar_email.php?id={$reservaId}&token={$tokenR}&ngrok-skip-browser-warning=true";
 
     $fechaFormateada = (new DateTime($info['fecha']))->format('d/m/Y');
     $horaFormateada  = (new DateTime($info['hora']))->format('H:i');

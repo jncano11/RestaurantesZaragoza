@@ -521,9 +521,9 @@ private fun RestauranteCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Tab de mis reservas (sin cambios)
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun MisReservasTab(reservas: List<Reserva>, onCancelar: (Int) -> Unit) {
     if (reservas.isEmpty()) {

@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit
 
 // ─── URLs DE LA API ───────────────────────────────────────────────────────────
 object Api {
-
-   // const val BASE_URL = "http://10.0.2.2/restaurantes_api/"        // Emulador
-    const val BASE_URL = "http://192.168.1.72/restaurantes_api/"  // Dispositivo físico
+  //  const val BASE_URL = "http://10.0.2.2/restaurantes_api/"        // Emulador
+//  const val BASE_URL = "http://192.168.1.72/restaurantes_api/"  // Dispositivo físico (antigua)
+const val BASE_URL = "https://lunacy-filled-educated.ngrok-free.dev/restaurantes_api/"  // ngrok
     // Usuarios
     const val LOGIN    = "${BASE_URL}usuarios/login.php"
     const val REGISTER = "${BASE_URL}usuarios/register.php"
@@ -176,7 +176,7 @@ private val booleanAdapter = object : TypeAdapter<Boolean>() {
     }
 }
 
-// ─── CLIENTE RETROFIT ─────────────────────────────────────────────────────────
+// CLIENTE RETROFIT
 object RetrofitClient {
     val instancia: ApiService by lazy {
         val logging = HttpLoggingInterceptor().apply {

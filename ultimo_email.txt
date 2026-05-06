@@ -1,0 +1,8 @@
+2026-05-04 18:44:09 | Reserva 64
+  CONFIRMAR: http://192.168.1.72/restaurantes_api/reservas/confirmar_email.php?id=64&token=c1d95369a45d1d5d62ee5d0d385b87c6b997a8cd8da000c3bb3a614b1ba15d46
+  RECHAZAR:  http://192.168.1.72/restaurantes_api/reservas/rechazar_email.php?id=64&token=72921e4d86f7f593d0982f0b2c34cf298e90d176bd2c46d825985fe1041a11d8
+
+2026-05-06 09:16:24 | Reserva 68
+  CONFIRMAR: https://lunacy-filled-educated.ngrok-free.dev/restaurantes_api/reservas/confirmar_email.php?id=68&token=ffc57c92c1bd5c04dcee6eb727e1dde2b0372230e64fa3eeef01153fd676117f
+  RECHAZAR:  https://lunacy-filled-educated.ngrok-free.dev/restaurantes_api/reservas/rechazar_email.php?id=68&token=3cc1d334919add48799f0982273ba43a258b941a47d91fc14180fe7055dc8460
+
