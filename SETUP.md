@@ -42,6 +42,8 @@ define('DB_USER', 'root');
 define('DB_PASS', 'tu_contraseña');
 ```
 
+> `db.php` está en `.gitignore` y **no se sube al repositorio**. Cada desarrollador tiene el suyo local. El servidor AWS tiene el suyo propio editado directamente en el servidor.
+
 ---
 
 ## 3. Configurar Apache para servir la API
@@ -206,3 +208,52 @@ La contraseña es `password`. Cámbiala desde la app después del primer login.
 **Los botones del email no funcionan** → Ngrok no está corriendo o la URL de `APP_BASE_URL` en `.env` está desactualizada. Lanza `ngrok http 80` y actualiza la URL.
 
 **404 en la API** → El `Alias` de Apache no está bien configurado o Apache no se reinició después de editarlo.
+
+---
+
+## Servidor AWS (producción)
+
+El proyecto tiene un servidor en AWS EC2 con la API ya desplegada y una base de datos MySQL propia.
+
+- **IP pública:** `13.48.57.113`
+- **API base URL:** `http://13.48.57.113/`
+- **Sin ngrok:** los emails funcionan directamente con esta IP
+
+### Conectar la app Android al servidor AWS
+
+En `app/src/main/java/com/example/restauranteszaragoza/network/RetrofitClient.kt`, activa la línea de AWS:
+
+```kotlin
+// const val BASE_URL = "http://10.0.2.2/restaurantes_api/"       // Emulador local
+// const val BASE_URL = "http://192.168.1.72/restaurantes_api/"   // XAMPP local
+const val BASE_URL = "http://13.48.57.113/"                        // AWS producción
+```
+
+### Acceder al servidor por SSH (PuTTY)
+
+1. Abre **PuTTY**
+2. Host: `13.48.57.113` · Puerto: `22`
+3. Ve a **Connection → SSH → Auth → Credentials** y carga el archivo `.ppk` (pedir a Samuel)
+4. Usuario: `ubuntu`
+
+### Subir archivos al servidor (WinSCP)
+
+1. Protocolo: **SFTP** · Host: `13.48.57.113` · Puerto: `22`
+2. Usuario: `ubuntu` · sin contraseña
+3. En **Avanzado → SSH → Autenticación** carga el `.ppk`
+4. Los archivos de la API están en `/var/www/restaurantes_api/`
+
+### Base de datos en el servidor
+
+- Usuario MySQL: `adminReats`
+- Base de datos: `restaurantes_zaragoza`
+- Acceso solo desde el propio servidor (no está expuesto externamente)
+
+Para ejecutar queries en el servidor:
+```bash
+mysql -u adminReats -p restaurantes_zaragoza
+```
+
+### Actualizar la API en el servidor
+
+Después de hacer cambios en `restaurante_apis/`, súbelos con WinSCP a `/var/www/restaurantes_api/`. Los cambios se aplican inmediatamente sin reiniciar nada.
