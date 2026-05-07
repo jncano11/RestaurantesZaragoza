@@ -1,8 +1,14 @@
 package com.example.restauranteszaragoza.ui.restaurante
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,13 +18,18 @@ import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.restauranteszaragoza.model.CategoriaResponse
+import com.example.restauranteszaragoza.model.FotoRestaurante
 import com.example.restauranteszaragoza.model.MenuCategoria
 import com.example.restauranteszaragoza.model.PlatoDetalle
 import com.example.restauranteszaragoza.model.Reserva
@@ -26,6 +37,9 @@ import com.example.restauranteszaragoza.model.Restaurante
 import com.example.restauranteszaragoza.network.RetrofitClient
 import com.example.restauranteszaragoza.network.SessionManager
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 
 private val ACCENT    = Color(0xFFFFA726)
@@ -277,19 +291,33 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                             StatCard("Hoy",         hoy.toString(),         Icons.Default.Today,        Color(0xFF1E88E5), Modifier.weight(1f))
                         }
 
-                        TabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT) {
-                            listOf("Todas", "Pendientes", "Hoy", "Menú").forEachIndexed { idx, label ->
+                        ScrollableTabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT, edgePadding = 0.dp) {
+                            listOf("Todas", "Pendientes", "Hoy", "Menú", "Fotos").forEachIndexed { idx, label ->
                                 Tab(selected = tabIndex == idx, onClick = { tabIndex = idx }) {
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
-                                        if (label == "Menú") Icon(Icons.Default.MenuBook, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray)
-                                        if (label == "Menú") Spacer(Modifier.width(4.dp))
+                                        when (label) {
+                                            "Menú"  -> { Icon(Icons.Default.MenuBook, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
+                                            "Fotos" -> { Icon(Icons.Default.PhotoLibrary, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
+                                            else    -> {}
+                                        }
                                         Text(label, color = if (tabIndex == idx) ACCENT else Color.Gray, fontSize = 13.sp)
+                                        if (label == "Pendientes" && pendientes > 0) {
+                                            Spacer(Modifier.width(4.dp))
+                                            Box(
+                                                Modifier.size(18.dp).background(Color(0xFFEF5350), CircleShape),
+                                                Alignment.Center
+                                            ) {
+                                                Text(pendientes.toString(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        if (tabIndex == 3) {
+                        if (tabIndex == 4) {
+                            FotosTab(restauranteId = miRestaurante?.id ?: 0)
+                        } else if (tabIndex == 3) {
                             MenuTab(
                                 restauranteId = miRestaurante?.id ?: 0,
                                 platos = platos,
@@ -370,6 +398,218 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                 }
                 } // Column
                 } // PullToRefreshBox
+            }
+        }
+    }
+}
+
+@Composable
+private fun FotosTab(restauranteId: Int) {
+    val scope   = rememberCoroutineScope()
+    val context = LocalContext.current
+    var fotos    by remember { mutableStateOf<List<FotoRestaurante>>(emptyList()) }
+    var cargando by remember { mutableStateOf(true) }
+    var subiendo by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
+    val maxFotos = 6
+
+    fun cargarFotos() {
+        scope.launch {
+            cargando = true
+            try { fotos = RetrofitClient.instancia.listarFotos(restauranteId).fotos }
+            catch (_: Exception) {}
+            cargando = false
+        }
+    }
+
+    LaunchedEffect(restauranteId) { cargarFotos() }
+
+    val fotoPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        val restantes = maxFotos - fotos.size
+        val seleccionadas = uris.take(restantes)
+        subiendo = true
+        scope.launch {
+            try {
+                val partes = seleccionadas.mapIndexed { i, uri ->
+                    val bytes = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
+                    val rb = bytes.toRequestBody("image/*".toMediaType())
+                    MultipartBody.Part.createFormData("fotos[]", "foto_$i.jpg", rb)
+                }
+                val idPart = restauranteId.toString().toRequestBody("text/plain".toMediaType())
+                val resp = RetrofitClient.instancia.subirFotos(idPart, partes)
+                if (resp.success) fotos = resp.fotos
+                else errorMsg = resp.message.ifBlank { "Error al subir las fotos" }
+            } catch (e: Exception) {
+                errorMsg = "Error de conexión: ${e.localizedMessage}"
+            } finally { subiendo = false }
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        when {
+            cargando -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                CircularProgressIndicator(color = ACCENT)
+            }
+
+            else -> {
+                val restantes = maxFotos - fotos.size
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Cabecera
+                    item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                            Arrangement.SpaceBetween, Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Fotos del restaurante (${fotos.size}/$maxFotos)",
+                                color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp
+                            )
+                            if (restantes > 0 && !subiendo) {
+                                Text("Toca + para añadir", color = Color.Gray, fontSize = 11.sp)
+                            }
+                        }
+                    }
+
+                    // Fotos existentes
+                    items(fotos) { foto ->
+                        val nombre = foto.urlFoto.substringAfterLast("/")
+                        Box(
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                        ) {
+                            AsyncImage(
+                                model = foto.urlFoto,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            // Badge portada
+                            if (foto.esPortada) {
+                                Surface(
+                                    modifier = Modifier.align(Alignment.BottomStart).padding(4.dp),
+                                    color = ACCENT.copy(alpha = 0.9f),
+                                    shape = RoundedCornerShape(4.dp)
+                                ) {
+                                    Text(
+                                        "Portada",
+                                        color = Color.Black, fontSize = 9.sp, fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            // Botón eliminar
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(4.dp)
+                                    .size(24.dp)
+                                    .background(Color.Black.copy(alpha = 0.6f), CircleShape)
+                                    .clickable {
+                                        scope.launch {
+                                            try {
+                                                RetrofitClient.instancia.eliminarFoto(
+                                                    mapOf(
+                                                        "restaurante_id" to restauranteId.toString(),
+                                                        "nombre_foto" to nombre
+                                                    )
+                                                )
+                                                fotos = fotos.filter { it.urlFoto != foto.urlFoto }
+                                            } catch (_: Exception) { errorMsg = "Error al eliminar la foto" }
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+
+                    // Celda "añadir" o spinner de subida
+                    if (subiendo) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFF1E1A14)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = ACCENT, modifier = Modifier.size(28.dp), strokeWidth = 3.dp
+                                )
+                            }
+                        }
+                    } else if (restantes > 0) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(ACCENT.copy(alpha = 0.08f))
+                                    .border(1.dp, ACCENT.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                    .clickable { fotoPicker.launch("image/*") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Default.AddPhotoAlternate, null, tint = ACCENT, modifier = Modifier.size(28.dp))
+                                    Spacer(Modifier.height(4.dp))
+                                    Text("Añadir", color = ACCENT, fontSize = 11.sp)
+                                }
+                            }
+                        }
+                    }
+
+                    // Vacío
+                    if (fotos.isEmpty() && !subiendo) {
+                        item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(top = 32.dp)
+                            ) {
+                                Icon(Icons.Default.PhotoLibrary, null, tint = Color.Gray, modifier = Modifier.size(56.dp))
+                                Spacer(Modifier.height(12.dp))
+                                Text("Sin fotos todavía", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text("Añade hasta 6 fotos de tu restaurante", color = Color.Gray, fontSize = 13.sp, textAlign = TextAlign.Center)
+                            }
+                        }
+                    }
+
+                    item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+                        Spacer(Modifier.height(80.dp))
+                    }
+                }
+            }
+        }
+
+        // Snack de error
+        errorMsg?.let { msg ->
+            Card(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1A1A)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Warning, null, tint = Color(0xFFEF5350), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(msg, color = Color(0xFFEF5350), fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { errorMsg = null }, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.Close, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                    }
+                }
             }
         }
     }
