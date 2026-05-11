@@ -26,7 +26,12 @@ if (!$restaurante) jsonResponse(['success' => false, 'message' => 'Restaurante n
 $fStmt = $pdo->prepare("SELECT url_foto, descripcion, es_portada FROM fotos_restaurante WHERE restaurante_id=? ORDER BY es_portada DESC, id ASC");
 $fStmt->execute([$id]);
 $fotos = $fStmt->fetchAll();
-foreach ($fotos as &$f) $f['es_portada'] = (bool)$f['es_portada'];
+$fProto   = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
+$fBaseUrl = $fProto . '://' . $_SERVER['HTTP_HOST'] . '/restaurantes_api/uploads/';
+foreach ($fotos as &$f) {
+    $f['url_foto']   = $fBaseUrl . $f['url_foto'];
+    $f['es_portada'] = (bool)$f['es_portada'];
+}
 $restaurante['fotos'] = $fotos;
 
 // Horarios
@@ -36,7 +41,7 @@ $restaurante['horarios'] = $hStmt->fetchAll();
 
 // Tipos correctos
 $restaurante['restaurante_id']   = (int)$restaurante['restaurante_id'];
-$restaurante['precio_medio']     = (float)$restaurante['precio_medio'];
+$restaurante['precio_medio']     = $restaurante['precio_medio'] ?? '';
 $restaurante['rating_global']    = (float)$restaurante['rating_global'];
 $restaurante['num_valoraciones'] = (int)$restaurante['num_valoraciones'];
 $restaurante['aforo_total']      = (int)$restaurante['aforo_total'];

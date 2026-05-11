@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.restauranteszaragoza.R
 import com.example.restauranteszaragoza.model.Horario
 import com.example.restauranteszaragoza.model.PlatoDetalle
@@ -147,7 +148,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                         Text(rest.nombre, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
                         Spacer(Modifier.height(12.dp))
                         InfoRow(Icons.Default.Place, rest.direccion)
-                        if (rest.telefono.isNotBlank()) InfoRow(Icons.Default.Phone, rest.telefono)
+                        if (!rest.telefono.isNullOrBlank()) InfoRow(Icons.Default.Phone, rest.telefono)
                         if (!rest.emailContacto.isNullOrBlank()) InfoRow(Icons.Default.Email, rest.emailContacto)
                         InfoRow(Icons.Default.EuroSymbol, "Precio medio: ${rest.precioMedio}")
                         if (rest.aforoTotal > 0) InfoRow(Icons.Default.People, "Aforo: ${rest.aforoTotal} personas")
@@ -197,7 +198,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 }
 
                 // ── Descripción ───────────────────────────────────────────────
-                if (rest.descripcion.isNotBlank()) {
+                if (!rest.descripcion.isNullOrBlank()) {
                     Text("Sobre el restaurante", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(8.dp))
                     Text(rest.descripcion, color = Color.LightGray, lineHeight = 22.sp, fontSize = 14.sp)
@@ -304,17 +305,21 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 Spacer(Modifier.height(20.dp))
 
                 // ── Galería ───────────────────────────────────────────────────
-                Text("Galería", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Spacer(Modifier.height(10.dp))
-                val imgs = listOf(R.drawable.parrilla, R.drawable.pasta, R.drawable.sushi, R.drawable.alta_cocina, R.drawable.modern_eats)
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(imgs) { img ->
-                        Image(
-                            painter = painterResource(id = img),
-                            contentDescription = null,
-                            modifier = Modifier.size(150.dp, 100.dp).clip(RoundedCornerShape(14.dp)),
-                            contentScale = ContentScale.Crop
-                        )
+                val fotos = rest.fotos
+                if (fotos.isNotEmpty()) {
+                    Text("Galería", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Spacer(Modifier.height(10.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(fotos) { foto ->
+                            AsyncImage(
+                                model = foto.urlFoto,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(160.dp, 110.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                            )
+                        }
                     }
                 }
 
