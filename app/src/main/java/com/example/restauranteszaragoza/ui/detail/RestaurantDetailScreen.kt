@@ -112,7 +112,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
             // ── Hero ──────────────────────────────────────────────────────────
             Box(Modifier.fillMaxWidth().height(280.dp)) {
                 Image(
-                    painter = painterResource(id = imageParaRestaurante(rest.categoria)),
+                    painter = painterResource(id = imageParaRestaurante(rest.categoria.orEmpty())),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -130,7 +130,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                             Surface(color = ACCENT.copy(alpha = 0.15f), shape = RoundedCornerShape(8.dp)) {
                                 Text(
-                                    rest.categoria.ifBlank { "General" },
+                                    (rest.categoria ?: "").ifBlank { "General" },
                                     color = ACCENT, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                 )
@@ -145,9 +145,9 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                             }
                         }
                         Spacer(Modifier.height(10.dp))
-                        Text(rest.nombre, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
+                        Text(rest.nombre.orEmpty(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
                         Spacer(Modifier.height(12.dp))
-                        InfoRow(Icons.Default.Place, rest.direccion)
+                        InfoRow(Icons.Default.Place, rest.direccion.orEmpty())
                         if (!rest.telefono.isNullOrBlank()) InfoRow(Icons.Default.Phone, rest.telefono)
                         if (!rest.emailContacto.isNullOrBlank()) InfoRow(Icons.Default.Email, rest.emailContacto)
                         InfoRow(Icons.Default.EuroSymbol, "Precio medio: ${rest.precioMedio}")
@@ -170,12 +170,12 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.LocationOn, null, tint = ACCENT, modifier = Modifier.size(20.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text(rest.direccion, color = Color.LightGray, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                Text(rest.direccion.orEmpty(), color = Color.LightGray, fontSize = 14.sp, modifier = Modifier.weight(1f))
                             }
                             Spacer(Modifier.height(12.dp))
                             Button(
                                 onClick = {
-                                    val uri = Uri.parse("geo:${rest.latitud},${rest.longitud}?q=${Uri.encode(rest.nombre)}")
+                                    val uri = Uri.parse("geo:${rest.latitud},${rest.longitud}?q=${Uri.encode(rest.nombre.orEmpty())}")
                                     val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply { setPackage("com.google.android.apps.maps") }
                                     if (mapIntent.resolveActivity(context.packageManager) != null) {
                                         context.startActivity(mapIntent)
@@ -234,12 +234,14 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                                     } else {
                                         Column(horizontalAlignment = Alignment.End) {
                                             turnos.filter { !it.cerrado }.forEach { turno ->
-                                                val label = if (turno.horaApertura.substringBefore(":").toIntOrNull() ?: 0 < 15)
+                                                val apertura = turno.horaApertura ?: ""
+                                                val cierre   = turno.horaCierre   ?: ""
+                                                val label = if (apertura.substringBefore(":").toIntOrNull() ?: 0 < 15)
                                                     "Mediodía" else "Noche"
                                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                                     Text("$label  ", color = Color.Gray, fontSize = 11.sp)
                                                     Text(
-                                                        "${turno.horaApertura.take(5)} – ${turno.horaCierre.take(5)}",
+                                                        "${apertura.take(5)} – ${cierre.take(5)}",
                                                         color = ACCENT, fontSize = 13.sp
                                                     )
                                                 }
@@ -339,14 +341,14 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                         ) {
                             Column(Modifier.padding(14.dp)) {
                                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                                    Text(v.nombreUsuario, color = Color.White, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                                    Text(v.nombreUsuario.orEmpty(), color = Color.White, fontWeight = FontWeight.Medium, fontSize = 14.sp)
                                     Row { repeat(v.puntuacion) { Icon(Icons.Default.Star, null, tint = Color(0xFFFFB300), modifier = Modifier.size(14.dp)) } }
                                 }
-                                if (v.comentario.isNotBlank()) {
+                                if (!v.comentario.isNullOrBlank()) {
                                     Spacer(Modifier.height(6.dp))
                                     Text(v.comentario, color = Color.LightGray, fontSize = 13.sp)
                                 }
-                                Text(v.fecha, color = Color.DarkGray, fontSize = 11.sp)
+                                Text(v.fecha.orEmpty(), color = Color.DarkGray, fontSize = 11.sp)
                             }
                         }
                     }
@@ -420,12 +422,12 @@ private fun PlatoCard(plato: PlatoDetalle) {
     ) {
         Row(modifier = Modifier.padding(14.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(plato.nombre, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                if (plato.descripcion.isNotBlank()) {
+                Text(plato.nombre.orEmpty(), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                if (!plato.descripcion.isNullOrBlank()) {
                     Spacer(Modifier.height(2.dp))
                     Text(plato.descripcion, color = Color.Gray, fontSize = 12.sp, maxLines = 2)
                 }
-                if (plato.alergenos.isNotBlank()) {
+                if (!plato.alergenos.isNullOrBlank()) {
                     Spacer(Modifier.height(4.dp))
                     Text("⚠️ ${plato.alergenos}", color = Color(0xFFFFCC80), fontSize = 11.sp)
                 }
@@ -506,7 +508,7 @@ private fun ReservaBottomSheet(
                 .padding(bottom = 32.dp)
         ) {
             Text("Hacer reserva", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-            Text(restaurante.nombre, color = ACCENT, fontSize = 14.sp)
+            Text(restaurante.nombre.orEmpty(), color = ACCENT, fontSize = 14.sp)
             Spacer(Modifier.height(20.dp))
 
             // ── Calendario ────────────────────────────────────────────────────

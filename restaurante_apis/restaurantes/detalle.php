@@ -8,9 +8,19 @@ if ($id <= 0) jsonResponse(['success' => false, 'message' => 'ID inválido'], 40
 
 $pdo = getDB();
 $stmt = $pdo->prepare("
-    SELECT r.id AS restaurante_id, r.nombre, r.descripcion, r.direccion, r.ciudad,
-           r.latitud, r.longitud, r.telefono, r.email_contacto,
-           r.categoria, r.precio_medio, r.aforo_total, r.usuario_id, r.activo,
+    SELECT r.id AS restaurante_id,
+           COALESCE(r.nombre, '')       AS nombre,
+           COALESCE(r.descripcion, '')  AS descripcion,
+           COALESCE(r.direccion, '')    AS direccion,
+           COALESCE(r.ciudad, '')       AS ciudad,
+           COALESCE(r.latitud, 0)       AS latitud,
+           COALESCE(r.longitud, 0)      AS longitud,
+           COALESCE(r.telefono, '')     AS telefono,
+           r.email_contacto,
+           COALESCE(r.categoria, '')    AS categoria,
+           COALESCE(r.precio_medio, '') AS precio_medio,
+           COALESCE(r.aforo_total, 0)   AS aforo_total,
+           r.usuario_id, r.activo,
            COALESCE(ROUND(AVG(v.puntuacion),1),0) AS rating_global,
            COUNT(DISTINCT v.id) AS num_valoraciones
     FROM restaurantes r
