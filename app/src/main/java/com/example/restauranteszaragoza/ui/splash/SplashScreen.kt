@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -104,26 +105,26 @@ fun SplashScreen(onSplashComplete: () -> Unit) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(160.dp)
                     .alpha(logoAlpha)
             ) {
-                // Arco giratorio de carga
-                CircularProgressIndicator(
-                    progress = { 0.72f },
-                    modifier = Modifier
-                        .size(148.dp)
-                        .rotate(arcRotation),
-                    color = Color(0xFF00E5FF),
-                    trackColor = Color(0x1A00E5FF),
-                    strokeWidth = 3.dp
-                )
                 // Logo con bounce + pulso
                 Image(
                     painter = painterResource(R.drawable.reats),
                     contentDescription = null,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .size(100.dp)
+                        .width(220.dp)
                         .scale(logoScale * logoPulse)
+                )
+                // Arco giratorio debajo del logo
+                CircularProgressIndicator(
+                    progress = { 0.72f },
+                    modifier = Modifier
+                        .size(240.dp)
+                        .rotate(arcRotation),
+                    color = Color(0xFF00E5FF),
+                    trackColor = Color(0x1A00E5FF),
+                    strokeWidth = 3.dp
                 )
             }
 
