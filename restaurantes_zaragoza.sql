@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 06, 2026 at 09:41 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 07-05-2026 a las 19:10:04
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `restaurantes_zaragoza`
+-- Base de datos: `restaurantes_zaragoza`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `fotos_restaurante`
+-- Estructura de tabla para la tabla `fotos_restaurante`
 --
 
 CREATE TABLE `fotos_restaurante` (
@@ -38,7 +38,7 @@ CREATE TABLE `fotos_restaurante` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `fotos_restaurante`
+-- Volcado de datos para la tabla `fotos_restaurante`
 --
 
 INSERT INTO `fotos_restaurante` (`id`, `restaurante_id`, `url_foto`, `descripcion`, `es_portada`, `orden`, `fecha_subida`) VALUES
@@ -57,7 +57,7 @@ INSERT INTO `fotos_restaurante` (`id`, `restaurante_id`, `url_foto`, `descripcio
 -- --------------------------------------------------------
 
 --
--- Table structure for table `horarios`
+-- Estructura de tabla para la tabla `horarios`
 --
 
 CREATE TABLE `horarios` (
@@ -70,7 +70,7 @@ CREATE TABLE `horarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `horarios`
+-- Volcado de datos para la tabla `horarios`
 --
 
 INSERT INTO `horarios` (`id`, `restaurante_id`, `dia_semana`, `hora_apertura`, `hora_cierre`, `cerrado`) VALUES
@@ -204,7 +204,7 @@ INSERT INTO `horarios` (`id`, `restaurante_id`, `dia_semana`, `hora_apertura`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `menu_categorias`
+-- Estructura de tabla para la tabla `menu_categorias`
 --
 
 CREATE TABLE `menu_categorias` (
@@ -215,7 +215,7 @@ CREATE TABLE `menu_categorias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `menu_categorias`
+-- Volcado de datos para la tabla `menu_categorias`
 --
 
 INSERT INTO `menu_categorias` (`id`, `restaurante_id`, `nombre`, `orden`) VALUES
@@ -277,7 +277,7 @@ INSERT INTO `menu_categorias` (`id`, `restaurante_id`, `nombre`, `orden`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `menu_platos`
+-- Estructura de tabla para la tabla `menu_platos`
 --
 
 CREATE TABLE `menu_platos` (
@@ -293,7 +293,7 @@ CREATE TABLE `menu_platos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `menu_platos`
+-- Volcado de datos para la tabla `menu_platos`
 --
 
 INSERT INTO `menu_platos` (`id`, `categoria_id`, `restaurante_id`, `nombre`, `descripcion`, `precio`, `foto_url`, `disponible`, `alergenos`) VALUES
@@ -394,7 +394,7 @@ INSERT INTO `menu_platos` (`id`, `categoria_id`, `restaurante_id`, `nombre`, `de
 -- --------------------------------------------------------
 
 --
--- Table structure for table `propinas`
+-- Estructura de tabla para la tabla `propinas`
 --
 
 CREATE TABLE `propinas` (
@@ -408,7 +408,7 @@ CREATE TABLE `propinas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `propinas`
+-- Volcado de datos para la tabla `propinas`
 --
 
 INSERT INTO `propinas` (`id`, `reserva_id`, `usuario_id`, `restaurante_id`, `cantidad`, `mensaje`, `fecha`) VALUES
@@ -424,7 +424,7 @@ INSERT INTO `propinas` (`id`, `reserva_id`, `usuario_id`, `restaurante_id`, `can
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reservas`
+-- Estructura de tabla para la tabla `reservas`
 --
 
 CREATE TABLE `reservas` (
@@ -441,7 +441,7 @@ CREATE TABLE `reservas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `reservas`
+-- Volcado de datos para la tabla `reservas`
 --
 
 INSERT INTO `reservas` (`id`, `usuario_id`, `restaurante_id`, `fecha`, `hora`, `num_personas`, `estado`, `notas`, `fecha_creacion`, `fecha_actualizacion`) VALUES
@@ -517,7 +517,7 @@ INSERT INTO `reservas` (`id`, `usuario_id`, `restaurante_id`, `fecha`, `hora`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `restaurantes`
+-- Estructura de tabla para la tabla `restaurantes`
 --
 
 CREATE TABLE `restaurantes` (
@@ -542,7 +542,7 @@ CREATE TABLE `restaurantes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `restaurantes`
+-- Volcado de datos para la tabla `restaurantes`
 --
 
 INSERT INTO `restaurantes` (`id`, `usuario_id`, `nombre`, `descripcion`, `direccion`, `ciudad`, `latitud`, `longitud`, `telefono`, `email_contacto`, `categoria`, `precio_medio`, `aforo_total`, `activo`, `solicitado`, `aprobado`, `aprobado_por`, `fecha_registro`) VALUES
@@ -569,7 +569,7 @@ INSERT INTO `restaurantes` (`id`, `usuario_id`, `nombre`, `descripcion`, `direcc
 -- --------------------------------------------------------
 
 --
--- Table structure for table `usuarios`
+-- Estructura de tabla para la tabla `usuarios`
 --
 
 CREATE TABLE `usuarios` (
@@ -586,7 +586,7 @@ CREATE TABLE `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `usuarios`
+-- Volcado de datos para la tabla `usuarios`
 --
 
 INSERT INTO `usuarios` (`id`, `nombre`, `apellidos`, `email`, `password_hash`, `telefono`, `rol`, `foto_perfil`, `fecha_registro`, `activo`) VALUES
@@ -634,7 +634,7 @@ INSERT INTO `usuarios` (`id`, `nombre`, `apellidos`, `email`, `password_hash`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `valoraciones`
+-- Estructura de tabla para la tabla `valoraciones`
 --
 
 CREATE TABLE `valoraciones` (
@@ -648,7 +648,7 @@ CREATE TABLE `valoraciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `valoraciones`
+-- Volcado de datos para la tabla `valoraciones`
 --
 
 INSERT INTO `valoraciones` (`id`, `usuario_id`, `restaurante_id`, `reserva_id`, `puntuacion`, `comentario`, `fecha`) VALUES
@@ -688,8 +688,8 @@ INSERT INTO `valoraciones` (`id`, `usuario_id`, `restaurante_id`, `reserva_id`, 
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `vista_restaurantes`
--- (See below for the actual view)
+-- Estructura Stand-in para la vista `vista_restaurantes`
+-- (Véase abajo para la vista actual)
 --
 CREATE TABLE `vista_restaurantes` (
 `id` int(11)
@@ -713,39 +713,39 @@ CREATE TABLE `vista_restaurantes` (
 -- --------------------------------------------------------
 
 --
--- Structure for view `vista_restaurantes`
+-- Estructura para la vista `vista_restaurantes`
 --
 DROP TABLE IF EXISTS `vista_restaurantes`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_restaurantes`  AS SELECT `r`.`id` AS `id`, `r`.`nombre` AS `nombre`, `r`.`descripcion` AS `descripcion`, `r`.`direccion` AS `direccion`, `r`.`latitud` AS `latitud`, `r`.`longitud` AS `longitud`, `r`.`telefono` AS `telefono`, `r`.`email_contacto` AS `email_contacto`, `r`.`categoria` AS `categoria`, `r`.`precio_medio` AS `precio_medio`, `r`.`aforo_total` AS `aforo_total`, `r`.`activo` AS `activo`, coalesce(round(avg(`v`.`puntuacion`),1),0) AS `valoracion_media`, count(distinct `v`.`id`) AS `num_valoraciones`, (select count(0) from `reservas` `res` where `res`.`restaurante_id` = `r`.`id` and `res`.`fecha` = curdate() and `res`.`estado` in ('pendiente','confirmada')) AS `reservas_hoy`, `r`.`aforo_total`- (select count(0) from `reservas` `res2` where `res2`.`restaurante_id` = `r`.`id` and `res2`.`fecha` = curdate() and `res2`.`estado` in ('pendiente','confirmada')) AS `plazas_disponibles_hoy` FROM (`restaurantes` `r` left join `valoraciones` `v` on(`v`.`restaurante_id` = `r`.`id`)) WHERE `r`.`activo` = 1 GROUP BY `r`.`id` ;
 
 --
--- Indexes for dumped tables
+-- Índices para tablas volcadas
 --
 
 --
--- Indexes for table `fotos_restaurante`
+-- Indices de la tabla `fotos_restaurante`
 --
 ALTER TABLE `fotos_restaurante`
   ADD PRIMARY KEY (`id`),
   ADD KEY `restaurante_id` (`restaurante_id`);
 
 --
--- Indexes for table `horarios`
+-- Indices de la tabla `horarios`
 --
 ALTER TABLE `horarios`
   ADD PRIMARY KEY (`id`),
   ADD KEY `restaurante_id` (`restaurante_id`);
 
 --
--- Indexes for table `menu_categorias`
+-- Indices de la tabla `menu_categorias`
 --
 ALTER TABLE `menu_categorias`
   ADD PRIMARY KEY (`id`),
   ADD KEY `restaurante_id` (`restaurante_id`);
 
 --
--- Indexes for table `menu_platos`
+-- Indices de la tabla `menu_platos`
 --
 ALTER TABLE `menu_platos`
   ADD PRIMARY KEY (`id`),
@@ -753,7 +753,7 @@ ALTER TABLE `menu_platos`
   ADD KEY `restaurante_id` (`restaurante_id`);
 
 --
--- Indexes for table `propinas`
+-- Indices de la tabla `propinas`
 --
 ALTER TABLE `propinas`
   ADD PRIMARY KEY (`id`),
@@ -762,7 +762,7 @@ ALTER TABLE `propinas`
   ADD KEY `restaurante_id` (`restaurante_id`);
 
 --
--- Indexes for table `reservas`
+-- Indices de la tabla `reservas`
 --
 ALTER TABLE `reservas`
   ADD PRIMARY KEY (`id`),
@@ -770,7 +770,7 @@ ALTER TABLE `reservas`
   ADD KEY `restaurante_id` (`restaurante_id`);
 
 --
--- Indexes for table `restaurantes`
+-- Indices de la tabla `restaurantes`
 --
 ALTER TABLE `restaurantes`
   ADD PRIMARY KEY (`id`),
@@ -778,14 +778,14 @@ ALTER TABLE `restaurantes`
   ADD KEY `fk_aprobado_por` (`aprobado_por`);
 
 --
--- Indexes for table `usuarios`
+-- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `valoraciones`
+-- Indices de la tabla `valoraciones`
 --
 ALTER TABLE `valoraciones`
   ADD PRIMARY KEY (`id`),
@@ -794,94 +794,94 @@ ALTER TABLE `valoraciones`
   ADD KEY `reserva_id` (`reserva_id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT for table `fotos_restaurante`
+-- AUTO_INCREMENT de la tabla `fotos_restaurante`
 --
 ALTER TABLE `fotos_restaurante`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `horarios`
+-- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
 
 --
--- AUTO_INCREMENT for table `menu_categorias`
+-- AUTO_INCREMENT de la tabla `menu_categorias`
 --
 ALTER TABLE `menu_categorias`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
--- AUTO_INCREMENT for table `menu_platos`
+-- AUTO_INCREMENT de la tabla `menu_platos`
 --
 ALTER TABLE `menu_platos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
 
 --
--- AUTO_INCREMENT for table `propinas`
+-- AUTO_INCREMENT de la tabla `propinas`
 --
 ALTER TABLE `propinas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `reservas`
+-- AUTO_INCREMENT de la tabla `reservas`
 --
 ALTER TABLE `reservas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
--- AUTO_INCREMENT for table `restaurantes`
+-- AUTO_INCREMENT de la tabla `restaurantes`
 --
 ALTER TABLE `restaurantes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
--- AUTO_INCREMENT for table `usuarios`
+-- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT for table `valoraciones`
+-- AUTO_INCREMENT de la tabla `valoraciones`
 --
 ALTER TABLE `valoraciones`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
--- Constraints for dumped tables
+-- Restricciones para tablas volcadas
 --
 
 --
--- Constraints for table `fotos_restaurante`
+-- Filtros para la tabla `fotos_restaurante`
 --
 ALTER TABLE `fotos_restaurante`
   ADD CONSTRAINT `fotos_restaurante_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `horarios`
+-- Filtros para la tabla `horarios`
 --
 ALTER TABLE `horarios`
   ADD CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `menu_categorias`
+-- Filtros para la tabla `menu_categorias`
 --
 ALTER TABLE `menu_categorias`
   ADD CONSTRAINT `menu_categorias_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `menu_platos`
+-- Filtros para la tabla `menu_platos`
 --
 ALTER TABLE `menu_platos`
   ADD CONSTRAINT `menu_platos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `menu_categorias` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `menu_platos_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `propinas`
+-- Filtros para la tabla `propinas`
 --
 ALTER TABLE `propinas`
   ADD CONSTRAINT `propinas_ibfk_1` FOREIGN KEY (`reserva_id`) REFERENCES `reservas` (`id`) ON DELETE CASCADE,
@@ -889,21 +889,21 @@ ALTER TABLE `propinas`
   ADD CONSTRAINT `propinas_ibfk_3` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `reservas`
+-- Filtros para la tabla `reservas`
 --
 ALTER TABLE `reservas`
   ADD CONSTRAINT `reservas_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `reservas_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `restaurantes`
+-- Filtros para la tabla `restaurantes`
 --
 ALTER TABLE `restaurantes`
   ADD CONSTRAINT `fk_aprobado_por` FOREIGN KEY (`aprobado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `restaurantes_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `valoraciones`
+-- Filtros para la tabla `valoraciones`
 --
 ALTER TABLE `valoraciones`
   ADD CONSTRAINT `valoraciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,

@@ -44,8 +44,10 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
     var pendientes   by remember { mutableStateOf<List<RestaurantePendiente>>(emptyList()) }
     var snackMsg              by remember { mutableStateOf<String?>(null) }
     val snackState            = remember { SnackbarHostState() }
-    var filtroRestauranteId   by remember { mutableStateOf<Int?>(null) }
+    var filtroRestauranteId    by remember { mutableStateOf<Int?>(null) }
     var dropdownReservaAbierto by remember { mutableStateOf(false) }
+    var busquedaRestaurante    by remember { mutableStateOf("") }
+    var busquedaUsuario        by remember { mutableStateOf("") }
 
     fun recargar() {
         scope.launch {
@@ -126,8 +128,39 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                 when (tabIndex) {
 
                     // ── Usuarios ──────────────────────────────────────────────
-                    0 -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(usuarios) { u ->
+                    0 -> {
+                        val usuariosFiltrados = if (busquedaUsuario.isBlank()) usuarios
+                            else usuarios.filter {
+                                it.nombre.contains(busquedaUsuario, ignoreCase = true) ||
+                                it.apellidos.contains(busquedaUsuario, ignoreCase = true) ||
+                                it.email.contains(busquedaUsuario, ignoreCase = true) ||
+                                it.rol.contains(busquedaUsuario, ignoreCase = true)
+                            }
+                        Column {
+                            OutlinedTextField(
+                                value = busquedaUsuario,
+                                onValueChange = { busquedaUsuario = it },
+                                placeholder = { Text("Buscar por nombre, email o rol...", color = Color.Gray, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                                trailingIcon = { if (busquedaUsuario.isNotBlank()) IconButton(onClick = { busquedaUsuario = "" }) { Icon(Icons.Default.Clear, null, tint = Color.Gray) } },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = ACCENT, unfocusedBorderColor = Color(0xFF2A2435),
+                                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                                    cursorColor = ACCENT
+                                )
+                            )
+                            LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                if (usuariosFiltrados.isEmpty()) {
+                                    item {
+                                        Box(Modifier.fillMaxWidth().padding(top = 32.dp), Alignment.Center) {
+                                            Text("Sin resultados", color = Color.Gray, fontSize = 13.sp)
+                                        }
+                                    }
+                                }
+                                items(usuariosFiltrados) { u ->
                             AdminUsuarioCard(
                                 usuario = u,
                                 onToggleActivo = {
@@ -163,23 +196,57 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                                 }
                             )
                         }
-                        item { Spacer(Modifier.height(24.dp)) }
+                                item { Spacer(Modifier.height(24.dp)) }
+                            }
+                        }
                     }
 
                     // ── Restaurantes ──────────────────────────────────────────
-                    1 -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(restaurantes) { r ->
-                            AdminRestauranteCard(restaurante = r, onToggle = {
-                                scope.launch {
-                                    try {
-                                        RetrofitClient.instancia.toggleRestaurante(mapOf("restaurante_id" to r.id.toString()))
-                                        restaurantes = RetrofitClient.instancia.listarRestaurantesAdmin()
-                                        snackMsg = "Restaurante actualizado"
-                                    } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                    1 -> {
+                        val restaurantesFiltrados = if (busquedaRestaurante.isBlank()) restaurantes
+                            else restaurantes.filter {
+                                it.nombre.contains(busquedaRestaurante, ignoreCase = true) ||
+                                it.categoria.contains(busquedaRestaurante, ignoreCase = true) ||
+                                it.direccion.contains(busquedaRestaurante, ignoreCase = true)
+                            }
+                        Column {
+                            OutlinedTextField(
+                                value = busquedaRestaurante,
+                                onValueChange = { busquedaRestaurante = it },
+                                placeholder = { Text("Buscar por nombre, categoría o dirección...", color = Color.Gray, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                                trailingIcon = { if (busquedaRestaurante.isNotBlank()) IconButton(onClick = { busquedaRestaurante = "" }) { Icon(Icons.Default.Clear, null, tint = Color.Gray) } },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = ACCENT, unfocusedBorderColor = Color(0xFF2A2435),
+                                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                                    cursorColor = ACCENT
+                                )
+                            )
+                            LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                if (restaurantesFiltrados.isEmpty()) {
+                                    item {
+                                        Box(Modifier.fillMaxWidth().padding(top = 32.dp), Alignment.Center) {
+                                            Text("Sin resultados", color = Color.Gray, fontSize = 13.sp)
+                                        }
+                                    }
                                 }
-                            })
+                                items(restaurantesFiltrados) { r ->
+                                    AdminRestauranteCard(restaurante = r, onToggle = {
+                                        scope.launch {
+                                            try {
+                                                RetrofitClient.instancia.toggleRestaurante(mapOf("restaurante_id" to r.id.toString()))
+                                                restaurantes = RetrofitClient.instancia.listarRestaurantesAdmin()
+                                                snackMsg = "Restaurante actualizado"
+                                            } catch (_: Exception) { snackMsg = "❌ Error de conexión" }
+                                        }
+                                    })
+                                }
+                                item { Spacer(Modifier.height(24.dp)) }
+                            }
                         }
-                        item { Spacer(Modifier.height(24.dp)) }
                     }
 
                     // ── Pendientes de aprobación ──────────────────────────────

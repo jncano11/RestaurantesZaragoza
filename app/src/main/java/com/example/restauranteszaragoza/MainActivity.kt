@@ -15,6 +15,7 @@ import com.example.restauranteszaragoza.ui.login.LoginScreen
 import com.example.restauranteszaragoza.ui.perfil.PerfilScreen
 import com.example.restauranteszaragoza.ui.register.RegisterScreen
 import com.example.restauranteszaragoza.ui.restaurante.RestauranteDashboardScreen
+import com.example.restauranteszaragoza.ui.splash.SplashScreen
 import com.example.restauranteszaragoza.ui.theme.RestaurantesZaragozaTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val context             = LocalContext.current
-    var screen             by remember { mutableStateOf("login") }
+    var screen             by remember { mutableStateOf("splash") }
     var selectedRestaurante by remember { mutableStateOf<Restaurante?>(null) }
 
     fun logout() {
@@ -46,6 +47,8 @@ fun AppNavigation() {
     }
 
     when (screen) {
+
+        "splash" -> SplashScreen(onSplashComplete = { screen = "login" })
 
         "login" -> LoginScreen(
             onLoginSuccess = {

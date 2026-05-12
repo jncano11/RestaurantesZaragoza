@@ -128,6 +128,12 @@ data class FotoRestaurante(
     @SerializedName("es_portada") val esPortada: Boolean = false
 )
 
+data class FotosResponse(
+    val success: Boolean = false,
+    val fotos: List<FotoRestaurante> = emptyList(),
+    val message: String = ""
+)
+
 // ─── ESTADÍSTICAS ADMIN ───────────────────────────────────────────────────────
 data class EstadisticasAdmin(
     @SerializedName("total_usuarios") val totalUsuarios: Int = 0,

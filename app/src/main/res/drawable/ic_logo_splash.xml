@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Fondo circular oscuro -->
+    <path
+        android:fillColor="#0D1B2A"
+        android:pathData="M60,60 m-56,0 a56,56 0 1,0 112,0 a56,56 0 1,0 -112,0" />
+
+    <!-- Anillo exterior cyan -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.5"
+        android:pathData="M60,60 m-52,0 a52,52 0 1,0 104,0 a52,52 0 1,0 -104,0" />
+
+    <!-- Anillo interior sutil (profundidad) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1A00E5FF"
+        android:strokeWidth="1"
+        android:pathData="M60,60 m-46,0 a46,46 0 1,0 92,0 a46,46 0 1,0 -92,0" />
+
+    <!-- TENEDOR - púa izquierda -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M40,22 L40,54 L42.5,54 L42.5,22 Z" />
+
+    <!-- TENEDOR - púa central -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M45.5,22 L45.5,54 L48,54 L48,22 Z" />
+
+    <!-- TENEDOR - púa derecha -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M51,22 L51,54 L53.5,54 L53.5,22 Z" />
+
+    <!-- TENEDOR - puente entre púas y mango -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M40,54 L53.5,54 L53.5,57.5 L40,57.5 Z" />
+
+    <!-- TENEDOR - mango -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M44.5,57.5 L44.5,95 L49,95 L49,57.5 Z" />
+
+    <!-- CUCHILLO - hoja triangular (punta arriba) -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M74,22 L70.5,54 L77.5,54 Z" />
+
+    <!-- CUCHILLO - guarda -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M70,54 L78,54 L78,58 L70,58 Z" />
+
+    <!-- CUCHILLO - mango -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M71.5,58 L71.5,95 L76.5,95 L76.5,58 Z" />
+
+</vector>

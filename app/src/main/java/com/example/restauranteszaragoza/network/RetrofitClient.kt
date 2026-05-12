@@ -7,7 +7,9 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -19,7 +21,9 @@ import java.util.concurrent.TimeUnit
 object Api {
   //  const val BASE_URL = "http://10.0.2.2/restaurantes_api/"        // Emulador
 //  const val BASE_URL = "http://192.168.1.72/restaurantes_api/"  // Dispositivo físico (antigua)
-const val BASE_URL = "https://lunacy-filled-educated.ngrok-free.dev/restaurantes_api/"  // ngrok
+//const val BASE_URL = "https://lunacy-filled-educated.ngrok-free.dev/restaurantes_api/"  // ngrok
+
+    const val BASE_URL = "http://r-eats.smartinez.click/" //AWS
     // Usuarios
     const val LOGIN    = "${BASE_URL}usuarios/login.php"
     const val REGISTER = "${BASE_URL}usuarios/register.php"
@@ -162,6 +166,20 @@ interface ApiService {
 
     @POST("admin/usuario_eliminar.php")
     suspend fun eliminarUsuario(@Body body: Map<String, String>): ApiResponse
+
+    // ── Fotos de restaurante ──
+    @GET("restaurantes/fotos_listar.php")
+    suspend fun listarFotos(@Query("restaurante_id") restauranteId: Int): FotosResponse
+
+    @Multipart
+    @POST("restaurantes/fotos_subir.php")
+    suspend fun subirFotos(
+        @Part("restaurante_id") restauranteId: RequestBody,
+        @Part fotos: List<MultipartBody.Part>
+    ): FotosResponse
+
+    @POST("restaurantes/foto_eliminar.php")
+    suspend fun eliminarFoto(@Body body: Map<String, String>): ApiResponse
 }
 
 // Acepta 0/1 además de true/false para campos Boolean de MySQL

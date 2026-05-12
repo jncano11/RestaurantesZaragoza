@@ -231,12 +231,29 @@ const val BASE_URL = "http://13.48.57.113/"                        // AWS produc
 
 ### Acceder al servidor por SSH (PuTTY)
 
+**Con contraseña (método para el equipo):**
+
 1. Abre **PuTTY**
 2. Host: `13.48.57.113` · Puerto: `22`
-3. Ve a **Connection → SSH → Auth → Credentials** y carga el archivo `.ppk` (pedir a Samuel)
+3. Pulsa **Open** → usuario: `ubuntu` → introduce la contraseña del servidor
+4. No hace falta ningún archivo `.ppk`
+
+**Con clave privada (solo Samuel):**
+
+1. Abre **PuTTY**
+2. Host: `13.48.57.113` · Puerto: `22`
+3. Ve a **Connection → SSH → Auth → Credentials** y carga el archivo `.ppk`
 4. Usuario: `ubuntu`
 
 ### Subir archivos al servidor (WinSCP)
+
+**Con contraseña (método para el equipo):**
+
+1. Protocolo: **SFTP** · Host: `13.48.57.113` · Puerto: `22`
+2. Usuario: `ubuntu` · introduce la contraseña del servidor
+3. Los archivos de la API están en `/var/www/restaurantes_api/`
+
+**Con clave privada (solo Samuel):**
 
 1. Protocolo: **SFTP** · Host: `13.48.57.113` · Puerto: `22`
 2. Usuario: `ubuntu` · sin contraseña

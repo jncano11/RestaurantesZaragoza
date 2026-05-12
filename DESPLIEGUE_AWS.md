@@ -39,12 +39,47 @@ Registro del proceso seguido para crear y configurar el servidor de producción 
 
 ## 2. Conectarse por SSH (PuTTY)
 
+**Con clave privada (configuración inicial — requiere el .ppk):**
+
 1. Abre PuTTY
 2. **Host Name:** `13.48.57.113` · **Port:** `22`
 3. Ve a **Connection → SSH → Auth → Credentials**
 4. Carga el archivo `.ppk`
 5. Guarda la sesión con un nombre (ej. `restaurantes-aws`)
 6. Pulsa **Open** → usuario: `ubuntu`
+
+---
+
+## 2b. Habilitar acceso por contraseña (para el equipo)
+
+Una vez conectado con el `.ppk`, ejecutar estos pasos para que el resto del equipo pueda conectarse sin clave privada:
+
+```bash
+# Establecer contraseña para el usuario ubuntu
+sudo passwd ubuntu
+
+# Habilitar autenticación por contraseña en SSH
+sudo nano /etc/ssh/sshd_config
+```
+
+Buscar la línea `PasswordAuthentication no` y cambiarla a:
+
+```
+PasswordAuthentication yes
+```
+
+Guardar y reiniciar SSH:
+
+```bash
+sudo systemctl restart ssh
+```
+
+A partir de aquí cualquier miembro del equipo puede conectarse con PuTTY usando:
+- **Host:** `13.48.57.113` · **Puerto:** `22`
+- **Usuario:** `ubuntu`
+- **Contraseña:** la establecida con `passwd`
+
+Sin necesidad de ningún archivo `.ppk`.
 
 ---
 
