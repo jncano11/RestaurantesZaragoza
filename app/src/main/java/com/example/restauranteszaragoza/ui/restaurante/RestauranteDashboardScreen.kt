@@ -337,7 +337,7 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                                 onPlatoCreado = {
                                     scope.launch {
                                         val rid = miRestaurante?.id ?: 0
-                                        platos = RetrofitClient.instancia.listarMenu(rid)
+                                        try { platos = RetrofitClient.instancia.listarMenu(rid) } catch (_: Exception) {}
                                         try { categorias = RetrofitClient.instancia.listarCategorias(rid) } catch (_: Exception) {}
                                         snackMsg = "✅ Plato añadido al menú"
                                     }
