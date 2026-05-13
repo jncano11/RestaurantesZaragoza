@@ -35,7 +35,7 @@ $stmt = $pdo->prepare("
     SELECT COALESCE(SUM(num_personas), 0)
     FROM reservas
     WHERE restaurante_id = ? AND fecha = ? AND hora = ?
-      AND estado IN ('pendiente', 'confirmada')
+      AND estado IN ('pendiente', 'confirmada', 'esperando_usuario')
 ");
 $stmt->execute([$restaurante_id, $fecha, $hora]);
 $ya_reservadas = intval($stmt->fetchColumn());

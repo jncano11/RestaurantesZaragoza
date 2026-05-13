@@ -60,7 +60,8 @@ fun HomeScreen(
 ) {
     val scope    = rememberCoroutineScope()
     val context  = LocalContext.current
-    val prefs    = remember { context.getSharedPreferences("restaurantes_prefs", Context.MODE_PRIVATE) }
+    val prefs       = remember { context.getSharedPreferences("restaurantes_prefs", Context.MODE_PRIVATE) }
+    val favKey      = "favoritos_${SessionManager.usuarioId}"
     var restaurantes          by remember { mutableStateOf<List<Restaurante>>(emptyList()) }
     var misReservas           by remember { mutableStateOf<List<Reserva>>(emptyList()) }
     var loading               by remember { mutableStateOf(true) }
@@ -72,12 +73,12 @@ fun HomeScreen(
     var mostrarOrden          by remember { mutableStateOf(false) }
     var favoritos             by remember {
         mutableStateOf<Set<Int>>(
-            prefs.getStringSet("favoritos", emptySet())!!.mapNotNull { it.toIntOrNull() }.toSet()
+            prefs.getStringSet(favKey, emptySet())!!.mapNotNull { it.toIntOrNull() }.toSet()
         )
     }
 
     LaunchedEffect(favoritos) {
-        prefs.edit().putStringSet("favoritos", favoritos.map { it.toString() }.toSet()).apply()
+        prefs.edit().putStringSet(favKey, favoritos.map { it.toString() }.toSet()).apply()
     }
 
     val usuario = SessionManager.usuarioActual

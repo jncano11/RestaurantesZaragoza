@@ -58,7 +58,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                 reservas     = RetrofitClient.instancia.todasReservas()
                 pendientes   = RetrofitClient.instancia.restaurantesPendientes()
             } catch (_: Exception) {
-                stats = EstadisticasAdmin(totalUsuarios=12, totalRestaurantes=8, totalReservas=47, reservasHoy=5, ingresosPropinas=138.50)
+                snackMsg = "❌ Error al cargar datos"
             }
         }
     }
@@ -177,7 +177,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                                         try {
                                             RetrofitClient.instancia.cambiarRolUsuario(mapOf(
                                                 "usuario_id" to u.id.toString(),
-                                                "nuevo_rol"  to nuevoRol
+                                                "rol"        to nuevoRol
                                             ))
                                             usuarios = RetrofitClient.instancia.listarUsuarios()
                                             snackMsg = "✅ Rol cambiado a $nuevoRol"

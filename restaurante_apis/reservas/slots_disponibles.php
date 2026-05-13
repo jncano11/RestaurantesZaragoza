@@ -9,7 +9,8 @@ header("Content-Type: application/json; charset=utf-8");
 header("Access-Control-Allow-Origin: *");
  
 require_once '../config/db.php';
- 
+
+$pdo            = getDB();
 $restaurante_id = intval($_GET['restaurante_id'] ?? 0);
 $fecha          = $_GET['fecha']          ?? '';
 $num_personas   = intval($_GET['num_personas'] ?? 1);
@@ -74,7 +75,7 @@ foreach ($slots_posibles as $hora) {
         WHERE restaurante_id = ?
           AND fecha = ?
           AND hora  = ?
-          AND estado IN ('pendiente', 'confirmada')
+          AND estado IN ('pendiente', 'confirmada', 'esperando_usuario')
     ");
     $stmt->execute([$restaurante_id, $fecha, $hora . ':00']);
     $ocupadas     = intval($stmt->fetchColumn());

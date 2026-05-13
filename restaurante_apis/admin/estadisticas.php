@@ -21,9 +21,7 @@ $hoyStmt = $pdo->prepare("SELECT COUNT(*) FROM reservas WHERE fecha = CURDATE() 
 $hoyStmt->execute();
 $stats['reservas_hoy'] = (int)$hoyStmt->fetchColumn();
 
-// Ingresos por propinas
-$propinasStmt = $pdo->query("SELECT COALESCE(SUM(cantidad), 0) FROM propinas");
-$stats['ingresos_propinas'] = (float)$propinasStmt->fetchColumn();
+$stats['ingresos_propinas'] = 0;
 
 // Reservas por estado (bonus)
 $estadoStmt = $pdo->query("
