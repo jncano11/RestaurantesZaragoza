@@ -36,13 +36,13 @@ private val BG_BOT  = Color(0xFF2C5364)
 private val ACCENT  = Color(0xFF00E5FF)
 private val CARD_BG = Color(0xFF1A2733)
 
-// ── Categorías disponibles ────────────────────────────────────────────────────
+// Categorías disponibles
 private val CATEGORIAS = listOf(
     "Todas", "Parrilla", "Sushi", "Pasta", "Alta cocina",
     "Mariscos", "Mexicana", "Vegana", "Americana", "Fusión", "Sidreria", "Kebab"
 )
 
-// ── Opciones de ordenación ────────────────────────────────────────────────────
+//Opciones de ordenación
 private enum class OrdenOpcion(val label: String) {
     NINGUNO("Relevancia"),
     RATING_DESC("Mejor valorados"),
@@ -106,7 +106,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) { cargarDatos() }
 
-    // ── Filtrado + ordenación ─────────────────────────────────────────────────
+    //Filtrado + ordenación
     val restaurantesFiltrados = restaurantes
         .filter { r ->
             val matchBusqueda  = r.nombre.contains(searchQuery, true) ||
@@ -129,7 +129,7 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(BG_TOP, BG_MID, BG_BOT)))) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // ── Top Bar ──────────────────────────────────────────────────────
+            //Top Bar
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -155,7 +155,7 @@ fun HomeScreen(
                 }
             }
 
-            // ── Tabs ──────────────────────────────────────────────────────────
+            //Tabs
             TabRow(
                 selectedTabIndex = tabSeleccionado,
                 containerColor = Color.Transparent,
@@ -191,13 +191,13 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             ) {
             when (tabSeleccionado) {
-                // ─────────────── TAB RESTAURANTES ────────────────────────────
+                //TAB RESTAURANTES
                 0 -> {
                     LazyColumn(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // ── Barra de búsqueda ────────────────────────────────
+                        //Barra de búsqueda
                         item {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -275,7 +275,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // ── Chips de categoría ───────────────────────────────
+                        //Chips de categoría
                         item {
                             LazyRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -309,7 +309,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // ── Contador de resultados + indicador de filtro activo ──
+                        // Contador de resultados + indicador de filtro activo
                         item {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -345,7 +345,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // ── Lista de restaurantes ────────────────────────────
+                        // Lista de restaurantes
                         if (loading) {
                             item {
                                 Box(Modifier.fillMaxWidth().padding(48.dp), Alignment.Center) {
@@ -382,7 +382,7 @@ fun HomeScreen(
                     }
                 }
 
-                // ─────────────── TAB FAVORITOS ───────────────────────────────
+                //  TAB FAVORITOS
                 1 -> {
                     val favoritosList = restaurantes.filter { it.id in favoritos }
                     if (favoritosList.isEmpty()) {
@@ -419,7 +419,7 @@ fun HomeScreen(
                     }
                 }
 
-                // ─────────────── TAB MIS RESERVAS ────────────────────────────
+                // TAB MIS RESERVAS
                 2 -> {
                     MisReservasTab(
                         reservas = misReservas,
@@ -439,9 +439,9 @@ fun HomeScreen(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Card de restaurante (con botón favorito)
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun RestauranteCard(
     restaurante: Restaurante,

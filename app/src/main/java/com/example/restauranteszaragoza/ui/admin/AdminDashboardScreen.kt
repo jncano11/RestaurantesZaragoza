@@ -70,7 +70,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
         Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(BG_COLORS)).padding(padding)) {
             Column(Modifier.fillMaxSize()) {
 
-                // ── Header ───────────────────────────────────────────────────
+                //Header
                 Box(
                     modifier = Modifier.fillMaxWidth()
                         .background(Brush.horizontalGradient(listOf(Color(0xFF4527A0), Color(0xFF7B1FA2))))
@@ -91,7 +91,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                     }
                 }
 
-                // ── Stats ─────────────────────────────────────────────────────
+                //Stats
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxWidth().height(180.dp).padding(12.dp),
@@ -104,7 +104,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                     item { AdminStatCard("Propinas €",   "%.2f".format(stats.ingresosPropinas), Icons.Default.Payments,   Color(0xFFAB47BC)) }
                 }
 
-                // ── Tabs ──────────────────────────────────────────────────────
+                //Tabs
                 val tabs = listOf("Usuarios", "Restaurantes", "Reservas", "Pendientes")
                 TabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT) {
                     tabs.forEachIndexed { i, label ->
@@ -127,7 +127,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
 
                 when (tabIndex) {
 
-                    // ── Usuarios ──────────────────────────────────────────────
+                    //Usuarios
                     0 -> {
                         val usuariosFiltrados = if (busquedaUsuario.isBlank()) usuarios
                             else usuarios.filter {
@@ -201,7 +201,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                         }
                     }
 
-                    // ── Restaurantes ──────────────────────────────────────────
+                    //Restaurantes
                     1 -> {
                         val restaurantesFiltrados = if (busquedaRestaurante.isBlank()) restaurantes
                             else restaurantes.filter {
@@ -249,7 +249,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                         }
                     }
 
-                    // ── Pendientes de aprobación ──────────────────────────────
+                    //Pendientes de aprobación
                     3 -> {
                         if (pendientes.isEmpty()) {
                             Box(Modifier.fillMaxSize().padding(top = 60.dp), Alignment.TopCenter) {
@@ -298,7 +298,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                         }
                     }
 
-                    // ── Reservas ──────────────────────────────────────────────
+                    //Reservas
                     2 -> {
                         val reservasFiltradas = if (filtroRestauranteId == null) reservas
                                                 else reservas.filter { it.restauranteId == filtroRestauranteId }
@@ -366,7 +366,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun AdminStatCard(label: String, value: String, icon: ImageVector, color: Color) {
     Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG)) {
@@ -383,9 +383,9 @@ private fun AdminStatCard(label: String, value: String, icon: ImageVector, color
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Card de Usuario con: activar/desactivar, cambiar rol, eliminar
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun AdminUsuarioCard(
     usuario: Usuario,
@@ -511,7 +511,7 @@ private fun AdminUsuarioCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun AdminRestauranteCard(restaurante: Restaurante, onToggle: () -> Unit) {
     val isActivo    = restaurante.activo == 1
@@ -546,7 +546,7 @@ private fun AdminRestauranteCard(restaurante: Restaurante, onToggle: () -> Unit)
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun AdminRestaurantePendienteCard(
     restaurante: RestaurantePendiente,
@@ -633,7 +633,7 @@ private fun AdminRestaurantePendienteCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun AdminReservaCard(reserva: Reserva) {
     val (color, icon) = when (reserva.estado) {

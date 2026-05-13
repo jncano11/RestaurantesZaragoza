@@ -66,7 +66,7 @@ fun AppNavigation() {
             onBackToLogin     = { screen = "login" }
         )
 
-        // ── ROL: usuario ──────────────────────────────────────────────────────
+        //ROL: usuario
         "home" -> {
             if (selectedRestaurante == null) {
                 HomeScreen(
@@ -86,12 +86,12 @@ fun AppNavigation() {
             onBack = { screen = "home" }
         )
 
-        // ── ROL: restaurante ──────────────────────────────────────────────────
+        // ROL: restaurante
         "restaurante_dashboard" -> RestauranteDashboardScreen(
             onLogout = { logout() }
         )
 
-        // ── ROL: admin ────────────────────────────────────────────────────────
+        //ROL: admin
         "admin_dashboard" -> AdminDashboardScreen(
             onLogout = { logout() }
         )

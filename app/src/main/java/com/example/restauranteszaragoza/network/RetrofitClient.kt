@@ -80,7 +80,7 @@ interface ApiService {
     @POST("admin/restaurante_aprobar.php")
     suspend fun aprobarRechazarRestaurante(@Body body: Map<String, String>): ApiResponse
 
-    // ── Restaurantes ──
+    // Restaurantes
     @GET("restaurantes/listar.php")
     suspend fun listarRestaurantes(
         @Query("categoria") categoria: String? = null,
@@ -97,7 +97,7 @@ interface ApiService {
     @GET("usuarios/perfil_stats.php")
     suspend fun perfilStats(@Query("usuario_id") usuarioId: Int): PerfilStats
 
-    // ── Menú ──
+    // Menú
     @GET("menu/platos.php")
     suspend fun listarMenu(@Query("restaurante_id") restauranteId: Int): List<PlatoDetalle>
 
@@ -119,7 +119,7 @@ interface ApiService {
     @POST("restaurantes/editar.php")
     suspend fun editarRestaurante(@Body body: Map<String, String>): ApiResponse
 
-    // ── Reservas ──
+    // Reservas
     @GET("reservas/mis_reservas.php")
     suspend fun misReservas(@Query("usuario_id") usuarioId: Int): List<Reserva>
 
@@ -135,14 +135,14 @@ interface ApiService {
     @POST("reservas/confirmar.php")
     suspend fun confirmarReserva(@Body body: Map<String, String>): ApiResponse
 
-    // ── Valoraciones ──
+    //Valoraciones
     @GET("valoraciones/por_restaurante.php")
     suspend fun valoracionesRestaurante(@Query("restaurante_id") id: Int): List<Valoracion>
 
     @POST("valoraciones/crear.php")
     suspend fun crearValoracion(@Body body: Map<String, String>): ApiResponse
 
-    // ── Admin ──
+    //Admin
     @GET("admin/estadisticas.php")
     suspend fun estadisticasAdmin(): EstadisticasAdmin
 
@@ -167,7 +167,7 @@ interface ApiService {
     @POST("admin/usuario_eliminar.php")
     suspend fun eliminarUsuario(@Body body: Map<String, String>): ApiResponse
 
-    // ── Fotos de restaurante ──
+    //Fotos de restaurante
     @GET("restaurantes/fotos_listar.php")
     suspend fun listarFotos(@Query("restaurante_id") restauranteId: Int): FotosResponse
 

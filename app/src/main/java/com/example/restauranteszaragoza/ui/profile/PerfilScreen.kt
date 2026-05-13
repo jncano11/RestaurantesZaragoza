@@ -49,7 +49,7 @@ fun PerfilScreen(onBack: () -> Unit) {
     ) {
         Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
 
-            // ── Header ────────────────────────────────────────────────────────
+            //Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,7 +107,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                 }
             }
 
-            // ── Contenido ─────────────────────────────────────────────────────
+            //Contenido
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
 
                 when {
@@ -134,7 +134,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                     else -> {
                         val s = stats!!
 
-                        // ── Datos de contacto ─────────────────────────────────
+                        //Datos de contacto
                         Text("Información personal", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(Modifier.height(10.dp))
                         Card(
@@ -156,7 +156,7 @@ fun PerfilScreen(onBack: () -> Unit) {
 
                         Spacer(Modifier.height(24.dp))
 
-                        // ── Estadísticas generales ────────────────────────────
+                        //Estadísticas generales
                         Text("Mis estadísticas", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(Modifier.height(10.dp))
 
@@ -212,7 +212,7 @@ fun PerfilScreen(onBack: () -> Unit) {
 
                         Spacer(Modifier.height(24.dp))
 
-                        // ── Desglose de reservas ──────────────────────────────
+                        //Desglose de reservas
                         Text("Estado de mis reservas", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(Modifier.height(10.dp))
                         Card(
@@ -233,7 +233,7 @@ fun PerfilScreen(onBack: () -> Unit) {
 
                         Spacer(Modifier.height(24.dp))
 
-                        // ── Últimas reservas ──────────────────────────────────
+                        //Últimas reservas
                         if (s.ultimasReservas.isNotEmpty()) {
                             Text("Últimas reservas", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             Spacer(Modifier.height(10.dp))

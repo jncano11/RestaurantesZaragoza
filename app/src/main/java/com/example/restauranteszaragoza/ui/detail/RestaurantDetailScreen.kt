@@ -40,9 +40,9 @@ import java.util.Locale
 private val ACCENT  = Color(0xFF00E5FF)
 private val CARD_BG = Color(0xFF1A2733)
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Pantalla principal de detalle del restaurante
-// ─────────────────────────────────────────────────────────────────────────────
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
@@ -109,7 +109,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
 
-            // ── Hero ──────────────────────────────────────────────────────────
+            //Hero
             Box(Modifier.fillMaxWidth().height(280.dp)) {
                 Image(
                     painter = painterResource(id = imageParaRestaurante(rest.categoria.orEmpty())),
@@ -124,7 +124,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 
             Column(modifier = Modifier.padding(horizontal = 20.dp).offset(y = (-20).dp)) {
 
-                // ── Info Card ─────────────────────────────────────────────────
+                //Info Card
                 Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = CARD_BG)) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
@@ -157,7 +157,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(20.dp))
 
-                // ── Mapa ──────────────────────────────────────────────────────
+                //Mapa
                 if (rest.latitud != 0.0 || rest.longitud != 0.0) {
                     Text("Ubicación", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(10.dp))
@@ -197,7 +197,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                     Spacer(Modifier.height(20.dp))
                 }
 
-                // ── Descripción ───────────────────────────────────────────────
+                //Descripción
                 if (!rest.descripcion.isNullOrBlank()) {
                     Text("Sobre el restaurante", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(8.dp))
@@ -205,7 +205,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                     Spacer(Modifier.height(20.dp))
                 }
 
-                // ── Horarios ──────────────────────────────────────────────────
+                //Horarios
                 val horarios = rest.horarios
                 if (horarios.isNotEmpty()) {
                     Text("Horarios", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -258,7 +258,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                     Spacer(Modifier.height(20.dp))
                 }
 
-                // ── MENÚ ──────────────────────────────────────────────────────
+                // MENÚ
                 Text("Menú", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(Modifier.height(10.dp))
                 if (menuPlatos.isNotEmpty()) {
@@ -306,7 +306,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                 }
                 Spacer(Modifier.height(20.dp))
 
-                // ── Galería ───────────────────────────────────────────────────
+                //Galería
                 val fotos = rest.fotos
                 if (fotos.isNotEmpty()) {
                     Text("Galería", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -327,7 +327,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(20.dp))
 
-                // ── Valoraciones ──────────────────────────────────────────────
+                // Valoraciones
                 Text("Valoraciones", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(Modifier.height(10.dp))
                 if (valoraciones.isEmpty()) {
@@ -356,7 +356,7 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(24.dp))
 
-                // ── Botones ───────────────────────────────────────────────────
+                //Botones
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedButton(
                         onClick = { showValoracionDialog = true },
@@ -410,9 +410,9 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Card de plato del menú
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun PlatoCard(plato: PlatoDetalle) {
     Card(
@@ -443,9 +443,9 @@ private fun PlatoCard(plato: PlatoDetalle) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Bottom Sheet de Reserva — con calendario y horas disponibles
-// ─────────────────────────────────────────────────────────────────────────────
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReservaBottomSheet(
@@ -511,7 +511,7 @@ private fun ReservaBottomSheet(
             Text(restaurante.nombre.orEmpty(), color = ACCENT, fontSize = 14.sp)
             Spacer(Modifier.height(20.dp))
 
-            // ── Calendario ────────────────────────────────────────────────────
+            // Calendario
             Text("Selecciona la fecha", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(10.dp))
 
@@ -633,7 +633,7 @@ private fun ReservaBottomSheet(
 
             Spacer(Modifier.height(20.dp))
 
-            // ── Horas disponibles ─────────────────────────────────────────────
+            // Horas disponibles
             Text("Selecciona la hora", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(10.dp))
 
@@ -687,7 +687,7 @@ private fun ReservaBottomSheet(
 
             Spacer(Modifier.height(20.dp))
 
-            // ── Número de personas ────────────────────────────────────────────
+            //Número de personas
             Text("Número de personas", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(10.dp))
             Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF111E28))) {
@@ -725,7 +725,7 @@ private fun ReservaBottomSheet(
 
             Spacer(Modifier.height(20.dp))
 
-            // ── Notas opcionales ──────────────────────────────────────────────
+            //Notas opcionales
             Text("Notas opcionales", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
@@ -749,7 +749,7 @@ private fun ReservaBottomSheet(
 
             Spacer(Modifier.height(20.dp))
 
-            // ── Botón Confirmar ───────────────────────────────────────────────
+            //Botón Confirmar
             Button(
                 onClick = {
                     when {
@@ -791,9 +791,9 @@ private fun ReservaBottomSheet(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Dialog de Valoración
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 private fun ValoracionDialog(restauranteId: Int, onDismiss: () -> Unit, onSuccess: (String) -> Unit) {
     val scope      = rememberCoroutineScope()

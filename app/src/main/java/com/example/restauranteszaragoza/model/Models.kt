@@ -2,7 +2,7 @@ package com.example.restauranteszaragoza.model
 
 import com.google.gson.annotations.SerializedName
 
-// ─── USUARIO ─────────────────────────────────────────────────────────────────
+// USUARIO
 data class Usuario(
     val id: Int = 0,
     val nombre: String = "",
@@ -22,7 +22,7 @@ data class LoginResponse(
     val usuario: Usuario? = null
 )
 
-// ─── RESTAURANTE ──────────────────────────────────────────────────────────────
+//RESTAURANTE
 data class Restaurante(
     // La API devuelve "restaurante_id", mapeamos a "id"
     @SerializedName("restaurante_id") val id: Int = 0,
@@ -60,7 +60,7 @@ data class Restaurante(
     @SerializedName("num_valoraciones") val numValoraciones: Int = 0
 )
 
-// ─── RESERVA ──────────────────────────────────────────────────────────────────
+//RESERVA
 data class Reserva(
     val id: Int = 0,
     @SerializedName("usuario_id") val usuarioId: Int = 0,
@@ -74,7 +74,7 @@ data class Reserva(
     val notas: String = ""
 )
 
-// ─── VALORACION ───────────────────────────────────────────────────────────────
+//VALORACION
 data class Valoracion(
     val id: Int = 0,
     @SerializedName("usuario_id") val usuarioId: Int = 0,
@@ -85,7 +85,7 @@ data class Valoracion(
     val fecha: String = ""
 )
 
-// ─── PLATO ────────────────────────────────────────────────────────────────────
+//PLATO
 data class Plato(
     val id: Int = 0,
     @SerializedName("categoria_id") val categoriaId: Int = 0,
@@ -98,7 +98,7 @@ data class Plato(
     val alergenos: String = ""
 )
 
-// ─── HORARIO ──────────────────────────────────────────────────────────────────
+//HORARIO
 data class Horario(
     @SerializedName("dia_semana") val diaSemana: Int = 0,
     @SerializedName("hora_apertura") val horaApertura: String = "",
@@ -111,7 +111,7 @@ data class Horario(
     }
 }
 
-// ─── PLATO MENÚ (devuelto por detalle.php) ────────────────────────────────────
+//PLATO MENÚ (devuelto por detalle.php)
 data class PlatoMenu(
     @SerializedName("categoria_nombre") val categoriaNombre: String = "",
     val nombre: String = "",
@@ -121,7 +121,7 @@ data class PlatoMenu(
     val alergenos: String = ""
 )
 
-// ─── FOTO RESTAURANTE ─────────────────────────────────────────────────────────
+//FOTO RESTAURANTE
 data class FotoRestaurante(
     @SerializedName("url_foto") val urlFoto: String = "",
     val descripcion: String = "",
@@ -134,7 +134,7 @@ data class FotosResponse(
     val message: String = ""
 )
 
-// ─── ESTADÍSTICAS ADMIN ───────────────────────────────────────────────────────
+//ESTADÍSTICAS ADMIN
 data class EstadisticasAdmin(
     @SerializedName("total_usuarios") val totalUsuarios: Int = 0,
     @SerializedName("total_restaurantes") val totalRestaurantes: Int = 0,
@@ -143,7 +143,7 @@ data class EstadisticasAdmin(
     @SerializedName("ingresos_propinas") val ingresosPropinas: Double = 0.0
 )
 
-// ─── RESTAURANTE PENDIENTE (admin) ───────────────────────────────────────────
+//RESTAURANTE PENDIENTE (admin)
 data class RestaurantePendiente(
     @SerializedName("restaurante_id") val id: Int = 0,
     val nombre: String = "",
@@ -156,13 +156,13 @@ data class RestaurantePendiente(
     @SerializedName("email_propietario") val emailPropietario: String = ""
 )
 
-// ─── RESPUESTAS GENERICAS ─────────────────────────────────────────────────────
+//RESPUESTAS GENERICAS
 data class ApiResponse(
     val success: Boolean,
     val message: String = ""
 )
 
-// ─── MENÚ RESPUESTA LISTAR ───────────────────────────────────────────────────
+//MENÚ RESPUESTA LISTAR
 data class MenuCategoria(
     val id: Int = 0,
     val nombre: String = "",

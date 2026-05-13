@@ -38,7 +38,7 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
-    // ── Datos usuario ──────────────────────────────────────────
+    //Datos usuario
     var nombre    by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var email     by remember { mutableStateOf("") }
@@ -46,7 +46,7 @@ fun RegisterScreen(
     var password  by remember { mutableStateOf("") }
     var showPass  by remember { mutableStateOf(false) }
 
-    // ── Modo restaurante ───────────────────────────────────────
+    //Modo restaurante
     var esRestaurante         by remember { mutableStateOf(false) }
     var nombreRestaurante     by remember { mutableStateOf("") }
     var descripcion           by remember { mutableStateOf("") }
@@ -93,7 +93,7 @@ fun RegisterScreen(
                     }
                 }
 
-                // ── Datos personales ───────────────────────────────────
+                //Datos personales
                 FormField("Nombre *", nombre) { nombre = it; errorMsg = null }
                 FormField("Apellidos", apellidos) { apellidos = it }
                 FormField("Correo electrónico *", email) { email = it; errorMsg = null }
@@ -122,7 +122,7 @@ fun RegisterScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // ── Botón ¿Eres un restaurante? ────────────────────────
+                //Botón ¿Eres un restaurante?
                 OutlinedButton(
                     onClick = { esRestaurante = !esRestaurante; errorMsg = null },
                     modifier = Modifier.fillMaxWidth(),
@@ -143,7 +143,7 @@ fun RegisterScreen(
                     )
                 }
 
-                // ── Formulario restaurante (animado) ───────────────────
+                // Formulario restaurante (animado)
                 AnimatedVisibility(
                     visible = esRestaurante,
                     enter   = expandVertically(),
