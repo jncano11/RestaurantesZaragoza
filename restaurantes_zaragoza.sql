@@ -1,916 +1,380 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
+-- MySQL dump 10.13  Distrib 8.0.45, for Linux (x86_64)
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 07-05-2026 a las 19:10:04
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
+-- Host: localhost    Database: restaurantes_zaragoza
+-- ------------------------------------------------------
+-- Server version	8.0.45-0ubuntu0.24.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Base de datos: `restaurantes_zaragoza`
+-- Table structure for table `fotos_restaurante`
 --
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `fotos_restaurante`
---
-
+DROP TABLE IF EXISTS `fotos_restaurante`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `fotos_restaurante` (
-  `id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
-  `url_foto` varchar(500) NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `es_portada` tinyint(1) DEFAULT 0,
-  `orden` int(11) DEFAULT 0,
-  `fecha_subida` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `restaurante_id` int NOT NULL,
+  `url_foto` varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `es_portada` tinyint(1) DEFAULT '0',
+  `orden` int DEFAULT '0',
+  `fecha_subida` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  CONSTRAINT `fotos_restaurante_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `fotos_restaurante`
+-- Dumping data for table `fotos_restaurante`
 --
 
-INSERT INTO `fotos_restaurante` (`id`, `restaurante_id`, `url_foto`, `descripcion`, `es_portada`, `orden`, `fecha_subida`) VALUES
-(1, 7, 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800', 'Interior de la taberna', 1, 1, '2026-01-11 10:00:00'),
-(2, 7, 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800', 'Platos principales', 0, 2, '2026-01-11 10:01:00'),
-(3, 8, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800', 'Chuletón a la brasa', 1, 1, '2026-01-11 10:02:00'),
-(4, 8, 'https://images.unsplash.com/photo-1558030006-450675393462?w=800', 'Terraza junto al Ebro', 0, 2, '2026-01-11 10:03:00'),
-(5, 9, 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800', 'Zona de desayunos', 1, 1, '2026-01-11 10:04:00'),
-(6, 11, 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800', 'Marisco fresco del día', 1, 1, '2026-01-11 10:05:00'),
-(7, 12, 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800', 'Tacos y salsas', 1, 1, '2026-01-11 10:06:00'),
-(8, 13, 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800', 'Bowl de quinoa', 1, 1, '2026-01-11 10:07:00'),
-(9, 14, 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800', 'Ramen tonkotsu', 1, 1, '2026-01-11 10:08:00'),
-(10, 15, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800', 'La Baturra burger', 1, 1, '2026-01-11 10:09:00'),
-(11, 16, 'https://images.unsplash.com/photo-1528736235302-52922df5c122?w=800', 'Barra de pinchos', 1, 1, '2026-01-11 10:10:00');
-
--- --------------------------------------------------------
+LOCK TABLES `fotos_restaurante` WRITE;
+/*!40000 ALTER TABLE `fotos_restaurante` DISABLE KEYS */;
+INSERT INTO `fotos_restaurante` VALUES (1,7,'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800','Interior de la taberna',1,1,'2026-01-11 10:00:00'),(2,7,'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800','Platos principales',0,2,'2026-01-11 10:01:00'),(3,8,'https://images.unsplash.com/photo-1544025162-d76694265947?w=800','Chuletón a la brasa',1,1,'2026-01-11 10:02:00'),(4,8,'https://images.unsplash.com/photo-1558030006-450675393462?w=800','Terraza junto al Ebro',0,2,'2026-01-11 10:03:00'),(5,9,'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800','Zona de desayunos',1,1,'2026-01-11 10:04:00'),(6,11,'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800','Marisco fresco del día',1,1,'2026-01-11 10:05:00'),(7,12,'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800','Tacos y salsas',1,1,'2026-01-11 10:06:00'),(8,13,'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800','Bowl de quinoa',1,1,'2026-01-11 10:07:00'),(9,14,'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800','Ramen tonkotsu',1,1,'2026-01-11 10:08:00'),(10,15,'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800','La Baturra burger',1,1,'2026-01-11 10:09:00'),(11,16,'https://images.unsplash.com/photo-1528736235302-52922df5c122?w=800','Barra de pinchos',1,1,'2026-01-11 10:10:00');
+/*!40000 ALTER TABLE `fotos_restaurante` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `horarios`
+-- Table structure for table `horarios`
 --
 
+DROP TABLE IF EXISTS `horarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `horarios` (
-  `id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
-  `dia_semana` tinyint(4) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `restaurante_id` int NOT NULL,
+  `dia_semana` tinyint NOT NULL,
   `hora_apertura` time DEFAULT NULL,
   `hora_cierre` time DEFAULT NULL,
-  `cerrado` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `cerrado` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=383 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `horarios`
+-- Dumping data for table `horarios`
 --
 
-INSERT INTO `horarios` (`id`, `restaurante_id`, `dia_semana`, `hora_apertura`, `hora_cierre`, `cerrado`) VALUES
-(1, 1, 0, '13:00:00', '16:00:00', 0),
-(2, 1, 0, '20:00:00', '23:30:00', 0),
-(3, 1, 1, '13:00:00', '16:00:00', 0),
-(4, 1, 1, '20:00:00', '23:30:00', 0),
-(5, 1, 2, '13:00:00', '16:00:00', 0),
-(6, 1, 2, '20:00:00', '23:30:00', 0),
-(7, 1, 3, '13:00:00', '16:00:00', 0),
-(8, 1, 3, '20:00:00', '23:30:00', 0),
-(9, 1, 4, '13:00:00', '16:00:00', 0),
-(10, 1, 4, '20:00:00', '23:30:00', 0),
-(11, 1, 5, '13:00:00', '17:00:00', 0),
-(12, 1, 5, '20:00:00', '00:00:00', 0),
-(13, 1, 6, NULL, NULL, 1),
-(14, 7, 0, NULL, NULL, 1),
-(15, 7, 1, '12:00:00', '16:00:00', 0),
-(16, 7, 1, '19:30:00', '23:30:00', 0),
-(17, 7, 2, '12:00:00', '16:00:00', 0),
-(18, 7, 2, '19:30:00', '23:30:00', 0),
-(19, 7, 3, '12:00:00', '16:00:00', 0),
-(20, 7, 3, '19:30:00', '23:30:00', 0),
-(21, 7, 4, '12:00:00', '16:00:00', 0),
-(22, 7, 4, '19:30:00', '23:30:00', 0),
-(23, 7, 5, '12:00:00', '17:00:00', 0),
-(24, 7, 5, '19:30:00', '00:00:00', 0),
-(25, 7, 6, '12:00:00', '17:00:00', 0),
-(26, 7, 6, '19:30:00', '00:00:00', 0),
-(27, 8, 0, NULL, NULL, 1),
-(28, 8, 1, NULL, NULL, 1),
-(29, 8, 2, '13:00:00', '16:30:00', 0),
-(30, 8, 2, '20:00:00', '23:30:00', 0),
-(31, 8, 3, '13:00:00', '16:30:00', 0),
-(32, 8, 3, '20:00:00', '23:30:00', 0),
-(33, 8, 4, '13:00:00', '16:30:00', 0),
-(34, 8, 4, '20:00:00', '23:30:00', 0),
-(35, 8, 5, '13:00:00', '17:00:00', 0),
-(36, 8, 5, '20:00:00', '00:00:00', 0),
-(37, 8, 6, '13:00:00', '17:00:00', 0),
-(38, 8, 6, '20:00:00', '00:00:00', 0),
-(39, 9, 0, '08:00:00', '22:00:00', 0),
-(40, 9, 1, '08:00:00', '22:00:00', 0),
-(41, 9, 2, '08:00:00', '22:00:00', 0),
-(42, 9, 3, '08:00:00', '22:00:00', 0),
-(43, 9, 4, '08:00:00', '22:00:00', 0),
-(44, 9, 5, '08:00:00', '23:00:00', 0),
-(45, 9, 6, '09:00:00', '23:00:00', 0),
-(46, 10, 0, '13:00:00', '16:00:00', 0),
-(47, 10, 0, '20:00:00', '23:30:00', 0),
-(48, 10, 1, '13:00:00', '16:00:00', 0),
-(49, 10, 1, '20:00:00', '23:30:00', 0),
-(50, 10, 2, '13:00:00', '16:00:00', 0),
-(51, 10, 2, '20:00:00', '23:30:00', 0),
-(52, 10, 3, '13:00:00', '16:00:00', 0),
-(53, 10, 3, '20:00:00', '23:30:00', 0),
-(54, 10, 4, '13:00:00', '16:00:00', 0),
-(55, 10, 4, '20:00:00', '23:30:00', 0),
-(56, 10, 5, '13:00:00', '17:00:00', 0),
-(57, 10, 5, '20:00:00', '00:30:00', 0),
-(58, 10, 6, NULL, NULL, 1),
-(59, 11, 0, NULL, NULL, 1),
-(60, 11, 1, '13:00:00', '16:30:00', 0),
-(61, 11, 1, '20:00:00', '23:30:00', 0),
-(62, 11, 2, '13:00:00', '16:30:00', 0),
-(63, 11, 2, '20:00:00', '23:30:00', 0),
-(64, 11, 3, '13:00:00', '16:30:00', 0),
-(65, 11, 3, '20:00:00', '23:30:00', 0),
-(66, 11, 4, '13:00:00', '16:30:00', 0),
-(67, 11, 4, '20:00:00', '23:30:00', 0),
-(68, 11, 5, '13:00:00', '17:00:00', 0),
-(69, 11, 5, '20:00:00', '00:00:00', 0),
-(70, 11, 6, '13:00:00', '17:00:00', 0),
-(71, 11, 6, '20:00:00', '00:00:00', 0),
-(72, 12, 0, NULL, NULL, 1),
-(73, 12, 1, '20:00:00', '23:30:00', 0),
-(74, 12, 2, '20:00:00', '23:30:00', 0),
-(75, 12, 3, '20:00:00', '23:30:00', 0),
-(76, 12, 4, '20:00:00', '23:30:00', 0),
-(77, 12, 5, '13:00:00', '16:00:00', 0),
-(78, 12, 5, '20:00:00', '00:30:00', 0),
-(79, 12, 6, '13:00:00', '16:00:00', 0),
-(80, 12, 6, '20:00:00', '00:30:00', 0),
-(81, 13, 0, NULL, NULL, 1),
-(82, 13, 1, NULL, NULL, 1),
-(83, 13, 2, '13:00:00', '16:00:00', 0),
-(84, 13, 3, '13:00:00', '16:00:00', 0),
-(85, 13, 4, '13:00:00', '16:00:00', 0),
-(86, 13, 4, '19:30:00', '22:30:00', 0),
-(87, 13, 5, '13:00:00', '16:30:00', 0),
-(88, 13, 5, '19:30:00', '22:30:00', 0),
-(89, 13, 6, '12:00:00', '16:30:00', 0),
-(90, 13, 6, '19:30:00', '22:30:00', 0),
-(91, 14, 0, NULL, NULL, 1),
-(92, 14, 1, '13:00:00', '15:30:00', 0),
-(93, 14, 1, '20:00:00', '23:00:00', 0),
-(94, 14, 2, '13:00:00', '15:30:00', 0),
-(95, 14, 2, '20:00:00', '23:00:00', 0),
-(96, 14, 3, '13:00:00', '15:30:00', 0),
-(97, 14, 3, '20:00:00', '23:00:00', 0),
-(98, 14, 4, '13:00:00', '15:30:00', 0),
-(99, 14, 4, '20:00:00', '23:00:00', 0),
-(100, 14, 5, '13:00:00', '16:00:00', 0),
-(101, 14, 5, '20:00:00', '23:30:00', 0),
-(102, 14, 6, '13:00:00', '16:00:00', 0),
-(103, 14, 6, '20:00:00', '23:30:00', 0),
-(104, 15, 0, '20:00:00', '23:00:00', 0),
-(105, 15, 1, '20:00:00', '23:00:00', 0),
-(106, 15, 2, '20:00:00', '23:00:00', 0),
-(107, 15, 3, '20:00:00', '23:00:00', 0),
-(108, 15, 4, '20:00:00', '23:00:00', 0),
-(109, 15, 5, '13:00:00', '16:00:00', 0),
-(110, 15, 5, '20:00:00', '23:30:00', 0),
-(111, 15, 6, '13:00:00', '16:00:00', 0),
-(112, 15, 6, '20:00:00', '23:30:00', 0),
-(113, 16, 0, '11:00:00', '15:30:00', 0),
-(114, 16, 0, '19:00:00', '23:00:00', 0),
-(115, 16, 1, '11:00:00', '15:30:00', 0),
-(116, 16, 1, '19:00:00', '23:00:00', 0),
-(117, 16, 2, '11:00:00', '15:30:00', 0),
-(118, 16, 2, '19:00:00', '23:00:00', 0),
-(119, 16, 3, '11:00:00', '15:30:00', 0),
-(120, 16, 3, '19:00:00', '23:00:00', 0),
-(121, 16, 4, '11:00:00', '15:30:00', 0),
-(122, 16, 4, '19:00:00', '23:00:00', 0),
-(123, 16, 5, '11:00:00', '17:00:00', 0),
-(124, 16, 5, '19:00:00', '00:00:00', 0),
-(125, 16, 6, '11:00:00', '17:00:00', 0),
-(126, 16, 6, '19:00:00', '00:00:00', 0);
-
--- --------------------------------------------------------
+LOCK TABLES `horarios` WRITE;
+/*!40000 ALTER TABLE `horarios` DISABLE KEYS */;
+INSERT INTO `horarios` VALUES (1,1,0,'13:00:00','16:00:00',0),(2,1,0,'20:00:00','23:30:00',0),(3,1,1,'13:00:00','16:00:00',0),(4,1,1,'20:00:00','23:30:00',0),(5,1,2,'13:00:00','16:00:00',0),(6,1,2,'20:00:00','23:30:00',0),(7,1,3,'13:00:00','16:00:00',0),(8,1,3,'20:00:00','23:30:00',0),(9,1,4,'13:00:00','16:00:00',0),(10,1,4,'20:00:00','23:30:00',0),(11,1,5,'13:00:00','17:00:00',0),(12,1,5,'20:00:00','00:00:00',0),(13,1,6,NULL,NULL,1),(14,7,0,NULL,NULL,1),(15,7,1,'12:00:00','16:00:00',0),(16,7,1,'19:30:00','23:30:00',0),(17,7,2,'12:00:00','16:00:00',0),(18,7,2,'19:30:00','23:30:00',0),(19,7,3,'12:00:00','16:00:00',0),(20,7,3,'19:30:00','23:30:00',0),(21,7,4,'12:00:00','16:00:00',0),(22,7,4,'19:30:00','23:30:00',0),(23,7,5,'12:00:00','17:00:00',0),(24,7,5,'19:30:00','00:00:00',0),(25,7,6,'12:00:00','17:00:00',0),(26,7,6,'19:30:00','00:00:00',0),(27,8,0,NULL,NULL,1),(28,8,1,NULL,NULL,1),(29,8,2,'13:00:00','16:30:00',0),(30,8,2,'20:00:00','23:30:00',0),(31,8,3,'13:00:00','16:30:00',0),(32,8,3,'20:00:00','23:30:00',0),(33,8,4,'13:00:00','16:30:00',0),(34,8,4,'20:00:00','23:30:00',0),(35,8,5,'13:00:00','17:00:00',0),(36,8,5,'20:00:00','00:00:00',0),(37,8,6,'13:00:00','17:00:00',0),(38,8,6,'20:00:00','00:00:00',0),(39,9,0,'08:00:00','22:00:00',0),(40,9,1,'08:00:00','22:00:00',0),(41,9,2,'08:00:00','22:00:00',0),(42,9,3,'08:00:00','22:00:00',0),(43,9,4,'08:00:00','22:00:00',0),(44,9,5,'08:00:00','23:00:00',0),(45,9,6,'09:00:00','23:00:00',0),(46,10,0,'13:00:00','16:00:00',0),(47,10,0,'20:00:00','23:30:00',0),(48,10,1,'13:00:00','16:00:00',0),(49,10,1,'20:00:00','23:30:00',0),(50,10,2,'13:00:00','16:00:00',0),(51,10,2,'20:00:00','23:30:00',0),(52,10,3,'13:00:00','16:00:00',0),(53,10,3,'20:00:00','23:30:00',0),(54,10,4,'13:00:00','16:00:00',0),(55,10,4,'20:00:00','23:30:00',0),(56,10,5,'13:00:00','17:00:00',0),(57,10,5,'20:00:00','00:30:00',0),(58,10,6,NULL,NULL,1),(59,11,0,NULL,NULL,1),(60,11,1,'13:00:00','16:30:00',0),(61,11,1,'20:00:00','23:30:00',0),(62,11,2,'13:00:00','16:30:00',0),(63,11,2,'20:00:00','23:30:00',0),(64,11,3,'13:00:00','16:30:00',0),(65,11,3,'20:00:00','23:30:00',0),(66,11,4,'13:00:00','16:30:00',0),(67,11,4,'20:00:00','23:30:00',0),(68,11,5,'13:00:00','17:00:00',0),(69,11,5,'20:00:00','00:00:00',0),(70,11,6,'13:00:00','17:00:00',0),(71,11,6,'20:00:00','00:00:00',0),(72,12,0,NULL,NULL,1),(73,12,1,'20:00:00','23:30:00',0),(74,12,2,'20:00:00','23:30:00',0),(75,12,3,'20:00:00','23:30:00',0),(76,12,4,'20:00:00','23:30:00',0),(77,12,5,'13:00:00','16:00:00',0),(78,12,5,'20:00:00','00:30:00',0),(79,12,6,'13:00:00','16:00:00',0),(80,12,6,'20:00:00','00:30:00',0),(81,13,0,NULL,NULL,1),(82,13,1,NULL,NULL,1),(83,13,2,'13:00:00','16:00:00',0),(84,13,3,'13:00:00','16:00:00',0),(85,13,4,'13:00:00','16:00:00',0),(86,13,4,'19:30:00','22:30:00',0),(87,13,5,'13:00:00','16:30:00',0),(88,13,5,'19:30:00','22:30:00',0),(89,13,6,'12:00:00','16:30:00',0),(90,13,6,'19:30:00','22:30:00',0),(91,14,0,NULL,NULL,1),(92,14,1,'13:00:00','15:30:00',0),(93,14,1,'20:00:00','23:00:00',0),(94,14,2,'13:00:00','15:30:00',0),(95,14,2,'20:00:00','23:00:00',0),(96,14,3,'13:00:00','15:30:00',0),(97,14,3,'20:00:00','23:00:00',0),(98,14,4,'13:00:00','15:30:00',0),(99,14,4,'20:00:00','23:00:00',0),(100,14,5,'13:00:00','16:00:00',0),(101,14,5,'20:00:00','23:30:00',0),(102,14,6,'13:00:00','16:00:00',0),(103,14,6,'20:00:00','23:30:00',0),(104,15,0,'20:00:00','23:00:00',0),(105,15,1,'20:00:00','23:00:00',0),(106,15,2,'20:00:00','23:00:00',0),(107,15,3,'20:00:00','23:00:00',0),(108,15,4,'20:00:00','23:00:00',0),(109,15,5,'13:00:00','16:00:00',0),(110,15,5,'20:00:00','23:30:00',0),(111,15,6,'13:00:00','16:00:00',0),(112,15,6,'20:00:00','23:30:00',0),(113,16,0,'11:00:00','15:30:00',0),(114,16,0,'19:00:00','23:00:00',0),(115,16,1,'11:00:00','15:30:00',0),(116,16,1,'19:00:00','23:00:00',0),(117,16,2,'11:00:00','15:30:00',0),(118,16,2,'19:00:00','23:00:00',0),(119,16,3,'11:00:00','15:30:00',0),(120,16,3,'19:00:00','23:00:00',0),(121,16,4,'11:00:00','15:30:00',0),(122,16,4,'19:00:00','23:00:00',0),(123,16,5,'11:00:00','17:00:00',0),(124,16,5,'19:00:00','00:00:00',0),(125,16,6,'11:00:00','17:00:00',0),(126,16,6,'19:00:00','00:00:00',0),(127,40,0,NULL,NULL,1),(128,40,1,'13:30:00','15:30:00',0),(129,40,1,'20:30:00','22:30:00',0),(130,40,2,'13:30:00','15:30:00',0),(131,40,2,'20:30:00','22:30:00',0),(132,40,3,'13:30:00','15:30:00',0),(133,40,3,'20:30:00','22:30:00',0),(134,40,4,'13:30:00','15:30:00',0),(135,40,4,'20:30:00','22:30:00',0),(136,40,5,'13:30:00','15:30:00',0),(137,40,5,'20:30:00','22:30:00',0),(138,40,6,NULL,NULL,1),(139,41,0,NULL,NULL,1),(140,41,1,'13:30:00','15:30:00',0),(141,41,1,'20:30:00','22:30:00',0),(142,41,2,'13:30:00','15:30:00',0),(143,41,2,'20:30:00','22:30:00',0),(144,41,3,'13:30:00','15:30:00',0),(145,41,3,'20:30:00','22:30:00',0),(146,41,4,'13:30:00','15:30:00',0),(147,41,4,'20:30:00','22:30:00',0),(148,41,5,'13:30:00','15:30:00',0),(149,41,5,'20:30:00','22:30:00',0),(150,41,6,'13:30:00','15:30:00',0),(151,42,0,NULL,NULL,1),(152,42,1,'13:30:00','15:30:00',0),(153,42,1,'20:30:00','23:00:00',0),(154,42,2,'13:30:00','15:30:00',0),(155,42,2,'20:30:00','23:00:00',0),(156,42,3,'13:30:00','15:30:00',0),(157,42,3,'20:30:00','23:00:00',0),(158,42,4,'13:30:00','15:30:00',0),(159,42,4,'20:30:00','23:00:00',0),(160,42,5,'13:30:00','15:30:00',0),(161,42,5,'20:30:00','23:00:00',0),(162,42,6,NULL,NULL,1),(163,43,0,NULL,NULL,1),(164,43,1,'13:00:00','16:00:00',0),(165,43,1,'20:00:00','23:30:00',0),(166,43,2,'13:00:00','16:00:00',0),(167,43,2,'20:00:00','23:30:00',0),(168,43,3,'13:00:00','16:00:00',0),(169,43,3,'20:00:00','23:30:00',0),(170,43,4,'13:00:00','16:00:00',0),(171,43,4,'20:00:00','23:30:00',0),(172,43,5,'13:00:00','16:00:00',0),(173,43,5,'20:00:00','23:30:00',0),(174,43,6,'13:00:00','16:00:00',0),(175,44,0,'13:00:00','16:00:00',0),(176,44,0,'20:00:00','23:30:00',0),(177,44,1,'13:00:00','16:00:00',0),(178,44,1,'20:00:00','23:30:00',0),(179,44,2,'13:00:00','16:00:00',0),(180,44,2,'20:00:00','23:30:00',0),(181,44,3,'13:00:00','16:00:00',0),(182,44,3,'20:00:00','23:30:00',0),(183,44,4,'13:00:00','16:00:00',0),(184,44,4,'20:00:00','23:30:00',0),(185,44,5,'13:00:00','16:00:00',0),(186,44,5,'20:00:00','00:00:00',0),(187,44,6,'13:00:00','16:00:00',0),(188,44,6,'20:00:00','23:30:00',0),(189,45,0,NULL,NULL,1),(190,45,1,'13:00:00','16:00:00',0),(191,45,1,'20:00:00','23:30:00',0),(192,45,2,'13:00:00','16:00:00',0),(193,45,2,'20:00:00','23:30:00',0),(194,45,3,'13:00:00','16:00:00',0),(195,45,3,'20:00:00','23:30:00',0),(196,45,4,'13:00:00','16:00:00',0),(197,45,4,'20:00:00','23:30:00',0),(198,45,5,'13:00:00','16:00:00',0),(199,45,5,'20:00:00','00:00:00',0),(200,45,6,'13:00:00','16:00:00',0),(201,46,0,NULL,NULL,1),(202,46,1,'13:00:00','16:00:00',0),(203,46,1,'20:00:00','23:30:00',0),(204,46,2,'13:00:00','16:00:00',0),(205,46,2,'20:00:00','23:30:00',0),(206,46,3,'13:00:00','16:00:00',0),(207,46,3,'20:00:00','23:30:00',0),(208,46,4,'13:00:00','16:00:00',0),(209,46,4,'20:00:00','23:30:00',0),(210,46,5,'13:00:00','16:00:00',0),(211,46,5,'20:00:00','00:00:00',0),(212,46,6,'13:00:00','16:00:00',0),(213,46,6,'20:00:00','23:30:00',0),(214,47,0,'13:00:00','16:00:00',0),(215,47,0,'20:00:00','23:30:00',0),(216,47,1,'13:00:00','16:00:00',0),(217,47,1,'20:00:00','23:30:00',0),(218,47,2,'13:00:00','16:00:00',0),(219,47,2,'20:00:00','23:30:00',0),(220,47,3,'13:00:00','16:00:00',0),(221,47,3,'20:00:00','23:30:00',0),(222,47,4,'13:00:00','16:00:00',0),(223,47,4,'20:00:00','23:30:00',0),(224,47,5,'13:00:00','16:00:00',0),(225,47,5,'20:00:00','00:00:00',0),(226,47,6,'13:00:00','16:00:00',0),(227,47,6,'20:00:00','23:30:00',0),(228,48,0,NULL,NULL,1),(229,48,1,'13:00:00','16:00:00',0),(230,48,1,'20:00:00','23:00:00',0),(231,48,2,'13:00:00','16:00:00',0),(232,48,2,'20:00:00','23:00:00',0),(233,48,3,'13:00:00','16:00:00',0),(234,48,3,'20:00:00','23:00:00',0),(235,48,4,'13:00:00','16:00:00',0),(236,48,4,'20:00:00','23:00:00',0),(237,48,5,'13:00:00','16:00:00',0),(238,48,5,'20:00:00','23:30:00',0),(239,48,6,'13:00:00','16:00:00',0),(240,49,0,NULL,NULL,1),(241,49,1,'13:00:00','16:00:00',0),(242,49,1,'20:00:00','23:30:00',0),(243,49,2,'13:00:00','16:00:00',0),(244,49,2,'20:00:00','23:30:00',0),(245,49,3,'13:00:00','16:00:00',0),(246,49,3,'20:00:00','23:30:00',0),(247,49,4,'13:00:00','16:00:00',0),(248,49,4,'20:00:00','23:30:00',0),(249,49,5,'13:00:00','16:00:00',0),(250,49,5,'20:00:00','00:00:00',0),(251,49,6,'13:00:00','16:00:00',0),(252,49,6,'20:00:00','23:30:00',0),(253,50,0,'13:00:00','16:00:00',0),(254,50,0,'20:00:00','23:30:00',0),(255,50,1,'13:00:00','16:00:00',0),(256,50,1,'20:00:00','23:30:00',0),(257,50,2,'13:00:00','16:00:00',0),(258,50,2,'20:00:00','23:30:00',0),(259,50,3,'13:00:00','16:00:00',0),(260,50,3,'20:00:00','23:30:00',0),(261,50,4,'13:00:00','16:00:00',0),(262,50,4,'20:00:00','23:30:00',0),(263,50,5,'13:00:00','16:00:00',0),(264,50,5,'20:00:00','00:00:00',0),(265,50,6,'13:00:00','16:00:00',0),(266,50,6,'20:00:00','23:30:00',0),(267,51,0,NULL,NULL,1),(268,51,1,'13:00:00','16:00:00',0),(269,51,1,'20:00:00','23:30:00',0),(270,51,2,'13:00:00','16:00:00',0),(271,51,2,'20:00:00','23:30:00',0),(272,51,3,'13:00:00','16:00:00',0),(273,51,3,'20:00:00','23:30:00',0),(274,51,4,'13:00:00','16:00:00',0),(275,51,4,'20:00:00','23:30:00',0),(276,51,5,'13:00:00','16:00:00',0),(277,51,5,'20:00:00','00:00:00',0),(278,51,6,'13:00:00','16:00:00',0),(279,51,6,'20:00:00','23:30:00',0),(280,52,0,'08:00:00','14:00:00',0),(281,52,0,'16:00:00','22:00:00',0),(282,52,1,'08:00:00','14:00:00',0),(283,52,1,'16:00:00','22:00:00',0),(284,52,2,'08:00:00','14:00:00',0),(285,52,2,'16:00:00','22:00:00',0),(286,52,3,'08:00:00','14:00:00',0),(287,52,3,'16:00:00','22:00:00',0),(288,52,4,'08:00:00','14:00:00',0),(289,52,4,'16:00:00','23:00:00',0),(290,52,5,'08:00:00','14:00:00',0),(291,52,5,'16:00:00','23:00:00',0),(292,52,6,'09:00:00','14:00:00',0),(293,52,6,'16:00:00','22:00:00',0),(294,53,0,NULL,NULL,1),(295,53,1,'09:00:00','16:00:00',0),(296,53,1,'19:00:00','00:00:00',0),(297,53,2,'09:00:00','16:00:00',0),(298,53,2,'19:00:00','00:00:00',0),(299,53,3,'09:00:00','16:00:00',0),(300,53,3,'19:00:00','00:00:00',0),(301,53,4,'09:00:00','16:00:00',0),(302,53,4,'19:00:00','00:00:00',0),(303,53,5,'09:00:00','16:00:00',0),(304,53,5,'19:00:00','01:00:00',0),(305,53,6,'10:00:00','17:00:00',0),(306,53,6,'19:00:00','00:00:00',0),(307,54,0,NULL,NULL,1),(308,54,1,'12:00:00','16:00:00',0),(309,54,1,'19:30:00','23:30:00',0),(310,54,2,'12:00:00','16:00:00',0),(311,54,2,'19:30:00','23:30:00',0),(312,54,3,'12:00:00','16:00:00',0),(313,54,3,'19:30:00','23:30:00',0),(314,54,4,'12:00:00','16:00:00',0),(315,54,4,'19:30:00','00:00:00',0),(316,54,5,'12:00:00','16:00:00',0),(317,54,5,'19:30:00','00:00:00',0),(318,54,6,'12:00:00','16:00:00',0),(319,54,6,'19:30:00','23:30:00',0),(320,55,0,NULL,NULL,1),(321,55,1,'13:00:00','16:00:00',0),(322,55,1,'20:00:00','23:00:00',0),(323,55,2,'13:00:00','16:00:00',0),(324,55,2,'20:00:00','23:00:00',0),(325,55,3,'13:00:00','16:00:00',0),(326,55,3,'20:00:00','23:00:00',0),(327,55,4,'13:00:00','16:00:00',0),(328,55,4,'20:00:00','23:00:00',0),(329,55,5,'13:00:00','16:00:00',0),(330,55,5,'20:00:00','23:30:00',0),(331,55,6,NULL,NULL,1),(332,56,0,NULL,NULL,1),(333,56,1,'13:00:00','16:00:00',0),(334,56,1,'20:00:00','23:30:00',0),(335,56,2,'13:00:00','16:00:00',0),(336,56,2,'20:00:00','23:30:00',0),(337,56,3,'13:00:00','16:00:00',0),(338,56,3,'20:00:00','23:30:00',0),(339,56,4,'13:00:00','16:00:00',0),(340,56,4,'20:00:00','23:30:00',0),(341,56,5,'13:00:00','16:00:00',0),(342,56,5,'20:00:00','00:00:00',0),(343,56,6,'13:00:00','16:00:00',0),(344,56,6,'20:00:00','23:30:00',0),(345,57,0,NULL,NULL,1),(346,57,1,NULL,NULL,1),(347,57,2,'13:00:00','16:00:00',0),(348,57,2,'20:30:00','23:30:00',0),(349,57,3,'13:00:00','16:00:00',0),(350,57,3,'20:30:00','23:30:00',0),(351,57,4,'13:00:00','16:00:00',0),(352,57,4,'20:30:00','23:30:00',0),(353,57,5,'13:00:00','16:00:00',0),(354,57,5,'20:30:00','00:00:00',0),(355,57,6,'13:00:00','16:00:00',0),(356,58,0,NULL,NULL,1),(357,58,1,'13:00:00','16:00:00',0),(358,58,1,'20:00:00','23:30:00',0),(359,58,2,'13:00:00','16:00:00',0),(360,58,2,'20:00:00','23:30:00',0),(361,58,3,'13:00:00','16:00:00',0),(362,58,3,'20:00:00','23:30:00',0),(363,58,4,'13:00:00','16:00:00',0),(364,58,4,'20:00:00','23:30:00',0),(365,58,5,'13:00:00','16:00:00',0),(366,58,5,'20:00:00','00:00:00',0),(367,58,6,'13:00:00','16:00:00',0),(368,58,6,'20:00:00','23:30:00',0),(369,59,0,'13:00:00','16:00:00',0),(370,59,0,'20:00:00','23:30:00',0),(371,59,1,'13:00:00','16:00:00',0),(372,59,1,'20:00:00','23:30:00',0),(373,59,2,'13:00:00','16:00:00',0),(374,59,2,'20:00:00','23:30:00',0),(375,59,3,'13:00:00','16:00:00',0),(376,59,3,'20:00:00','23:30:00',0),(377,59,4,'13:00:00','16:00:00',0),(378,59,4,'20:00:00','23:30:00',0),(379,59,5,'13:00:00','16:00:00',0),(380,59,5,'20:00:00','00:00:00',0),(381,59,6,'13:00:00','16:00:00',0),(382,59,6,'20:00:00','23:30:00',0);
+/*!40000 ALTER TABLE `horarios` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `menu_categorias`
+-- Table structure for table `menu_categorias`
 --
 
+DROP TABLE IF EXISTS `menu_categorias`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `menu_categorias` (
-  `id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `orden` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `restaurante_id` int NOT NULL,
+  `nombre` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `orden` int DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  CONSTRAINT `menu_categorias_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `menu_categorias`
+-- Dumping data for table `menu_categorias`
 --
 
-INSERT INTO `menu_categorias` (`id`, `restaurante_id`, `nombre`, `orden`) VALUES
-(1, 1, 'Entrantes', 1),
-(2, 1, 'Carnes', 2),
-(3, 1, 'Pescados', 3),
-(4, 1, 'Postres', 4),
-(5, 2, 'Entrantes', 1),
-(6, 2, 'Pastas', 2),
-(7, 2, 'Postres', 3),
-(8, 7, 'Pinchos y tapas', 1),
-(9, 7, 'Raciones', 2),
-(10, 7, 'Platos principales', 3),
-(11, 7, 'Postres', 4),
-(12, 8, 'Entrantes', 1),
-(13, 8, 'Carnes a la brasa', 2),
-(14, 8, 'Verduras a la brasa', 3),
-(15, 8, 'Postres', 4),
-(16, 9, 'Desayunos', 1),
-(17, 9, 'Bocadillos', 2),
-(18, 9, 'Ensaladas', 3),
-(19, 9, 'Brunch', 4),
-(20, 10, 'Pinchos', 1),
-(21, 10, 'Tablas', 2),
-(22, 10, 'Platos', 3),
-(23, 11, 'Mariscos al vapor', 1),
-(24, 11, 'Pescados a la plancha', 2),
-(25, 11, 'Arroces', 3),
-(26, 11, 'Postres', 4),
-(27, 12, 'Guacamoles y salsas', 1),
-(28, 12, 'Tacos', 2),
-(29, 12, 'Tostadas', 3),
-(30, 12, 'Postres', 4),
-(31, 13, 'Aperitivos', 1),
-(32, 13, 'Ensaladas', 2),
-(33, 13, 'Platos calientes', 3),
-(34, 13, 'Postres veganos', 4),
-(35, 14, 'Entrantes japoneses', 1),
-(36, 14, 'Nigiris y makis', 2),
-(37, 14, 'Ramen', 3),
-(38, 14, 'Postres', 4),
-(39, 15, 'Para empezar', 1),
-(40, 15, 'Hamburguesas', 2),
-(41, 15, 'Sides', 3),
-(42, 15, 'Postres', 4),
-(43, 16, 'Pinchos fríos', 1),
-(44, 16, 'Pinchos calientes', 2),
-(45, 16, 'Montaditos', 3),
-(46, 16, 'Bebidas', 4),
-(47, 18, 'Especialidades', 1),
-(48, 18, 'Platos principales', 2),
-(49, 18, 'entrantes', 3),
-(50, 18, '45', 4),
-(51, 19, 'Entrante', 1),
-(52, 19, 'Primer plato', 2),
-(53, 19, 'Segundo Plato', 3),
-(54, 19, 'Postre', 4);
-
--- --------------------------------------------------------
+LOCK TABLES `menu_categorias` WRITE;
+/*!40000 ALTER TABLE `menu_categorias` DISABLE KEYS */;
+INSERT INTO `menu_categorias` VALUES (1,1,'Entrantes',1),(2,1,'Carnes',2),(3,1,'Pescados',3),(4,1,'Postres',4),(5,2,'Entrantes',1),(6,2,'Pastas',2),(7,2,'Postres',3),(8,7,'Pinchos y tapas',1),(9,7,'Raciones',2),(10,7,'Platos principales',3),(11,7,'Postres',4),(12,8,'Entrantes',1),(13,8,'Carnes a la brasa',2),(14,8,'Verduras a la brasa',3),(15,8,'Postres',4),(16,9,'Desayunos',1),(17,9,'Bocadillos',2),(18,9,'Ensaladas',3),(19,9,'Brunch',4),(20,10,'Pinchos',1),(21,10,'Tablas',2),(22,10,'Platos',3),(23,11,'Mariscos al vapor',1),(24,11,'Pescados a la plancha',2),(25,11,'Arroces',3),(26,11,'Postres',4),(27,12,'Guacamoles y salsas',1),(28,12,'Tacos',2),(29,12,'Tostadas',3),(30,12,'Postres',4),(31,13,'Aperitivos',1),(32,13,'Ensaladas',2),(33,13,'Platos calientes',3),(34,13,'Postres veganos',4),(35,14,'Entrantes japoneses',1),(36,14,'Nigiris y makis',2),(37,14,'Ramen',3),(38,14,'Postres',4),(39,15,'Para empezar',1),(40,15,'Hamburguesas',2),(41,15,'Sides',3),(42,15,'Postres',4),(43,16,'Pinchos fríos',1),(44,16,'Pinchos calientes',2),(45,16,'Montaditos',3),(46,16,'Bebidas',4),(47,18,'Especialidades',1),(48,18,'Platos principales',2),(49,18,'entrantes',3),(50,18,'45',4),(51,19,'Entrante',1),(52,19,'Primer plato',2),(53,19,'Segundo Plato',3),(54,19,'Postre',4),(55,40,'Aperitivos',1),(56,40,'Primeros',2),(57,40,'Principales',3),(58,40,'Postres',4),(59,41,'Aperitivos',1),(60,41,'Primeros',2),(61,41,'Principales',3),(62,41,'Postres',4),(63,42,'Snacks',1),(64,42,'Entrantes',2),(65,42,'Principales',3),(66,42,'Postres',4),(67,43,'Entrantes',1),(68,43,'Carnes',2),(69,43,'Pescados',3),(70,43,'Postres',4),(71,44,'Entrantes',1),(72,44,'Ternasco y carnes',2),(73,44,'Postres',3),(74,45,'Entrantes',1),(75,45,'Del mar',2),(76,45,'Carnes',3),(77,45,'Postres',4),(78,46,'Para empezar',1),(79,46,'Platos principales',2),(80,46,'Postres',3),(81,47,'Entrantes',1),(82,47,'Principales',2),(83,47,'Postres',3),(84,48,'Entrantes',1),(85,48,'Pasta y arroces',2),(86,48,'Carnes y pescados',3),(87,48,'Postres',4),(88,49,'Entrantes',1),(89,49,'El Cachopo',2),(90,49,'Carnes',3),(91,49,'Postres',4),(92,50,'Entrantes',1),(93,50,'Platos principales',2),(94,50,'Postres',3),(95,51,'Para empezar',1),(96,51,'Hamburguesas',2),(97,51,'Para compartir',3),(98,51,'Postres',4),(99,52,'Desayunos',1),(100,52,'Bocadillos',2),(101,52,'Meriendas',3),(102,52,'Bebidas',4),(103,53,'Brunch',1),(104,53,'Sándwiches y tostadas',2),(105,53,'Cócteles',3),(106,53,'Postres',4),(107,54,'Tapas',1),(108,54,'Raciones',2),(109,54,'Ibéricos',3),(110,55,'Entrantes',1),(111,55,'Cocina de cuchara',2),(112,55,'Carnes',3),(113,55,'Postres',4),(114,56,'Antipasti',1),(115,56,'Pasta fresca',2),(116,56,'Pizza',3),(117,56,'Postres',4),(118,57,'Entrantes',1),(119,57,'Carnes a la brasa',2),(120,57,'Postres',3),(121,58,'Tapas de mar',1),(122,58,'Mariscos',2),(123,58,'Frituras',3),(124,58,'Postres',4),(125,59,'Entrantes',1),(126,59,'Cocina aragonesa',2),(127,59,'Carnes y pescados',3),(128,59,'Postres',4);
+/*!40000 ALTER TABLE `menu_categorias` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `menu_platos`
+-- Table structure for table `menu_platos`
 --
 
+DROP TABLE IF EXISTS `menu_platos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `menu_platos` (
-  `id` int(11) NOT NULL,
-  `categoria_id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
-  `nombre` varchar(150) NOT NULL,
-  `descripcion` text DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `categoria_id` int NOT NULL,
+  `restaurante_id` int NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_general_ci,
   `precio` decimal(6,2) NOT NULL,
-  `foto_url` varchar(500) DEFAULT NULL,
-  `disponible` tinyint(1) DEFAULT 1,
-  `alergenos` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `foto_url` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `disponible` tinyint(1) DEFAULT '1',
+  `alergenos` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `categoria_id` (`categoria_id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  CONSTRAINT `menu_platos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `menu_categorias` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `menu_platos_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=270 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `menu_platos`
+-- Dumping data for table `menu_platos`
 --
 
-INSERT INTO `menu_platos` (`id`, `categoria_id`, `restaurante_id`, `nombre`, `descripcion`, `precio`, `foto_url`, `disponible`, `alergenos`) VALUES
-(1, 1, 1, 'Croquetas de jamón', 'Cremosas croquetas caseras', 8.50, NULL, 1, NULL),
-(2, 1, 1, 'Ensalada César', 'Con pollo a la plancha', 10.00, NULL, 1, NULL),
-(3, 2, 1, 'Chuletón de Ternasco', '500g con guarnición', 28.00, NULL, 1, NULL),
-(4, 2, 1, 'Magret de pato', 'Con salsa de frutos rojos', 22.00, NULL, 1, NULL),
-(5, 4, 1, 'Flan de huevo', 'Con nata montada', 5.00, NULL, 1, NULL),
-(6, 5, 2, 'Burrata', 'Con tomate pera y albahaca', 9.50, NULL, 1, NULL),
-(7, 6, 2, 'Tagliatelle carbonara', 'Receta tradicional italiana', 14.00, NULL, 1, NULL),
-(8, 8, 7, 'Pincho de tortilla', 'Tortilla española con cebolla caramelizada', 2.00, NULL, 1, 'huevo, gluten'),
-(9, 8, 7, 'Pincho de jamón ibérico', 'Pan de cristal con jamón ibérico D.O.', 3.50, NULL, 1, 'gluten'),
-(10, 8, 7, 'Pimiento del piquillo', 'Relleno de bacalao al pil-pil', 2.80, NULL, 1, 'pescado, gluten'),
-(11, 9, 7, 'Ración de patatas bravas', 'Con salsa brava casera y alioli', 7.00, NULL, 1, 'huevo'),
-(12, 9, 7, 'Ración de queso curado', 'Queso manchego curado con membrillo', 9.00, NULL, 1, 'lacteos'),
-(13, 10, 7, 'Migas a la pastora', 'Migas aragonesas con chorizo y pimiento', 14.00, NULL, 1, 'gluten'),
-(14, 10, 7, 'Ternasco al horno', 'Paletilla de ternasco I.G.P. con patatas panadera', 22.00, NULL, 1, NULL),
-(15, 11, 7, 'Helado de turrón', 'Artesanal con almendra marcona', 5.50, NULL, 1, 'frutos secos, lacteos'),
-(16, 11, 7, 'Crema catalana', 'Con su costra de azúcar quemada', 4.50, NULL, 1, 'huevo, lacteos'),
-(17, 12, 8, 'Cogote de merluza', 'Al horno con aceite de oliva virgen y ajo', 16.00, NULL, 1, 'pescado'),
-(18, 12, 8, 'Ensalada de temporada', 'Lechugas, tomate cherry, pepino y vinagreta', 9.00, NULL, 1, NULL),
-(19, 13, 8, 'Chuletón de buey', '600g madurado 45 días, con sal Maldon', 42.00, NULL, 1, NULL),
-(20, 13, 8, 'Secreto ibérico', 'A la brasa con mojo verde y patatas', 19.00, NULL, 1, NULL),
-(21, 13, 8, 'Cordero al sarmiento', 'Costillar de cordero lechal a las brasas de vid', 24.00, NULL, 1, NULL),
-(22, 14, 8, 'Alcachofas a la brasa', 'Con vinagreta de albahaca y piñones', 11.00, NULL, 1, 'frutos secos'),
-(23, 14, 8, 'Pimientos asados', 'Del piquillo asados al fuego con aceite y sal', 8.00, NULL, 1, NULL),
-(24, 15, 8, 'Torrijas con helado', 'Torrijas de brioche con helado de vainilla', 7.00, NULL, 1, 'gluten, lacteos, huevo'),
-(25, 16, 9, 'Tostada con tomate', 'Pan de masa madre con tomate rallado y AOVE', 4.50, NULL, 1, 'gluten'),
-(26, 16, 9, 'Tostada con aguacate', 'Aguacate, huevo poché y semillas', 6.00, NULL, 1, 'gluten, huevo'),
-(27, 17, 9, 'Bocadillo de calamares', 'Baguete crujiente con calamares fritos y limón', 7.50, NULL, 1, 'gluten, pescado'),
-(28, 17, 9, 'Bocadillo vegetal', 'Con hummus, zanahoria rallada y rúcula', 6.50, NULL, 1, 'gluten, sesamo'),
-(29, 18, 9, 'Ensalada griega', 'Tomate, pepino, cebolla, aceitunas y feta', 9.00, NULL, 1, 'lacteos'),
-(30, 19, 9, 'Brunch completo', 'Huevos, tostadas, fruta, zumo y café', 14.00, NULL, 1, 'gluten, huevo, lacteos'),
-(31, 20, 10, 'Pincho de txistorra', 'Txistorra a la plancha sobre pan de hogaza', 2.50, NULL, 1, 'gluten'),
-(32, 20, 10, 'Pincho de queso Idiazabal', 'Con tomate seco y albahaca', 2.80, NULL, 1, 'lacteos, gluten'),
-(33, 21, 10, 'Tabla ibérica', 'Jamón, lomo, chorizo y queso curado', 16.00, NULL, 1, 'lacteos, gluten'),
-(34, 21, 10, 'Tabla de quesos', 'Variedad de quesos españoles con frutos secos', 14.00, NULL, 1, 'lacteos, frutos secos'),
-(35, 22, 10, 'Fabada asturiana', 'Con compango asturiano y pan de maíz', 15.00, NULL, 1, 'gluten'),
-(36, 22, 10, 'Cachopo de ternera', 'Relleno de jamón y queso, empanado', 18.00, NULL, 1, 'gluten, lacteos, huevo'),
-(37, 23, 11, 'Mejillones al vapor', 'Con vinagreta de tomate y cebolla', 9.00, NULL, 1, 'moluscos'),
-(38, 23, 11, 'Almejas a la marinera', 'Salsa de ajo, perejil y vino blanco', 14.00, NULL, 1, 'moluscos, gluten'),
-(39, 23, 11, 'Gambas al ajillo', 'Con aceite picante, ajo y guindilla', 16.00, NULL, 1, 'crustaceos'),
-(40, 24, 11, 'Lubina a la plancha', 'Con patatas y ensalada', 22.00, NULL, 1, 'pescado'),
-(41, 24, 11, 'Rodaballo al horno', 'Con patatas panadera y salsa verde', 28.00, NULL, 1, 'pescado'),
-(42, 25, 11, 'Arroz negro', 'Con calamar y alioli casero', 18.00, NULL, 1, 'moluscos, crustaceos, huevo'),
-(43, 25, 11, 'Arroz de bogavante', 'Con bogavante del Cantábrico', 38.00, NULL, 1, 'crustaceos'),
-(44, 26, 11, 'Tarta de queso', 'Estilo vasco, suave y cremosa', 6.00, NULL, 1, 'lacteos, gluten, huevo'),
-(45, 27, 12, 'Guacamole clásico', 'Con chips de maíz artesanos', 7.50, NULL, 1, NULL),
-(46, 27, 12, 'Pico de gallo', 'Tomate, cebolla, cilantro y jalapeño', 5.00, NULL, 1, NULL),
-(47, 28, 12, 'Taco de carnitas', 'Cerdo confitado, cebolla morada y cilantro', 4.50, NULL, 1, 'gluten'),
-(48, 28, 12, 'Taco de pescado', 'Tilapia rebozada, col y mayonesa de chipotle', 4.50, NULL, 1, 'pescado, gluten, huevo'),
-(49, 28, 12, 'Taco vegano de jackfruit', 'Jackfruit guisado con salsa verde', 4.00, NULL, 1, 'gluten'),
-(50, 29, 12, 'Tostada de tinga', 'Pollo adobado, frijoles y crema', 6.50, NULL, 1, 'gluten, lacteos'),
-(51, 30, 12, 'Churros con chocolate', 'Churros crujientes con chocolate mexicano caliente', 5.50, NULL, 1, 'gluten'),
-(52, 31, 13, 'Hummus con crudités', 'Garbanzos, tahini y aceite de oliva', 6.00, NULL, 1, 'sesamo'),
-(53, 31, 13, 'Gyozas de verduras', 'Al vapor con salsa de soja y jengibre', 7.50, NULL, 1, 'gluten, soja'),
-(54, 32, 13, 'Bowl de quinoa', 'Quinoa, aguacate, edamame y vinagreta de limón', 11.00, NULL, 1, 'soja'),
-(55, 32, 13, 'Ensalada de remolacha', 'Con nueces, queso vegano y vinagreta de naranja', 10.00, NULL, 1, 'frutos secos'),
-(56, 33, 13, 'Curry de garbanzos', 'Con leche de coco, espinacas y arroz basmati', 13.00, NULL, 1, NULL),
-(57, 33, 13, 'Burger vegana', 'Albóndiga de legumbres, lechuga, tomate y cebolla', 12.00, NULL, 1, 'gluten, soja'),
-(58, 34, 13, 'Tarta de zanahoria', 'Con frosting de anacardos y canela', 5.50, NULL, 1, 'frutos secos, gluten'),
-(59, 35, 14, 'Edamame', 'Vainas de soja al vapor con sal', 4.50, NULL, 1, 'soja'),
-(60, 35, 14, 'Gyozas de cerdo', 'Fritas o al vapor con salsa ponzu', 8.00, NULL, 1, 'gluten, soja'),
-(61, 36, 14, 'Salmón nigiri (2 pzs)', 'Salmón fresco sobre arroz de sushi', 5.00, NULL, 1, 'pescado'),
-(62, 36, 14, 'California roll (8 pzs)', 'Cangrejo, aguacate y pepino', 9.00, NULL, 1, 'crustaceos, soja, gluten'),
-(63, 36, 14, 'Spicy tuna roll (8 pzs)', 'Atún, mayonesa picante y pepino', 10.00, NULL, 1, 'pescado, soja, gluten, huevo'),
-(64, 37, 14, 'Ramen tonkotsu', 'Caldo de cerdo 12h, chashu, huevo marinado y nori', 15.00, NULL, 1, 'gluten, huevo, soja'),
-(65, 37, 14, 'Ramen miso vegano', 'Caldo de miso, tofu, setas y bambú', 13.00, NULL, 1, 'soja, gluten'),
-(66, 38, 14, 'Mochi de helado', 'Tres variedades: vainilla, fresa y matcha', 6.00, NULL, 1, 'lacteos'),
-(67, 39, 15, 'Aros de cebolla', 'Crujientes, con mayonesa de trufa', 6.50, NULL, 1, 'gluten, huevo'),
-(68, 39, 15, 'Nuggets de pollo', 'De pollo de corral, con salsa BBQ', 7.00, NULL, 1, 'gluten, huevo'),
-(69, 40, 15, 'La Baturra', 'Ternasco I.G.P., queso Tronchón, cebolla y aioli', 14.00, NULL, 1, 'gluten, lacteos, huevo'),
-(70, 40, 15, 'La Vegana', 'Burger de legumbres, tofu ahumado y aguacate', 12.00, NULL, 1, 'gluten, soja'),
-(71, 40, 15, 'La BBQ Clásica', 'Ternera, queso cheddar, bacon y salsa BBQ', 13.00, NULL, 1, 'gluten, lacteos'),
-(72, 40, 15, 'La Picante', 'Doble de ternera, jalapeños, habanero y queso azul', 15.00, NULL, 1, 'gluten, lacteos'),
-(73, 41, 15, 'Patatas fritas caseras', 'Con sal Maldon y romero', 4.50, NULL, 1, NULL),
-(74, 41, 15, 'Ensalada coleslaw', 'Col, zanahoria y mayonesa', 3.50, NULL, 1, 'huevo'),
-(75, 42, 15, 'Brownie con helado', 'Chocolate 70%, nueces y helado de vainilla', 6.00, NULL, 1, 'gluten, frutos secos, lacteos, huevo'),
-(76, 43, 16, 'Pincho de boquerón', 'En vinagre con pimiento rojo', 2.20, NULL, 1, 'pescado, gluten'),
-(77, 43, 16, 'Pincho de salmón', 'Con queso crema y eneldo sobre pan de centeno', 2.80, NULL, 1, 'pescado, lacteos, gluten'),
-(78, 44, 16, 'Croqueta de morcilla', 'Con pimiento del piquillo', 2.50, NULL, 1, 'gluten, huevo, lacteos'),
-(79, 44, 16, 'Champiñón relleno', 'Con jamón y queso fundido', 2.80, NULL, 1, 'lacteos'),
-(80, 44, 16, 'Pimiento relleno', 'Bacalao al pil-pil con salsa verde', 3.00, NULL, 1, 'pescado, gluten'),
-(81, 45, 16, 'Montadito de foie', 'Foie mi-cuit con cebolla caramelizada', 4.50, NULL, 1, 'gluten'),
-(82, 45, 16, 'Montadito de morcilla', 'Morcilla de Aragón con pera a la plancha', 3.50, NULL, 1, 'gluten'),
-(83, 46, 16, 'Vino de la casa (copa)', 'Tinto, blanco o rosado del Somontano', 2.50, NULL, 1, NULL),
-(84, 46, 16, 'Sidra natural (botella)', 'Sidra asturiana natural, 750ml', 7.00, NULL, 1, NULL),
-(86, 47, 18, 'fish', '', 34.00, NULL, 1, ''),
-(88, 48, 18, 'calabacin con setas', '', 22.00, NULL, 1, ''),
-(89, 48, 18, 'preubaplato', 'descripcon', 3.00, NULL, 1, 'gluten'),
-(90, 49, 18, 'patatas alioli', 'con alioli', 12.00, NULL, 1, 'gluten'),
-(91, 50, 18, 'platoEstrella', 'ggn', 34.00, NULL, 1, ''),
-(92, 51, 19, 'Pollo al chilindron', 'Pollo', 21.00, NULL, 1, ''),
-(93, 52, 19, 'Alcachifas en tempura', '', 16.00, NULL, 1, ''),
-(94, 53, 19, 'Carabineros', '', 43.00, NULL, 1, ''),
-(95, 54, 19, 'Tarta de queso', '', 10.00, NULL, 1, '');
-
--- --------------------------------------------------------
+LOCK TABLES `menu_platos` WRITE;
+/*!40000 ALTER TABLE `menu_platos` DISABLE KEYS */;
+INSERT INTO `menu_platos` VALUES (1,1,1,'Croquetas de jamón','Cremosas croquetas caseras',8.50,NULL,1,NULL),(2,1,1,'Ensalada César','Con pollo a la plancha',10.00,NULL,1,NULL),(3,2,1,'Chuletón de Ternasco','500g con guarnición',28.00,NULL,1,NULL),(4,2,1,'Magret de pato','Con salsa de frutos rojos',22.00,NULL,1,NULL),(5,4,1,'Flan de huevo','Con nata montada',5.00,NULL,1,NULL),(6,5,2,'Burrata','Con tomate pera y albahaca',9.50,NULL,1,NULL),(7,6,2,'Tagliatelle carbonara','Receta tradicional italiana',14.00,NULL,1,NULL),(8,8,7,'Pincho de tortilla','Tortilla española con cebolla caramelizada',2.00,NULL,1,'huevo, gluten'),(9,8,7,'Pincho de jamón ibérico','Pan de cristal con jamón ibérico D.O.',3.50,NULL,1,'gluten'),(10,8,7,'Pimiento del piquillo','Relleno de bacalao al pil-pil',2.80,NULL,1,'pescado, gluten'),(11,9,7,'Ración de patatas bravas','Con salsa brava casera y alioli',7.00,NULL,1,'huevo'),(12,9,7,'Ración de queso curado','Queso manchego curado con membrillo',9.00,NULL,1,'lacteos'),(13,10,7,'Migas a la pastora','Migas aragonesas con chorizo y pimiento',14.00,NULL,1,'gluten'),(14,10,7,'Ternasco al horno','Paletilla de ternasco I.G.P. con patatas panadera',22.00,NULL,1,NULL),(15,11,7,'Helado de turrón','Artesanal con almendra marcona',5.50,NULL,1,'frutos secos, lacteos'),(16,11,7,'Crema catalana','Con su costra de azúcar quemada',4.50,NULL,1,'huevo, lacteos'),(17,12,8,'Cogote de merluza','Al horno con aceite de oliva virgen y ajo',16.00,NULL,1,'pescado'),(18,12,8,'Ensalada de temporada','Lechugas, tomate cherry, pepino y vinagreta',9.00,NULL,1,NULL),(19,13,8,'Chuletón de buey','600g madurado 45 días, con sal Maldon',42.00,NULL,1,NULL),(20,13,8,'Secreto ibérico','A la brasa con mojo verde y patatas',19.00,NULL,1,NULL),(21,13,8,'Cordero al sarmiento','Costillar de cordero lechal a las brasas de vid',24.00,NULL,1,NULL),(22,14,8,'Alcachofas a la brasa','Con vinagreta de albahaca y piñones',11.00,NULL,1,'frutos secos'),(23,14,8,'Pimientos asados','Del piquillo asados al fuego con aceite y sal',8.00,NULL,1,NULL),(24,15,8,'Torrijas con helado','Torrijas de brioche con helado de vainilla',7.00,NULL,1,'gluten, lacteos, huevo'),(25,16,9,'Tostada con tomate','Pan de masa madre con tomate rallado y AOVE',4.50,NULL,1,'gluten'),(26,16,9,'Tostada con aguacate','Aguacate, huevo poché y semillas',6.00,NULL,1,'gluten, huevo'),(27,17,9,'Bocadillo de calamares','Baguete crujiente con calamares fritos y limón',7.50,NULL,1,'gluten, pescado'),(28,17,9,'Bocadillo vegetal','Con hummus, zanahoria rallada y rúcula',6.50,NULL,1,'gluten, sesamo'),(29,18,9,'Ensalada griega','Tomate, pepino, cebolla, aceitunas y feta',9.00,NULL,1,'lacteos'),(30,19,9,'Brunch completo','Huevos, tostadas, fruta, zumo y café',14.00,NULL,1,'gluten, huevo, lacteos'),(31,20,10,'Pincho de txistorra','Txistorra a la plancha sobre pan de hogaza',2.50,NULL,1,'gluten'),(32,20,10,'Pincho de queso Idiazabal','Con tomate seco y albahaca',2.80,NULL,1,'lacteos, gluten'),(33,21,10,'Tabla ibérica','Jamón, lomo, chorizo y queso curado',16.00,NULL,1,'lacteos, gluten'),(34,21,10,'Tabla de quesos','Variedad de quesos españoles con frutos secos',14.00,NULL,1,'lacteos, frutos secos'),(35,22,10,'Fabada asturiana','Con compango asturiano y pan de maíz',15.00,NULL,1,'gluten'),(36,22,10,'Cachopo de ternera','Relleno de jamón y queso, empanado',18.00,NULL,1,'gluten, lacteos, huevo'),(37,23,11,'Mejillones al vapor','Con vinagreta de tomate y cebolla',9.00,NULL,1,'moluscos'),(38,23,11,'Almejas a la marinera','Salsa de ajo, perejil y vino blanco',14.00,NULL,1,'moluscos, gluten'),(39,23,11,'Gambas al ajillo','Con aceite picante, ajo y guindilla',16.00,NULL,1,'crustaceos'),(40,24,11,'Lubina a la plancha','Con patatas y ensalada',22.00,NULL,1,'pescado'),(41,24,11,'Rodaballo al horno','Con patatas panadera y salsa verde',28.00,NULL,1,'pescado'),(42,25,11,'Arroz negro','Con calamar y alioli casero',18.00,NULL,1,'moluscos, crustaceos, huevo'),(43,25,11,'Arroz de bogavante','Con bogavante del Cantábrico',38.00,NULL,1,'crustaceos'),(44,26,11,'Tarta de queso','Estilo vasco, suave y cremosa',6.00,NULL,1,'lacteos, gluten, huevo'),(45,27,12,'Guacamole clásico','Con chips de maíz artesanos',7.50,NULL,1,NULL),(46,27,12,'Pico de gallo','Tomate, cebolla, cilantro y jalapeño',5.00,NULL,1,NULL),(47,28,12,'Taco de carnitas','Cerdo confitado, cebolla morada y cilantro',4.50,NULL,1,'gluten'),(48,28,12,'Taco de pescado','Tilapia rebozada, col y mayonesa de chipotle',4.50,NULL,1,'pescado, gluten, huevo'),(49,28,12,'Taco vegano de jackfruit','Jackfruit guisado con salsa verde',4.00,NULL,1,'gluten'),(50,29,12,'Tostada de tinga','Pollo adobado, frijoles y crema',6.50,NULL,1,'gluten, lacteos'),(51,30,12,'Churros con chocolate','Churros crujientes con chocolate mexicano caliente',5.50,NULL,1,'gluten'),(52,31,13,'Hummus con crudités','Garbanzos, tahini y aceite de oliva',6.00,NULL,1,'sesamo'),(53,31,13,'Gyozas de verduras','Al vapor con salsa de soja y jengibre',7.50,NULL,1,'gluten, soja'),(54,32,13,'Bowl de quinoa','Quinoa, aguacate, edamame y vinagreta de limón',11.00,NULL,1,'soja'),(55,32,13,'Ensalada de remolacha','Con nueces, queso vegano y vinagreta de naranja',10.00,NULL,1,'frutos secos'),(56,33,13,'Curry de garbanzos','Con leche de coco, espinacas y arroz basmati',13.00,NULL,1,NULL),(57,33,13,'Burger vegana','Albóndiga de legumbres, lechuga, tomate y cebolla',12.00,NULL,1,'gluten, soja'),(58,34,13,'Tarta de zanahoria','Con frosting de anacardos y canela',5.50,NULL,1,'frutos secos, gluten'),(59,35,14,'Edamame','Vainas de soja al vapor con sal',4.50,NULL,1,'soja'),(60,35,14,'Gyozas de cerdo','Fritas o al vapor con salsa ponzu',8.00,NULL,1,'gluten, soja'),(61,36,14,'Salmón nigiri (2 pzs)','Salmón fresco sobre arroz de sushi',5.00,NULL,1,'pescado'),(62,36,14,'California roll (8 pzs)','Cangrejo, aguacate y pepino',9.00,NULL,1,'crustaceos, soja, gluten'),(63,36,14,'Spicy tuna roll (8 pzs)','Atún, mayonesa picante y pepino',10.00,NULL,1,'pescado, soja, gluten, huevo'),(64,37,14,'Ramen tonkotsu','Caldo de cerdo 12h, chashu, huevo marinado y nori',15.00,NULL,1,'gluten, huevo, soja'),(65,37,14,'Ramen miso vegano','Caldo de miso, tofu, setas y bambú',13.00,NULL,1,'soja, gluten'),(66,38,14,'Mochi de helado','Tres variedades: vainilla, fresa y matcha',6.00,NULL,1,'lacteos'),(67,39,15,'Aros de cebolla','Crujientes, con mayonesa de trufa',6.50,NULL,1,'gluten, huevo'),(68,39,15,'Nuggets de pollo','De pollo de corral, con salsa BBQ',7.00,NULL,1,'gluten, huevo'),(69,40,15,'La Baturra','Ternasco I.G.P., queso Tronchón, cebolla y aioli',14.00,NULL,1,'gluten, lacteos, huevo'),(70,40,15,'La Vegana','Burger de legumbres, tofu ahumado y aguacate',12.00,NULL,1,'gluten, soja'),(71,40,15,'La BBQ Clásica','Ternera, queso cheddar, bacon y salsa BBQ',13.00,NULL,1,'gluten, lacteos'),(72,40,15,'La Picante','Doble de ternera, jalapeños, habanero y queso azul',15.00,NULL,1,'gluten, lacteos'),(73,41,15,'Patatas fritas caseras','Con sal Maldon y romero',4.50,NULL,1,NULL),(74,41,15,'Ensalada coleslaw','Col, zanahoria y mayonesa',3.50,NULL,1,'huevo'),(75,42,15,'Brownie con helado','Chocolate 70%, nueces y helado de vainilla',6.00,NULL,1,'gluten, frutos secos, lacteos, huevo'),(76,43,16,'Pincho de boquerón','En vinagre con pimiento rojo',2.20,NULL,1,'pescado, gluten'),(77,43,16,'Pincho de salmón','Con queso crema y eneldo sobre pan de centeno',2.80,NULL,1,'pescado, lacteos, gluten'),(78,44,16,'Croqueta de morcilla','Con pimiento del piquillo',2.50,NULL,1,'gluten, huevo, lacteos'),(79,44,16,'Champiñón relleno','Con jamón y queso fundido',2.80,NULL,1,'lacteos'),(80,44,16,'Pimiento relleno','Bacalao al pil-pil con salsa verde',3.00,NULL,1,'pescado, gluten'),(81,45,16,'Montadito de foie','Foie mi-cuit con cebolla caramelizada',4.50,NULL,1,'gluten'),(82,45,16,'Montadito de morcilla','Morcilla de Aragón con pera a la plancha',3.50,NULL,1,'gluten'),(83,46,16,'Vino de la casa (copa)','Tinto, blanco o rosado del Somontano',2.50,NULL,1,NULL),(84,46,16,'Sidra natural (botella)','Sidra asturiana natural, 750ml',7.00,NULL,1,NULL),(86,47,18,'fish','',34.00,NULL,1,''),(88,48,18,'calabacin con setas','',22.00,NULL,1,''),(89,48,18,'preubaplato','descripcon',3.00,NULL,1,'gluten'),(90,49,18,'patatas alioli','con alioli',12.00,NULL,1,'gluten'),(91,50,18,'platoEstrella','ggn',34.00,NULL,1,''),(92,51,19,'Pollo al chilindron','Pollo',21.00,NULL,1,''),(93,52,19,'Alcachifas en tempura','',16.00,NULL,1,''),(94,53,19,'Carabineros','',43.00,NULL,1,''),(95,54,19,'Tarta de queso','',10.00,NULL,1,''),(96,55,40,'Bocado de foie con gelatina de Oporto','Foie mi-cuit, gelatina de Oporto y pan de especias',22.00,NULL,1,'gluten, lacteos'),(97,55,40,'Caldo de gallina trufado','Caldo concentrado de gallina con láminas de trufa negra',18.00,NULL,1,NULL),(98,56,40,'Espárrago blanco de Navarra con caviar','Espárrago confitado, caviar Osetra y mahonesa de yuzu',35.00,NULL,1,'pescado, huevo'),(99,56,40,'Huevo a baja temperatura con trufa negra','Yema de huevo a 63°, patata trufada y crujiente de jamón',38.00,NULL,1,'huevo, lacteos'),(100,57,40,'Cordero lechal al vacío con jugo de asado','Paletilla de lechal 24h, patata panadera y hierbas',55.00,NULL,1,NULL),(101,57,40,'Pichón con setas de temporada','Pichón de Araiz, jugo de caza y setas de roble',52.00,NULL,1,NULL),(102,58,40,'Petit four y chocolates','Selección de petit four y bombones de temporada',18.00,NULL,1,'gluten, lacteos, frutos secos'),(103,58,40,'Tarta de almendra con helado de tomillo','Tarta tibia de almendra marcona, helado de tomillo silvestre',20.00,NULL,1,'gluten, frutos secos, lacteos, huevo'),(104,59,41,'Buñuelo de bacalao con alioli de azafrán','Buñuelo crujiente, alioli emulsionado con azafrán del Jiloca',14.00,NULL,1,'pescado, gluten, huevo'),(105,59,41,'Croqueta líquida de jamón ibérico','Croqueta de bechamel fluida con jamón ibérico D.O.',12.00,NULL,1,'gluten, lacteos, huevo'),(106,60,41,'Alcachofa asada con vinagreta de trufa','Alcachofa de la huerta confitada, vinagreta de trufa negra',28.00,NULL,1,NULL),(107,60,41,'Vieira con coliflor y mantequilla noisette','Vieira gallega, puré de coliflor y mantequilla avellana',32.00,NULL,1,'moluscos, lacteos'),(108,61,41,'Lubina salvaje al vapor','Lubina, emulsión de oliva arbequina y verduras de temporada',45.00,NULL,1,'pescado'),(109,61,41,'Ternasco de Aragón I.G.P.','Paletilla de ternasco, patata rota y aceite de romero',48.00,NULL,1,NULL),(110,62,41,'Tarta de chocolate y caramelo salado','Tarta tibia de chocolate 70% con caramelo de flor de sal',16.00,NULL,1,'gluten, lacteos, huevo'),(111,62,41,'Sorbete de yuzu con galleta de almendra','Sorbete cítrico de yuzu, tierra de almendra y menta',14.00,NULL,1,'gluten, frutos secos'),(112,63,42,'Tartaleta de anguila ahumada','Tartaleta crujiente, anguila ahumada y crema de apionabo',16.00,NULL,1,'gluten, pescado, lacteos'),(113,63,42,'Piel de patata con crema agria','Piel de patata crujiente, crema agria y huevas de salmón',10.00,NULL,1,'lacteos, pescado'),(114,64,42,'Ostra con granizado de pepino','Ostra Gillardeau, granizado de pepino y aceite de eneldo',18.00,NULL,1,'moluscos'),(115,64,42,'Remolacha, cabra y huevas de trucha','Remolacha asada, queso de cabra fresco y huevas de trucha',22.00,NULL,1,'lacteos, pescado'),(116,65,42,'Pichón de Bresse con mole negro','Pichón madurado, mole negro de 32 ingredientes',52.00,NULL,1,'frutos secos, gluten'),(117,65,42,'Merluza con pilpil de sus espinas','Merluza del Cantábrico, pilpil gelatinoso y pil verde',44.00,NULL,1,'pescado'),(118,66,42,'Cuajada de oveja con miel y nueces','Cuajada artesana, miel de romero y nueces de Castilla',14.00,NULL,1,'lacteos, frutos secos'),(119,66,42,'Chocolate, café y cardamomo','Coulant de chocolate con helado de café y espuma de cardamomo',16.00,NULL,1,'gluten, lacteos, huevo'),(120,67,43,'Migas con foie y setas','Migas aragonesas con hígado de pato y setas de temporada',16.00,NULL,1,'gluten'),(121,67,43,'Croquetas caseras de jamón (6 ud)','Bechamel cremosa con jamón serrano, rebozado crujiente',9.00,NULL,1,'gluten, lacteos, huevo'),(122,67,43,'Ensalada de temporada','Lechugas variadas, tomate, pepino y vinagreta de la casa',8.00,NULL,1,NULL),(123,68,43,'Ternasco de Aragón al horno','Paletilla I.G.P. asada lentamente con patatas y romero',24.00,NULL,1,NULL),(124,68,43,'Chuletillas de cordero a la brasa','Chuletillas de cordero lechal con pimientos del piquillo',22.00,NULL,1,NULL),(125,68,43,'Carrillera de cerdo al vino tinto','Carrillera confitada con reducción de vino tinto y puré',18.00,NULL,1,NULL),(126,69,43,'Merluza a la romana con guarnición','Merluza rebozada, patatas panaderas y ensalada',20.00,NULL,1,'pescado, gluten, huevo'),(127,69,43,'Bacalao al pil-pil','Bacalao desalado en su propio pilpil con ajada',22.00,NULL,1,'pescado'),(128,70,43,'Flan de huevo casero','Flan tradicional con caramelo y nata montada',5.00,NULL,1,'huevo, lacteos'),(129,70,43,'Tarta de queso al horno','Tarta cremosa estilo vasco con mermelada de frutos rojos',6.00,NULL,1,'lacteos, gluten, huevo'),(130,71,44,'Ensaladilla rusa de la casa','Patata, zanahoria, atún, huevo y mayonesa artesana',8.00,NULL,1,'pescado, huevo'),(131,71,44,'Croquetas de ternasco (6 ud)','Croquetas cremosas de ternasco I.G.P. con pimentón',10.00,NULL,1,'gluten, lacteos, huevo'),(132,71,44,'Pimientos del piquillo asados','Pimientos del piquillo con anchoa y aceite de oliva',7.00,NULL,1,'pescado'),(133,72,44,'Paletilla de ternasco Josper','Paletilla entera I.G.P. al horno Josper con patatas',26.00,NULL,1,NULL),(134,72,44,'Chuletillas de ternasco','Chuletillas de cordero lechal a la brasa de Josper',24.00,NULL,1,NULL),(135,72,44,'Costilla de ternasco glaseada','Costillar glaseado con miel y romero, patata rota',22.00,NULL,1,NULL),(136,72,44,'Entrecot de vaca madurada','Entrecot madurado 30 días, sal Maldon y pimientos',28.00,NULL,1,NULL),(137,73,44,'Tarta de queso con coulis de frutos rojos','Tarta cremosa horneada con coulis de frambuesa y arándano',7.00,NULL,1,'lacteos, gluten, huevo'),(138,73,44,'Coulant de chocolate','Coulant de chocolate negro con helado de vainilla',6.00,NULL,1,'gluten, lacteos, huevo'),(139,74,45,'Ensaladilla rusa Sardi','Receta de la casa con atún, anchoa y mayonesa propia',9.00,NULL,1,'pescado, huevo'),(140,74,45,'Pulpo a la gallega','Pulpo cocido con pimentón de La Vera, sal y AOVE',16.00,NULL,1,'moluscos'),(141,75,45,'Atún rojo a la parrilla','Atún rojo del Mediterráneo, vuelta y vuelta con sal Maldon',26.00,NULL,1,'pescado'),(142,75,45,'Gambas a la plancha','Gambas blancas de Huelva a la plancha con limón',18.00,NULL,1,'crustaceos'),(143,75,45,'Chipirón de anzuelo a la plancha','Chipirones enteros a la plancha con su tinta y alioli',22.00,NULL,1,'moluscos, huevo'),(144,76,45,'Secreto ibérico a la brasa','Secreto de cerdo ibérico bellota, mojo verde y patatas',18.00,NULL,1,NULL),(145,76,45,'Solomillo con foie','Solomillo de ternera, medallón de foie y reducción de PX',24.00,NULL,1,NULL),(146,77,45,'Tarta de queso vasca','Tarta cremosa con centro fluido y mermelada de frambuesa',7.00,NULL,1,'lacteos, gluten, huevo'),(147,77,45,'Crema de limón con merengue','Lemon curd artesano con merengue italiano tostado',6.00,NULL,1,'huevo, lacteos'),(148,78,46,'Gumbo de mariscos estilo Nueva Orleans','Gumbo cajún con gambas, cangrejo y salchicha andouille',14.00,NULL,1,'crustaceos, gluten'),(149,78,46,'Alitas ahumadas con salsa cajún','Alitas de pollo ahumadas 4h con salsa picante cajún',12.00,NULL,1,NULL),(150,78,46,'Bao de cerdo confitado','Pan bao al vapor, cerdo confitado, encurtidos y hoisin',11.00,NULL,1,'gluten, soja'),(151,79,46,'Risotto negro con bogavante','Arroz negro con tinta de calamar y bogavante del Cantábrico',28.00,NULL,1,'crustaceos, moluscos'),(152,79,46,'Pulled pork ahumado','Cerdo ahumado 12h, coleslaw de col y pan de maíz tostado',22.00,NULL,1,'gluten'),(153,79,46,'Costillas BBQ de 12 horas','Costillas baby back ahumadas con salsa BBQ de whiskey',26.00,NULL,1,NULL),(154,80,46,'Beignets de Nueva Orleans','Buñuelos de masa frita con azúcar y salsa de caramelo',8.00,NULL,1,'gluten, lacteos, huevo'),(155,80,46,'Tarta de dulce de leche','Tarta cremosa de dulce de leche con galleta de cacao',7.00,NULL,1,'lacteos, gluten, huevo'),(156,81,47,'Croquetas del día (6 ud)','Croquetas caseras según mercado, rebozado crujiente',9.00,NULL,1,'gluten, lacteos, huevo'),(157,81,47,'Jamón ibérico de bellota (80g)','Jamón ibérico de bellota D.O. con pan con tomate',16.00,NULL,1,'gluten'),(158,81,47,'Ensalada de temporada','Mezclum de lechugas, tomate, pepino y vinagreta cítrica',8.00,NULL,1,NULL),(159,82,47,'Pollo de corral asado con patatas','Pollo de corral asado al horno con patatas y romero',18.00,NULL,1,NULL),(160,82,47,'Merluza al vapor con verduras','Merluza del Cantábrico al vapor, verduras de temporada',20.00,NULL,1,'pescado'),(161,82,47,'Ternasco de Aragón estofado','Ternasco I.G.P. guisado con verduras y patatas',22.00,NULL,1,NULL),(162,83,47,'Tarta de manzana con helado','Tarta tatin de manzana con helado de canela',6.00,NULL,1,'gluten, lacteos, huevo'),(163,83,47,'Panna cotta con frutos rojos','Panna cotta de vainilla con coulis de frutos del bosque',5.00,NULL,1,'lacteos'),(164,84,48,'Burrata con tomate y albahaca','Burrata fresca, tomate pera y pesto de albahaca',10.00,NULL,1,'lacteos'),(165,84,48,'Carpaccio de ternera','Ternera fileteada fina, rúcula, parmesano y limón',12.00,NULL,1,'lacteos'),(166,85,48,'Pasta fresca con trufa y parmesano','Tagliatelle fresca, mantequilla de trufa y parmesano 24m',16.00,NULL,1,'gluten, lacteos, huevo'),(167,85,48,'Arroz meloso de gambas y alcachofas','Arroz cremoso con gambas, alcachofas y azafrán',18.00,NULL,1,'crustaceos'),(168,86,48,'Salmón a la plancha con verduras','Salmón noruego, verduras asadas y vinagreta mediterránea',18.00,NULL,1,'pescado'),(169,86,48,'Pechuga de pollo a la parmesana','Pechuga empanada, salsa de tomate y parmesano gratinado',16.00,NULL,1,'gluten, lacteos, huevo'),(170,87,48,'Tiramisú casero','Tiramisú tradicional con café expreso y cacao puro',6.00,NULL,1,'gluten, lacteos, huevo'),(171,87,48,'Panna cotta de vainilla','Panna cotta con vaina de vainilla y caramelo de naranja',5.00,NULL,1,'lacteos'),(172,88,49,'Croquetas de jamón y queso (6 ud)','Croquetas con jamón serrano y queso curado, fritas al momento',9.00,NULL,1,'gluten, lacteos, huevo'),(173,88,49,'Ensalada de pimientos asados','Pimientos rojos asados al fuego con aceite y sal',8.00,NULL,1,NULL),(174,89,49,'Cachopo de wagyu con jamón y queso','Wagyu nacional, jamón ibérico, queso cremoso, panko',28.00,NULL,1,'gluten, lacteos, huevo'),(175,89,49,'Cachopo de ternera con setas y cabra','Ternera, setas silvestres y queso de cabra, empanado',22.00,NULL,1,'gluten, lacteos, huevo'),(176,90,49,'Entrecot de wagyu nacional (250g)','Wagyu nacional A4, sal Maldon y pimientos de padrón',38.00,NULL,1,NULL),(177,90,49,'Solomillo de ternera con foie','Solomillo de ternera con medallón de foie y trufa',26.00,NULL,1,NULL),(178,91,49,'Tarta de queso al horno','Tarta cremosa con mermelada de arándanos y frutos rojos',6.00,NULL,1,'lacteos, gluten, huevo'),(179,91,49,'Brownie de chocolate con helado','Brownie de chocolate 72% con nueces y helado de vainilla',7.00,NULL,1,'gluten, frutos secos, lacteos, huevo'),(180,92,50,'Croquetas de pato teriyaki (4 ud)','Croquetas de pato confitado con glaseado teriyaki',10.00,NULL,1,'gluten, soja, lacteos, huevo'),(181,92,50,'Gyozas de rabo de toro (5 ud)','Gyozas al vapor rellenas de rabo de toro estofado',11.00,NULL,1,'gluten, soja'),(182,92,50,'Tempura de verduras con salsa ponzu','Verduras de temporada en tempura ligera con ponzu cítrico',9.00,NULL,1,'gluten, soja'),(183,93,50,'Raviolis de trufa con mantequilla de salvia','Raviolis frescos rellenos de trufa, mantequilla y salvia',22.00,NULL,1,'gluten, lacteos, huevo'),(184,93,50,'Pollo en salsa de coco y curry verde','Muslo de pollo confitado, curry verde tailandés y arroz',18.00,NULL,1,NULL),(185,93,50,'Tataki de atún rojo con wakame','Atún sellado, ensalada de algas wakame y vinagreta de soja',24.00,NULL,1,'pescado, soja'),(186,94,50,'Coulant de chocolate con helado de matcha','Coulant de chocolate negro, helado artesano de matcha',8.00,NULL,1,'gluten, lacteos, huevo'),(187,94,50,'Cheesecake de frutos del bosque','Cheesecake cremoso con coulis de frutos del bosque',7.00,NULL,1,'lacteos, gluten, huevo'),(188,95,51,'Nachos con guacamole y queso','Nachos artesanos, guacamole fresco y queso fundido',9.00,NULL,1,'gluten, lacteos'),(189,95,51,'Alitas de pollo ahumadas al Kamado','Alitas 4h en Kamado con salsa BBQ de Jack Daniels',10.00,NULL,1,NULL),(190,96,51,'La Clásica Smoke','Ternera argentina, cheddar madurado, lechuga y tomate',14.00,NULL,1,'gluten, lacteos'),(191,96,51,'La Gallega','Ternera gallega, queso azul, cebolla caramelizada y rúcula',16.00,NULL,1,'gluten, lacteos'),(192,96,51,'La Kamado','Cerdo ahumado, coleslaw de col, jalapeño y salsa chipotle',15.00,NULL,1,'gluten, huevo'),(193,97,51,'Costillas de cerdo BBQ','Costillas baby back ahumadas al Kamado, salsa BBQ casera',22.00,NULL,1,NULL),(194,97,51,'Tabla de carnes ahumadas para 2','Brisket, pulled pork, costillas y chicken wings con salsas',36.00,NULL,1,'gluten'),(195,98,51,'Tarta de queso de la abuela','Tarta de queso casera con base de galleta y frutos rojos',6.00,NULL,1,'lacteos, gluten, huevo'),(196,98,51,'Tarta de dulce de leche argentino','Tarta con dulce de leche y bizcocho húmedo de cacao',7.00,NULL,1,'lacteos, gluten, huevo'),(197,99,52,'Churros con chocolate caliente','Churros artesanos con chocolate espeso a la taza',4.50,NULL,1,'gluten'),(198,99,52,'Tostada con mantequilla y mermelada','Pan de masa madre tostado con mantequilla y mermelada casera',3.00,NULL,1,'gluten, lacteos'),(199,99,52,'Desayuno completo','Café, tostada con AOVE, zumo de naranja y fruta de temporada',8.00,NULL,1,'gluten'),(200,100,52,'Bocadillo de jamón serrano','Jamón serrano en barra de pan crujiente recién horneada',5.00,NULL,1,'gluten'),(201,100,52,'Bocadillo de tortilla española','Tortilla de patata y cebolla en pan de barra',4.50,NULL,1,'gluten, huevo'),(202,101,52,'Porras con chocolate','Porras caseras con chocolate artesano a la taza',4.00,NULL,1,'gluten'),(203,101,52,'Pastel de crema','Pastel de crema pastelera con hojaldre crujiente',3.50,NULL,1,'gluten, lacteos, huevo'),(204,102,52,'Café con leche','Café de tueste natural con leche fresca',1.80,NULL,1,'lacteos'),(205,102,52,'Zumo de naranja natural','Zumo exprimido al momento de naranjas valencianas',2.50,NULL,1,NULL),(206,103,53,'Brunch Garbo','Huevos benedictinos, tostada de masa madre, zumo y café',16.00,NULL,1,'gluten, huevo, lacteos'),(207,103,53,'Tostada de aguacate con salmón','Aguacate, salmón ahumado, huevo poché y semillas',12.00,NULL,1,'gluten, pescado, huevo'),(208,104,53,'Croissant de jamón y queso','Croissant de mantequilla con jamón york y queso fundido',5.00,NULL,1,'gluten, lacteos'),(209,104,53,'Sándwich de pollo asado con pesto','Pollo asado, rúcula, tomate seco y pesto de albahaca',9.00,NULL,1,'gluten, frutos secos'),(210,105,53,'Spritz de Aperol','Aperol, prosecco, soda y naranja',8.00,NULL,1,NULL),(211,105,53,'Gin tonic de la casa','Gin premium con tónica artesana y botánicos seleccionados',10.00,NULL,1,NULL),(212,106,53,'Cruasán de mantequilla con crema','Cruasán artesano de mantequilla relleno de crema pastelera',4.00,NULL,1,'gluten, lacteos, huevo'),(213,106,53,'Tarta de zanahoria con frosting','Tarta esponjosa de zanahoria con frosting de queso crema',5.50,NULL,1,'gluten, lacteos, huevo, frutos secos'),(214,107,54,'Pincho de tortilla','Tortilla española con cebolla sobre pan tostado',2.00,NULL,1,'gluten, huevo'),(215,107,54,'Pincho de morcilla con pimiento','Morcilla de Aragón a la plancha con pimiento del piquillo',2.20,NULL,1,'gluten'),(216,107,54,'Boquerón en vinagre','Boquerón marinado en vinagre con ajo y perejil',2.00,NULL,1,'pescado, gluten'),(217,108,54,'Patatas bravas con alioli','Patatas fritas con salsa brava casera y alioli',7.00,NULL,1,'huevo'),(218,108,54,'Calamares a la romana','Calamares rebozados y fritos con mayonesa de limón',10.00,NULL,1,'moluscos, gluten, huevo'),(219,108,54,'Jamón con pan con tomate','Jamón serrano sobre pan con tomate y aceite de oliva',14.00,NULL,1,'gluten'),(220,109,54,'Tabla de jamón ibérico de bellota (80g)','Jamón ibérico de bellota D.O. loncheado al momento',18.00,NULL,1,NULL),(221,109,54,'Tabla mixta ibérica','Jamón, lomo, chorizo y salchichón ibérico con pan',16.00,NULL,1,'gluten'),(222,110,55,'Croquetas caseras (6 ud)','Croquetas de jamón y bacalao, rebozadas al momento',8.00,NULL,1,'gluten, lacteos, huevo, pescado'),(223,110,55,'Ensaladilla rusa','Patata, zanahoria, atún, huevo y mayonesa de la casa',7.00,NULL,1,'pescado, huevo'),(224,111,55,'Lentejas con chorizo y morcilla','Lentejas pardinas guisadas con chorizo y morcilla de Aragón',10.00,NULL,1,'gluten'),(225,111,55,'Patatas con costillas al horno','Costillas de cerdo al horno con patatas en su jugo',12.00,NULL,1,NULL),(226,112,55,'Chuletas de cerdo con pimientos','Chuletas de cerdo a la plancha con pimientos del piquillo',14.00,NULL,1,NULL),(227,112,55,'Pollo asado al horno','Pollo asado con patatas panadera y hierbas aromáticas',13.00,NULL,1,NULL),(228,113,55,'Arroz con leche','Arroz con leche casero espolvoreado con canela',4.00,NULL,1,'lacteos'),(229,113,55,'Natillas caseras','Natillas de vainilla con galleta María',4.00,NULL,1,'lacteos, huevo, gluten'),(230,114,56,'Bruschetta al pomodoro','Pan tostado con tomate fresco, albahaca y AOVE',7.00,NULL,1,'gluten'),(231,114,56,'Burrata con prosciutto e rúcula','Burrata fresca, prosciutto di Parma y rúcula silvestre',12.00,NULL,1,'lacteos'),(232,115,56,'Tagliatelle al ragù bolognese','Pasta fresca con ragù de ternera y cerdo cocinado 4h',16.00,NULL,1,'gluten, huevo'),(233,115,56,'Spaghetti alla carbonara','Guanciale, yema de huevo, pecorino romano y pimienta negra',15.00,NULL,1,'gluten, huevo, lacteos'),(234,115,56,'Pappardelle al tartufo','Pasta ancha fresca, mantequilla de trufa negra y parmesano',22.00,NULL,1,'gluten, huevo, lacteos'),(235,116,56,'Margherita','Tomate San Marzano, fior di latte y albahaca fresca',12.00,NULL,1,'gluten, lacteos'),(236,116,56,'Diavola','Tomate, mozzarella, salami picante y guindilla',14.00,NULL,1,'gluten, lacteos'),(237,116,56,'Quattro formaggi','Mozzarella, gorgonzola, parmesano y fontina',15.00,NULL,1,'gluten, lacteos'),(238,117,56,'Tiramisú della nonna','Tiramisú clásico con bizcocho savoiardo y mascarpone',7.00,NULL,1,'gluten, lacteos, huevo'),(239,117,56,'Panna cotta ai frutti di bosco','Panna cotta de vainilla con coulis de frutos del bosque',6.00,NULL,1,'lacteos'),(240,118,57,'Ensalada de pimientos asados con anchoas','Pimientos rojos asados, anchoa del Cantábrico y AOVE',9.00,NULL,1,'pescado'),(241,118,57,'Sopa de ajo castellana','Caldo de cocido con pan, pimentón, ajo y huevo escalfado',7.00,NULL,1,'gluten, huevo'),(242,118,57,'Morcilla de Aragón a la plancha','Morcilla artesana de Aragón con pimientos del piquillo',8.00,NULL,1,'gluten'),(243,119,57,'Cordero lechal al sarmiento (1/2)','Medio cordero lechal asado sobre brasas de sarmiento de vid',28.00,NULL,1,NULL),(244,119,57,'Chuletón de vaca madurada (600g)','Chuletón madurado 45 días, sal Maldon y pimientos asados',38.00,NULL,1,NULL),(245,119,57,'Costillar de cordero a la brasa','Costillar completo de cordero lechal a las brasas de vid',26.00,NULL,1,NULL),(246,119,57,'Chistorra a la brasa','Chistorra artesana de Aragón a la brasa con pan',14.00,NULL,1,'gluten'),(247,120,57,'Flan de huevo casero','Flan tradicional de huevo con caramelo y nata',5.00,NULL,1,'huevo, lacteos'),(248,120,57,'Torrijas de pan con leche','Torrijas de pan brioche con canela, naranja y miel',6.00,NULL,1,'gluten, lacteos, huevo'),(249,121,58,'Gambas al ajillo','Gambas blancas salteadas con ajo, guindilla y aceite de oliva',14.00,NULL,1,'crustaceos'),(250,121,58,'Mejillones al vapor','Mejillones gallegos al vapor con vinagreta de tomate',8.00,NULL,1,'moluscos'),(251,121,58,'Boquerones en vinagre','Boquerones marinados con ajo, perejil y AOVE',7.00,NULL,1,'pescado'),(252,122,58,'Gamba blanca de Huelva (250g)','Gamba blanca hervida con sal gorda, al punto exacto',22.00,NULL,1,'crustaceos'),(253,122,58,'Langostinos a la plancha (6 ud)','Langostinos frescos a la plancha con limón y sal Maldon',18.00,NULL,1,'crustaceos'),(254,122,58,'Cigalas cocidas (6 ud)','Cigalas del Cantábrico cocidas en agua de mar',28.00,NULL,1,'crustaceos'),(255,123,58,'Calamares a la romana','Calamares rebozados en harina y fritos, con alioli de limón',10.00,NULL,1,'moluscos, gluten, huevo'),(256,123,58,'Boquerones fritos','Boquerones enharinados y fritos, crujientes y sin espina',9.00,NULL,1,'pescado, gluten'),(257,123,58,'Fritura variada de pescado','Surtido de pescado del día rebozado y frito al momento',14.00,NULL,1,'pescado, gluten'),(258,124,58,'Tarta de queso','Tarta de queso cremosa con base de galleta',5.00,NULL,1,'lacteos, gluten, huevo'),(259,124,58,'Helado del día','Helado artesano de temporada',4.00,NULL,1,'lacteos'),(260,125,59,'Croquetas caseras de jamón (6 ud)','Bechamel cremosa con jamón serrano, rebozado artesano',9.00,NULL,1,'gluten, lacteos, huevo'),(261,125,59,'Ensalada de temporada','Lechugas variadas, tomate cherry y vinagreta de la casa',7.00,NULL,1,NULL),(262,125,59,'Pimientos del piquillo rellenos de bacalao','Pimientos asados rellenos de bacalao al pil-pil',10.00,NULL,1,'pescado'),(263,126,59,'Pollo al chilindrón','Receta aragonesa tradicional con pimiento, tomate y chorizo',15.00,NULL,1,NULL),(264,126,59,'Migas aragonesas con chorizo','Migas de pastor con chorizo, tocino y uvas',14.00,NULL,1,'gluten'),(265,126,59,'Ternasco estofado con patatas','Ternasco I.G.P. guisado a fuego lento con patatas',18.00,NULL,1,NULL),(266,127,59,'Merluza a la plancha','Merluza del Cantábrico a la plancha con guarnición de verduras',18.00,NULL,1,'pescado'),(267,127,59,'Chuletillas de cordero a la brasa','Chuletillas de cordero lechal a la brasa con patatas',20.00,NULL,1,NULL),(268,128,59,'Helado artesano (3 bolas)','Helado artesano de temporada, tres sabores a elegir',5.00,NULL,1,'lacteos'),(269,128,59,'Tarta de Santiago','Tarta tradicional de almendra con azúcar glasé y vino dulce',5.50,NULL,1,'frutos secos, huevo');
+/*!40000 ALTER TABLE `menu_platos` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `propinas`
+-- Table structure for table `propinas`
 --
 
+DROP TABLE IF EXISTS `propinas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `propinas` (
-  `id` int(11) NOT NULL,
-  `reserva_id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `reserva_id` int NOT NULL,
+  `usuario_id` int NOT NULL,
+  `restaurante_id` int NOT NULL,
   `cantidad` decimal(6,2) NOT NULL,
-  `mensaje` varchar(255) DEFAULT NULL,
-  `fecha` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `mensaje` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `reserva_id` (`reserva_id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  CONSTRAINT `propinas_ibfk_1` FOREIGN KEY (`reserva_id`) REFERENCES `reservas` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `propinas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `propinas_ibfk_3` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `propinas`
+-- Dumping data for table `propinas`
 --
 
-INSERT INTO `propinas` (`id`, `reserva_id`, `usuario_id`, `restaurante_id`, `cantidad`, `mensaje`, `fecha`) VALUES
-(1, 4, 11, 7, 3.00, '¡Todo perfecto!', '2026-02-14 23:00:00'),
-(2, 5, 12, 8, 5.00, 'Servicio excelente', '2026-02-20 16:00:00'),
-(3, 6, 13, 11, 4.00, 'El marisco era increíble', '2026-02-28 23:00:00'),
-(4, 8, 15, 16, 2.00, 'Muy buen ambiente', '2026-03-10 16:00:00'),
-(5, 12, 19, 15, 3.50, 'Volveremos seguro', '2026-04-01 23:30:00'),
-(6, 14, 5, 7, 2.50, 'Tapas de 10', '2026-04-08 16:00:00'),
-(7, 37, 15, 8, 8.00, 'La mejor comida de negocios posible', '2026-03-12 16:30:00'),
-(8, 45, 7, 7, 3.00, 'Siempre genial', '2026-04-17 15:30:00');
-
--- --------------------------------------------------------
+LOCK TABLES `propinas` WRITE;
+/*!40000 ALTER TABLE `propinas` DISABLE KEYS */;
+INSERT INTO `propinas` VALUES (1,4,11,7,3.00,'¡Todo perfecto!','2026-02-14 23:00:00'),(2,5,12,8,5.00,'Servicio excelente','2026-02-20 16:00:00'),(3,6,13,11,4.00,'El marisco era increíble','2026-02-28 23:00:00'),(4,8,15,16,2.00,'Muy buen ambiente','2026-03-10 16:00:00'),(5,12,19,15,3.50,'Volveremos seguro','2026-04-01 23:30:00'),(6,14,5,7,2.50,'Tapas de 10','2026-04-08 16:00:00'),(7,37,15,8,8.00,'La mejor comida de negocios posible','2026-03-12 16:30:00'),(8,45,7,7,3.00,'Siempre genial','2026-04-17 15:30:00');
+/*!40000 ALTER TABLE `propinas` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `reservas`
+-- Table structure for table `reservas`
 --
 
+DROP TABLE IF EXISTS `reservas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reservas` (
-  `id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `restaurante_id` int NOT NULL,
   `fecha` date NOT NULL,
   `hora` time NOT NULL,
-  `num_personas` int(11) NOT NULL DEFAULT 1,
-  `estado` enum('pendiente','esperando_usuario','confirmada','cancelada','completada') DEFAULT 'pendiente',
-  `notas` text DEFAULT NULL,
-  `fecha_creacion` datetime DEFAULT current_timestamp(),
-  `fecha_actualizacion` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `num_personas` int NOT NULL DEFAULT '1',
+  `estado` enum('pendiente','esperando_usuario','confirmada','cancelada','completada') COLLATE utf8mb4_general_ci DEFAULT 'pendiente',
+  `notas` text COLLATE utf8mb4_general_ci,
+  `fecha_creacion` datetime DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  CONSTRAINT `reservas_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `reservas_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `reservas`
+-- Dumping data for table `reservas`
 --
 
-INSERT INTO `reservas` (`id`, `usuario_id`, `restaurante_id`, `fecha`, `hora`, `num_personas`, `estado`, `notas`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 7, 3, '2026-04-15', '22:00:00', 2, 'cancelada', '', '2026-04-13 20:19:14', '2026-04-16 22:30:14'),
-(2, 7, 4, '2026-04-16', '22:00:00', 6, 'confirmada', 'mesa lejos de la cocina', '2026-04-13 20:44:42', '2026-04-14 17:20:05'),
-(3, 10, 4, '2026-04-15', '15:00:00', 5, 'confirmada', '', '2026-04-14 17:23:40', '2026-04-14 17:24:27'),
-(4, 11, 7, '2026-02-14', '20:30:00', 2, 'completada', 'San Valentín, mesa con velas', '2026-02-10 10:00:00', '2026-02-15 23:00:00'),
-(5, 12, 8, '2026-02-20', '13:30:00', 4, 'completada', '', '2026-02-17 12:00:00', '2026-02-21 22:00:00'),
-(6, 13, 11, '2026-02-28', '21:00:00', 3, 'completada', 'Alergía al marisco de uno', '2026-02-24 09:00:00', '2026-03-01 22:00:00'),
-(7, 14, 14, '2026-03-05', '20:00:00', 2, 'completada', '', '2026-03-01 11:00:00', '2026-03-06 22:00:00'),
-(8, 15, 16, '2026-03-10', '13:00:00', 5, 'completada', 'Cumpleaños, necesitamos tarta', '2026-03-06 18:00:00', '2026-03-11 22:00:00'),
-(9, 16, 12, '2026-03-15', '21:00:00', 2, 'completada', '', '2026-03-12 10:00:00', '2026-03-16 22:00:00'),
-(10, 17, 9, '2026-03-20', '10:30:00', 3, 'completada', 'Brunch de trabajo', '2026-03-18 08:00:00', '2026-03-21 22:00:00'),
-(11, 18, 13, '2026-03-25', '14:00:00', 1, 'completada', '', '2026-03-22 09:00:00', '2026-03-26 22:00:00'),
-(12, 19, 15, '2026-04-01', '21:00:00', 4, 'completada', 'Mesa cerca de la ventana', '2026-03-28 19:00:00', '2026-04-02 22:00:00'),
-(13, 20, 10, '2026-04-05', '20:30:00', 6, 'completada', '', '2026-04-01 10:00:00', '2026-04-06 22:00:00'),
-(14, 5, 7, '2026-04-08', '13:30:00', 2, 'completada', '', '2026-04-04 11:00:00', '2026-04-09 22:00:00'),
-(15, 6, 8, '2026-04-10', '21:00:00', 3, 'completada', '', '2026-04-06 09:00:00', '2026-04-11 22:00:00'),
-(16, 11, 11, '2026-03-02', '20:00:00', 2, 'cancelada', 'Imprevisto de trabajo', '2026-02-26 10:00:00', '2026-03-01 18:00:00'),
-(17, 12, 14, '2026-03-08', '21:00:00', 4, 'cancelada', '', '2026-03-05 09:00:00', '2026-03-07 17:00:00'),
-(18, 13, 15, '2026-03-18', '20:30:00', 2, 'cancelada', 'Enfermedad', '2026-03-14 11:00:00', '2026-03-17 20:00:00'),
-(19, 11, 8, '2026-04-25', '13:30:00', 4, 'confirmada', 'Mesa exterior si hay', '2026-04-18 10:00:00', '2026-04-18 11:00:00'),
-(20, 12, 7, '2026-04-26', '21:00:00', 2, 'confirmada', '', '2026-04-18 12:00:00', '2026-04-18 12:30:00'),
-(21, 13, 14, '2026-04-27', '20:00:00', 3, 'confirmada', 'Celiaco en el grupo', '2026-04-17 09:00:00', '2026-04-17 10:00:00'),
-(22, 14, 11, '2026-04-28', '21:30:00', 2, 'confirmada', 'Aniversario', '2026-04-16 18:00:00', '2026-04-16 19:00:00'),
-(23, 15, 12, '2026-04-30', '21:00:00', 6, 'confirmada', 'Fiesta de cumpleaños', '2026-04-19 10:00:00', '2026-04-19 10:30:00'),
-(24, 16, 9, '2026-05-02', '10:00:00', 2, 'confirmada', '', '2026-04-19 09:00:00', '2026-04-19 09:15:00'),
-(25, 17, 16, '2026-05-03', '13:30:00', 5, 'confirmada', 'Comida de empresa', '2026-04-18 14:00:00', '2026-04-18 15:00:00'),
-(26, 18, 8, '2026-05-05', '14:00:00', 3, 'pendiente', '', '2026-04-19 08:00:00', '2026-04-19 08:00:00'),
-(27, 19, 13, '2026-05-06', '13:30:00', 1, 'pendiente', 'Intolerante a la soja', '2026-04-19 09:00:00', '2026-04-19 09:00:00'),
-(28, 20, 15, '2026-05-07', '21:00:00', 2, 'pendiente', '', '2026-04-19 10:00:00', '2026-04-19 10:00:00'),
-(29, 5, 10, '2026-05-08', '20:30:00', 4, 'pendiente', '', '2026-04-19 11:00:00', '2026-04-19 11:00:00'),
-(30, 6, 14, '2026-05-09', '21:00:00', 2, 'pendiente', '', '2026-04-19 12:00:00', '2026-04-19 12:00:00'),
-(31, 11, 9, '2026-01-20', '10:30:00', 2, 'completada', '', '2026-01-17 09:00:00', '2026-01-21 22:00:00'),
-(32, 11, 12, '2026-01-28', '21:00:00', 3, 'completada', '', '2026-01-24 10:00:00', '2026-01-29 22:00:00'),
-(33, 12, 10, '2026-02-05', '13:30:00', 5, 'completada', '', '2026-02-01 11:00:00', '2026-02-06 22:00:00'),
-(34, 12, 16, '2026-02-12', '20:30:00', 2, 'completada', '', '2026-02-08 09:00:00', '2026-02-13 22:00:00'),
-(35, 13, 7, '2026-02-18', '14:00:00', 4, 'completada', '', '2026-02-14 10:00:00', '2026-02-19 22:00:00'),
-(36, 14, 15, '2026-03-01', '21:30:00', 2, 'completada', '', '2026-02-25 12:00:00', '2026-03-02 22:00:00'),
-(37, 15, 8, '2026-03-12', '13:30:00', 6, 'completada', 'Comida de negocios', '2026-03-08 09:00:00', '2026-03-13 22:00:00'),
-(38, 16, 11, '2026-03-22', '21:00:00', 4, 'completada', '', '2026-03-18 11:00:00', '2026-03-23 22:00:00'),
-(39, 17, 13, '2026-04-02', '14:00:00', 2, 'completada', '', '2026-03-30 09:00:00', '2026-04-03 22:00:00'),
-(40, 18, 16, '2026-04-09', '20:30:00', 3, 'completada', '', '2026-04-05 10:00:00', '2026-04-10 22:00:00'),
-(41, 19, 7, '2026-04-12', '13:30:00', 2, 'completada', '', '2026-04-08 11:00:00', '2026-04-13 22:00:00'),
-(42, 20, 9, '2026-04-14', '10:30:00', 4, 'completada', '', '2026-04-10 09:00:00', '2026-04-15 22:00:00'),
-(43, 5, 12, '2026-04-15', '21:00:00', 2, 'completada', '', '2026-04-11 12:00:00', '2026-04-16 22:00:00'),
-(44, 6, 14, '2026-04-16', '20:30:00', 3, 'completada', '', '2026-04-12 10:00:00', '2026-04-17 22:00:00'),
-(45, 7, 7, '2026-04-17', '13:30:00', 2, 'completada', '', '2026-04-13 11:00:00', '2026-04-18 22:00:00'),
-(46, 7, 16, '2026-03-20', '13:00:00', 4, 'completada', '', '2026-03-16 10:00:00', '2026-03-21 22:00:00'),
-(47, 7, 8, '2026-02-25', '14:00:00', 2, 'completada', '', '2026-02-21 09:00:00', '2026-02-26 22:00:00'),
-(48, 7, 13, '2026-01-30', '13:30:00', 1, 'completada', '', '2026-01-26 11:00:00', '2026-01-31 22:00:00'),
-(49, 33, 11, '2026-05-06', '20:00:00', 2, 'pendiente', '', '2026-05-02 00:50:20', '2026-05-02 00:50:20'),
-(50, 33, 11, '2026-05-19', '14:00:00', 2, 'pendiente', '', '2026-05-02 00:55:28', '2026-05-02 00:55:28'),
-(51, 33, 18, '2026-04-28', '20:00:00', 2, 'cancelada', '', '2026-05-02 00:59:19', '2026-05-02 01:18:30'),
-(52, 33, 18, '2026-05-29', '13:00:00', 5, 'esperando_usuario', '', '2026-05-02 01:29:18', '2026-05-02 01:30:35'),
-(53, 33, 18, '2026-06-30', '14:00:00', 2, 'esperando_usuario', '', '2026-05-02 01:29:33', '2026-05-02 01:30:32'),
-(54, 33, 18, '2026-05-18', '21:00:00', 2, 'cancelada', '', '2026-05-02 01:32:01', '2026-05-02 01:32:52'),
-(55, 33, 18, '2026-05-26', '14:30:00', 2, 'confirmada', '', '2026-05-02 18:21:21', '2026-05-02 18:38:24'),
-(56, 33, 18, '2026-04-29', '12:30:00', 6, 'cancelada', '', '2026-05-02 18:30:12', '2026-05-02 19:19:06'),
-(57, 33, 18, '2026-04-27', '15:00:00', 2, 'cancelada', '', '2026-05-02 19:04:11', '2026-05-02 19:19:16'),
-(58, 33, 18, '2026-05-25', '21:00:00', 2, 'esperando_usuario', '', '2026-05-02 19:14:40', '2026-05-02 19:16:00'),
-(59, 33, 18, '2026-05-31', '21:30:00', 2, 'esperando_usuario', 'gluten', '2026-05-02 20:07:47', '2026-05-02 20:08:45'),
-(60, 33, 18, '2026-05-21', '17:00:00', 2, 'esperando_usuario', 'espeviz', '2026-05-02 20:13:20', '2026-05-02 20:14:25'),
-(61, 33, 18, '2026-05-29', '21:30:00', 4, 'cancelada', 'juan viene ', '2026-05-04 11:28:53', '2026-05-04 11:29:42'),
-(62, 33, 18, '2026-05-26', '21:00:00', 2, 'esperando_usuario', 'prueba para Juacko', '2026-05-04 11:31:56', '2026-05-04 11:32:17'),
-(63, 33, 18, '2026-05-26', '21:30:00', 3, 'esperando_usuario', 'Juan , Ivo y yo', '2026-05-04 11:40:33', '2026-05-04 11:40:42'),
-(64, 38, 18, '2026-05-06', '14:30:00', 3, 'cancelada', 'Juacko , Ivo y Samu', '2026-05-04 18:43:55', '2026-05-06 08:19:06'),
-(65, 38, 18, '2026-05-06', '14:00:00', 3, 'cancelada', 'juacko , IVO y samu', '2026-05-04 18:52:52', '2026-05-06 08:19:12'),
-(66, 38, 18, '2026-05-12', '14:00:00', 2, 'confirmada', 'p1', '2026-05-04 19:06:39', '2026-05-04 19:09:55'),
-(67, 38, 18, '2026-05-20', '14:30:00', 3, 'confirmada', 'p3', '2026-05-04 19:10:54', '2026-05-04 19:11:27'),
-(68, 39, 19, '2026-05-09', '21:00:00', 4, 'confirmada', 'lejos de la cocina', '2026-05-06 09:15:58', '2026-05-06 09:27:05');
-
--- --------------------------------------------------------
+LOCK TABLES `reservas` WRITE;
+/*!40000 ALTER TABLE `reservas` DISABLE KEYS */;
+INSERT INTO `reservas` VALUES (1,7,3,'2026-04-15','22:00:00',2,'cancelada','','2026-04-13 20:19:14','2026-04-16 22:30:14'),(2,7,4,'2026-04-16','22:00:00',6,'confirmada','mesa lejos de la cocina','2026-04-13 20:44:42','2026-04-14 17:20:05'),(3,10,4,'2026-04-15','15:00:00',5,'confirmada','','2026-04-14 17:23:40','2026-04-14 17:24:27'),(4,11,7,'2026-02-14','20:30:00',2,'completada','San Valentín, mesa con velas','2026-02-10 10:00:00','2026-02-15 23:00:00'),(5,12,8,'2026-02-20','13:30:00',4,'completada','','2026-02-17 12:00:00','2026-02-21 22:00:00'),(6,13,11,'2026-02-28','21:00:00',3,'completada','Alergía al marisco de uno','2026-02-24 09:00:00','2026-03-01 22:00:00'),(7,14,14,'2026-03-05','20:00:00',2,'completada','','2026-03-01 11:00:00','2026-03-06 22:00:00'),(8,15,16,'2026-03-10','13:00:00',5,'completada','Cumpleaños, necesitamos tarta','2026-03-06 18:00:00','2026-03-11 22:00:00'),(9,16,12,'2026-03-15','21:00:00',2,'completada','','2026-03-12 10:00:00','2026-03-16 22:00:00'),(10,17,9,'2026-03-20','10:30:00',3,'completada','Brunch de trabajo','2026-03-18 08:00:00','2026-03-21 22:00:00'),(11,18,13,'2026-03-25','14:00:00',1,'completada','','2026-03-22 09:00:00','2026-03-26 22:00:00'),(12,19,15,'2026-04-01','21:00:00',4,'completada','Mesa cerca de la ventana','2026-03-28 19:00:00','2026-04-02 22:00:00'),(13,20,10,'2026-04-05','20:30:00',6,'completada','','2026-04-01 10:00:00','2026-04-06 22:00:00'),(14,5,7,'2026-04-08','13:30:00',2,'completada','','2026-04-04 11:00:00','2026-04-09 22:00:00'),(15,6,8,'2026-04-10','21:00:00',3,'completada','','2026-04-06 09:00:00','2026-04-11 22:00:00'),(16,11,11,'2026-03-02','20:00:00',2,'cancelada','Imprevisto de trabajo','2026-02-26 10:00:00','2026-03-01 18:00:00'),(17,12,14,'2026-03-08','21:00:00',4,'cancelada','','2026-03-05 09:00:00','2026-03-07 17:00:00'),(18,13,15,'2026-03-18','20:30:00',2,'cancelada','Enfermedad','2026-03-14 11:00:00','2026-03-17 20:00:00'),(19,11,8,'2026-04-25','13:30:00',4,'confirmada','Mesa exterior si hay','2026-04-18 10:00:00','2026-04-18 11:00:00'),(20,12,7,'2026-04-26','21:00:00',2,'confirmada','','2026-04-18 12:00:00','2026-04-18 12:30:00'),(21,13,14,'2026-04-27','20:00:00',3,'confirmada','Celiaco en el grupo','2026-04-17 09:00:00','2026-04-17 10:00:00'),(22,14,11,'2026-04-28','21:30:00',2,'confirmada','Aniversario','2026-04-16 18:00:00','2026-04-16 19:00:00'),(23,15,12,'2026-04-30','21:00:00',6,'confirmada','Fiesta de cumpleaños','2026-04-19 10:00:00','2026-04-19 10:30:00'),(24,16,9,'2026-05-02','10:00:00',2,'confirmada','','2026-04-19 09:00:00','2026-04-19 09:15:00'),(25,17,16,'2026-05-03','13:30:00',5,'confirmada','Comida de empresa','2026-04-18 14:00:00','2026-04-18 15:00:00'),(26,18,8,'2026-05-05','14:00:00',3,'pendiente','','2026-04-19 08:00:00','2026-04-19 08:00:00'),(27,19,13,'2026-05-06','13:30:00',1,'pendiente','Intolerante a la soja','2026-04-19 09:00:00','2026-04-19 09:00:00'),(28,20,15,'2026-05-07','21:00:00',2,'pendiente','','2026-04-19 10:00:00','2026-04-19 10:00:00'),(29,5,10,'2026-05-08','20:30:00',4,'pendiente','','2026-04-19 11:00:00','2026-04-19 11:00:00'),(30,6,14,'2026-05-09','21:00:00',2,'pendiente','','2026-04-19 12:00:00','2026-04-19 12:00:00'),(31,11,9,'2026-01-20','10:30:00',2,'completada','','2026-01-17 09:00:00','2026-01-21 22:00:00'),(32,11,12,'2026-01-28','21:00:00',3,'completada','','2026-01-24 10:00:00','2026-01-29 22:00:00'),(33,12,10,'2026-02-05','13:30:00',5,'completada','','2026-02-01 11:00:00','2026-02-06 22:00:00'),(34,12,16,'2026-02-12','20:30:00',2,'completada','','2026-02-08 09:00:00','2026-02-13 22:00:00'),(35,13,7,'2026-02-18','14:00:00',4,'completada','','2026-02-14 10:00:00','2026-02-19 22:00:00'),(36,14,15,'2026-03-01','21:30:00',2,'completada','','2026-02-25 12:00:00','2026-03-02 22:00:00'),(37,15,8,'2026-03-12','13:30:00',6,'completada','Comida de negocios','2026-03-08 09:00:00','2026-03-13 22:00:00'),(38,16,11,'2026-03-22','21:00:00',4,'completada','','2026-03-18 11:00:00','2026-03-23 22:00:00'),(39,17,13,'2026-04-02','14:00:00',2,'completada','','2026-03-30 09:00:00','2026-04-03 22:00:00'),(40,18,16,'2026-04-09','20:30:00',3,'completada','','2026-04-05 10:00:00','2026-04-10 22:00:00'),(41,19,7,'2026-04-12','13:30:00',2,'completada','','2026-04-08 11:00:00','2026-04-13 22:00:00'),(42,20,9,'2026-04-14','10:30:00',4,'completada','','2026-04-10 09:00:00','2026-04-15 22:00:00'),(43,5,12,'2026-04-15','21:00:00',2,'completada','','2026-04-11 12:00:00','2026-04-16 22:00:00'),(44,6,14,'2026-04-16','20:30:00',3,'completada','','2026-04-12 10:00:00','2026-04-17 22:00:00'),(45,7,7,'2026-04-17','13:30:00',2,'completada','','2026-04-13 11:00:00','2026-04-18 22:00:00'),(46,7,16,'2026-03-20','13:00:00',4,'completada','','2026-03-16 10:00:00','2026-03-21 22:00:00'),(47,7,8,'2026-02-25','14:00:00',2,'completada','','2026-02-21 09:00:00','2026-02-26 22:00:00'),(48,7,13,'2026-01-30','13:30:00',1,'completada','','2026-01-26 11:00:00','2026-01-31 22:00:00'),(49,33,11,'2026-05-06','20:00:00',2,'pendiente','','2026-05-02 00:50:20','2026-05-02 00:50:20'),(50,33,11,'2026-05-19','14:00:00',2,'pendiente','','2026-05-02 00:55:28','2026-05-02 00:55:28'),(51,33,18,'2026-04-28','20:00:00',2,'cancelada','','2026-05-02 00:59:19','2026-05-02 01:18:30'),(52,33,18,'2026-05-29','13:00:00',5,'esperando_usuario','','2026-05-02 01:29:18','2026-05-02 01:30:35'),(53,33,18,'2026-06-30','14:00:00',2,'esperando_usuario','','2026-05-02 01:29:33','2026-05-02 01:30:32'),(54,33,18,'2026-05-18','21:00:00',2,'cancelada','','2026-05-02 01:32:01','2026-05-02 01:32:52'),(55,33,18,'2026-05-26','14:30:00',2,'confirmada','','2026-05-02 18:21:21','2026-05-02 18:38:24'),(56,33,18,'2026-04-29','12:30:00',6,'cancelada','','2026-05-02 18:30:12','2026-05-02 19:19:06'),(57,33,18,'2026-04-27','15:00:00',2,'cancelada','','2026-05-02 19:04:11','2026-05-02 19:19:16'),(58,33,18,'2026-05-25','21:00:00',2,'esperando_usuario','','2026-05-02 19:14:40','2026-05-02 19:16:00'),(59,33,18,'2026-05-31','21:30:00',2,'esperando_usuario','gluten','2026-05-02 20:07:47','2026-05-02 20:08:45'),(60,33,18,'2026-05-21','17:00:00',2,'esperando_usuario','espeviz','2026-05-02 20:13:20','2026-05-02 20:14:25'),(61,33,18,'2026-05-29','21:30:00',4,'cancelada','juan viene ','2026-05-04 11:28:53','2026-05-04 11:29:42'),(62,33,18,'2026-05-26','21:00:00',2,'esperando_usuario','prueba para Juacko','2026-05-04 11:31:56','2026-05-04 11:32:17'),(63,33,18,'2026-05-26','21:30:00',3,'esperando_usuario','Juan , Ivo y yo','2026-05-04 11:40:33','2026-05-04 11:40:42'),(64,38,18,'2026-05-06','14:30:00',3,'cancelada','Juacko , Ivo y Samu','2026-05-04 18:43:55','2026-05-06 08:19:06'),(65,38,18,'2026-05-06','14:00:00',3,'cancelada','juacko , IVO y samu','2026-05-04 18:52:52','2026-05-06 08:19:12'),(66,38,18,'2026-05-12','14:00:00',2,'confirmada','p1','2026-05-04 19:06:39','2026-05-04 19:09:55'),(67,38,18,'2026-05-20','14:30:00',3,'confirmada','p3','2026-05-04 19:10:54','2026-05-04 19:11:27'),(68,39,19,'2026-05-09','21:00:00',4,'confirmada','lejos de la cocina','2026-05-06 09:15:58','2026-05-06 09:27:05'),(69,33,18,'2026-05-29','12:00:00',2,'esperando_usuario','','2026-05-07 17:22:39','2026-05-07 17:24:27'),(70,33,18,'2026-05-18','14:30:00',2,'esperando_usuario','','2026-05-07 17:30:26','2026-05-07 17:30:52'),(71,33,18,'2026-05-20','15:00:00',2,'esperando_usuario','','2026-05-07 17:34:09','2026-05-07 17:34:37'),(72,33,18,'2026-05-25','12:00:00',1,'esperando_usuario','','2026-05-07 17:38:35','2026-05-07 17:40:16'),(73,41,18,'2026-05-18','12:00:00',2,'esperando_usuario','p\n','2026-05-07 17:46:44','2026-05-07 17:47:03'),(74,42,11,'2026-05-22','15:30:00',4,'pendiente','','2026-05-08 16:16:03','2026-05-08 16:16:03'),(75,41,18,'2026-05-29','14:30:00',2,'esperando_usuario','prueba real correo\n','2026-05-12 16:26:35','2026-05-12 16:27:53'),(76,41,18,'2026-05-31','14:00:00',2,'esperando_usuario','merendando \n','2026-05-12 16:29:50','2026-05-12 16:30:01'),(77,41,18,'2026-05-26','21:00:00',2,'esperando_usuario','cenita\n','2026-05-12 16:32:29','2026-05-12 16:32:37'),(78,41,18,'2026-05-25','14:00:00',2,'esperando_usuario','haber si funciona \n','2026-05-12 16:35:46','2026-05-12 16:35:55'),(79,41,18,'2026-05-26','21:00:00',2,'esperando_usuario','la ultima ya\n','2026-05-12 16:38:16','2026-05-12 16:38:30'),(80,41,18,'2026-05-26','16:30:00',2,'confirmada','poquito ya','2026-05-12 16:57:31','2026-05-12 16:58:08'),(81,41,18,'2026-05-31','21:30:00',2,'cancelada','','2026-05-12 16:58:22','2026-05-12 16:59:16'),(82,43,18,'2026-05-16','14:00:00',4,'confirmada','al pan una de las personas','2026-05-12 17:44:11','2026-05-12 17:47:12'),(83,41,17,'2026-05-30','14:00:00',2,'pendiente','','2026-05-13 06:12:06','2026-05-13 06:12:06'),(84,39,18,'2026-05-15','19:00:00',10,'esperando_usuario','Samuel que no nos atienda \n','2026-05-13 06:21:23','2026-05-13 06:32:37'),(85,39,5,'2026-05-15','18:30:00',4,'confirmada','Adrian es alérgico a los cacahuetes','2026-05-13 06:24:44','2026-05-13 06:27:21'),(87,33,42,'2026-06-20','20:30:00',2,'pendiente','','2026-05-13 10:33:37','2026-05-13 10:33:37');
+/*!40000 ALTER TABLE `reservas` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `restaurantes`
+-- Table structure for table `restaurantes`
 --
 
+DROP TABLE IF EXISTS `restaurantes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `restaurantes` (
-  `id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `nombre` varchar(150) NOT NULL,
-  `descripcion` text DEFAULT NULL,
-  `direccion` varchar(255) NOT NULL,
-  `ciudad` varchar(100) DEFAULT 'Zaragoza',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_general_ci,
+  `direccion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `ciudad` varchar(100) COLLATE utf8mb4_general_ci DEFAULT 'Zaragoza',
   `latitud` decimal(10,8) DEFAULT NULL,
   `longitud` decimal(11,8) DEFAULT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `email_contacto` varchar(200) DEFAULT NULL,
-  `categoria` varchar(80) DEFAULT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email_contacto` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `categoria` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `precio_medio` decimal(6,2) DEFAULT NULL,
-  `aforo_total` int(11) DEFAULT 50,
-  `activo` tinyint(1) DEFAULT 1,
-  `solicitado` tinyint(1) NOT NULL DEFAULT 0,
-  `aprobado` tinyint(1) NOT NULL DEFAULT 0,
-  `aprobado_por` int(11) DEFAULT NULL,
-  `fecha_registro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `aforo_total` int DEFAULT '50',
+  `activo` tinyint(1) DEFAULT '1',
+  `solicitado` tinyint(1) NOT NULL DEFAULT '0',
+  `aprobado` tinyint(1) NOT NULL DEFAULT '0',
+  `aprobado_por` int DEFAULT NULL,
+  `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `fk_aprobado_por` (`aprobado_por`),
+  CONSTRAINT `fk_aprobado_por` FOREIGN KEY (`aprobado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `restaurantes_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `restaurantes`
+-- Dumping data for table `restaurantes`
 --
 
-INSERT INTO `restaurantes` (`id`, `usuario_id`, `nombre`, `descripcion`, `direccion`, `ciudad`, `latitud`, `longitud`, `telefono`, `email_contacto`, `categoria`, `precio_medio`, `aforo_total`, `activo`, `solicitado`, `aprobado`, `aprobado_por`, `fecha_registro`) VALUES
-(1, 31, 'La Bodegón Aragonés', 'Cocina tradicional aragonesa con los mejores vinos de la región.', 'Calle Alfonso I, 14, Zaragoza', 'Zaragoza', 41.64880000, -0.88910000, '976 20 10 01', NULL, 'española', 28.50, 60, 1, 0, 1, 35, '2026-04-08 18:31:37'),
-(2, 3, 'La Casa de Ana', 'Restaurante familiar especializado en cocina mediterránea.', 'Paseo de la Independencia, 22, Zaragoza', 'Zaragoza', 41.65120000, -0.88730000, '976 20 10 02', NULL, 'pasta', 22.00, 40, 1, 0, 1, 35, '2026-04-08 18:31:37'),
-(3, 4, 'El Rincón Secreto', 'Alta cocina con producto de temporada y bodega selecta.', 'Plaza del Pilar, 3, Zaragoza', 'Zaragoza', 41.65730000, -0.87730000, '976 20 10 03', NULL, 'sushi', 45.00, 30, 1, 0, 1, 35, '2026-04-08 18:31:37'),
-(4, 9, 'Chicago', 'Restaurante de buena calidad , donde serviremos comida tradicional de buena calidad', 'Almozara 18', 'Zaragoza', NULL, NULL, '678909876', 'chicago@gmail.com', 'Otras', 20.00, 35, 1, 0, 1, 35, '2026-04-13 20:43:29'),
-(5, 10, 'Montessori', 'Comida de colegio de mala calidad', 'Calle Lagasca , 3', 'Zaragoza', NULL, NULL, '676789865', 'Montessori@gmail.com', 'Alta cocina', 15.00, 20, 1, 0, 1, 35, '2026-04-15 00:37:36'),
-(6, 10, 'Juanko Pizza', 'Las mejores pizzas italianas', 'Maria Zayas Sotomayor', 'Zaragoza', NULL, NULL, '654786523', '', 'Italiana', 35.00, 50, 1, 0, 1, 35, '2026-04-15 10:11:30'),
-(7, 21, 'Taberna del Pilar', 'Tapas y vinos aragoneses junto a la Basílica del Pilar.', 'Plaza del Pilar, 12, Zaragoza', 'Zaragoza', 41.65720000, -0.87800000, '976300107', 'info@tabernapilar.com', 'española', 18.00, 45, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(8, 22, 'Asador El Ebro', 'Carnes y verduras a la brasa a orillas del Ebro.', 'Paseo Echegaray y Caballero, 5, Zaragoza', 'Zaragoza', 41.65200000, -0.88100000, '976300208', 'info@asadorzgz.com', 'española', 38.00, 55, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(9, 23, 'Café Aragón', 'Desayunos, brunchs y cocina de fusión con producto local.', 'Calle Don Jaime I, 33, Zaragoza', 'Zaragoza', 41.65400000, -0.87950000, '976300309', 'info@cafearagon.com', 'fusión', 15.00, 35, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(10, 24, 'Sidrería Zaragozana', 'Sidra natural asturiana y pinchos de txistorra y queso.', 'Calle Predicadores, 8, Zaragoza', 'Zaragoza', 41.65600000, -0.88500000, '976300410', 'info@sidreriazgz.com', 'sidreria', 20.00, 40, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(11, 25, 'Marisquería del Ebro', 'El mejor marisco y pescado fresco del Cantábrico y Mediterráneo.', 'Avenida César Augusto, 19, Zaragoza', 'Zaragoza', 41.65000000, -0.88200000, '976300511', 'info@marisqueriaebro.com', 'mariscos', 50.00, 50, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(12, 26, 'Tacos & Mezcal', 'Auténtica cocina mexicana con tacos, tostadas y mezcales artesanos.', 'Calle San Blas, 22, Zaragoza', 'Zaragoza', 41.65300000, -0.89000000, '976300612', 'info@tacosmexzgz.com', 'mexicana', 22.00, 38, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(13, 27, 'Verde & Sano', 'Restaurante 100% vegano con ingredientes de proximidad.', 'Calle Manifestación, 14, Zaragoza', 'Zaragoza', 41.64900000, -0.88000000, '976300713', 'info@veganzgz.com', 'vegana', 19.00, 30, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(14, 28, 'Yami Sushi & Ramen', 'Cocina japonesa tradicional: sushi, ramen y gyozas.', 'Calle Coso, 55, Zaragoza', 'Zaragoza', 41.65500000, -0.88300000, '976300814', 'info@yamizgz.com', 'japonesa', 28.00, 42, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(15, 29, 'Burger Artesanal Zgz', 'Hamburguesas premium con carne de ternasco y panes de masa madre.', 'Paseo de las Damas, 7, Zaragoza', 'Zaragoza', 41.64750000, -0.87700000, '976300915', 'info@burgeriaartesanal.com', 'americana', 16.00, 48, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(16, 30, 'Bar de Pinchos Baturro', 'Pinchos y montaditos al estilo aragonés, imprescindible.', 'Calle Temple, 3, Zaragoza', 'Zaragoza', 41.65100000, -0.87600000, '976301016', 'info@pinchoszgz.com', 'kebab', 12.00, 30, 1, 0, 1, 35, '2026-01-10 10:00:00'),
-(17, 36, 'Taberna del chipi', 'un sitio para comidas familiares o comidas de empresa , te sentiras como en casa', 'Avenida tenor fleta , 65', 'Zaragoza', NULL, NULL, '976343434', NULL, 'Parrilla', NULL, 50, 1, 0, 1, 35, '2026-04-30 23:16:16'),
-(18, 37, 'la recamara', '.', 'calle mayor', 'Zaragoza', NULL, NULL, '976212321', 'recamara@info.com', 'Fusión', 34.00, 33, 1, 1, 1, 35, '2026-04-30 23:32:21'),
-(19, 40, 'La Buganvilla', 'Lo mejor en El centro', 'Plaza Ariño, 1, Zaragoza, ES 50003', 'Zaragoza', NULL, NULL, '976656565', NULL, 'Alta cocina', NULL, 50, 1, 1, 1, 8, '2026-05-06 09:10:21');
-
--- --------------------------------------------------------
+LOCK TABLES `restaurantes` WRITE;
+/*!40000 ALTER TABLE `restaurantes` DISABLE KEYS */;
+INSERT INTO `restaurantes` VALUES (1,31,'La Bodegón Aragonés','Cocina tradicional aragonesa con los mejores vinos de la región.','Calle Alfonso I, 14, Zaragoza','Zaragoza',41.64880000,-0.88910000,'976 20 10 01',NULL,'española',28.50,60,1,0,1,35,'2026-04-08 18:31:37'),(2,3,'La Casa de Ana','Restaurante familiar especializado en cocina mediterránea.','Paseo de la Independencia, 22, Zaragoza','Zaragoza',41.65120000,-0.88730000,'976 20 10 02',NULL,'pasta',22.00,40,1,0,1,35,'2026-04-08 18:31:37'),(3,4,'El Rincón Secreto','Alta cocina con producto de temporada y bodega selecta.','Plaza del Pilar, 3, Zaragoza','Zaragoza',41.65730000,-0.87730000,'976 20 10 03',NULL,'sushi',45.00,30,1,0,1,35,'2026-04-08 18:31:37'),(4,9,'Chicago','Restaurante de buena calidad , donde serviremos comida tradicional de buena calidad','Almozara 18','Zaragoza',NULL,NULL,'678909876','chicago@gmail.com','Otras',20.00,35,1,0,1,35,'2026-04-13 20:43:29'),(5,10,'Montessori','Comida de colegio de mala calidad','Calle Lagasca , 3','Zaragoza',NULL,NULL,'676789865','Montessori@gmail.com','Alta cocina',15.00,20,1,0,1,35,'2026-04-15 00:37:36'),(6,10,'Juanko Pizza','Las mejores pizzas italianas','Maria Zayas Sotomayor','Zaragoza',NULL,NULL,'654786523','','Italiana',35.00,50,1,0,1,35,'2026-04-15 10:11:30'),(7,21,'Taberna del Pilar','Tapas y vinos aragoneses junto a la Basílica del Pilar.','Plaza del Pilar, 12, Zaragoza','Zaragoza',41.65720000,-0.87800000,'976300107','info@tabernapilar.com','española',18.00,45,1,0,1,35,'2026-01-10 10:00:00'),(8,22,'Asador El Ebro','Carnes y verduras a la brasa a orillas del Ebro.','Paseo Echegaray y Caballero, 5, Zaragoza','Zaragoza',41.65200000,-0.88100000,'976300208','info@asadorzgz.com','española',38.00,55,1,0,1,35,'2026-01-10 10:00:00'),(9,23,'Café Aragón','Desayunos, brunchs y cocina de fusión con producto local.','Calle Don Jaime I, 33, Zaragoza','Zaragoza',41.65400000,-0.87950000,'976300309','info@cafearagon.com','fusión',15.00,35,1,0,1,35,'2026-01-10 10:00:00'),(10,24,'Sidrería Zaragozana','Sidra natural asturiana y pinchos de txistorra y queso.','Calle Predicadores, 8, Zaragoza','Zaragoza',41.65600000,-0.88500000,'976300410','info@sidreriazgz.com','sidreria',20.00,40,1,0,1,35,'2026-01-10 10:00:00'),(11,25,'Marisquería del Ebro','El mejor marisco y pescado fresco del Cantábrico y Mediterráneo.','Avenida César Augusto, 19, Zaragoza','Zaragoza',41.65000000,-0.88200000,'976300511','info@marisqueriaebro.com','mariscos',50.00,50,1,0,1,35,'2026-01-10 10:00:00'),(12,26,'Tacos & Mezcal','Auténtica cocina mexicana con tacos, tostadas y mezcales artesanos.','Calle San Blas, 22, Zaragoza','Zaragoza',41.65300000,-0.89000000,'976300612','info@tacosmexzgz.com','mexicana',22.00,38,1,0,1,35,'2026-01-10 10:00:00'),(13,27,'Verde & Sano','Restaurante 100% vegano con ingredientes de proximidad.','Calle Manifestación, 14, Zaragoza','Zaragoza',41.64900000,-0.88000000,'976300713','info@veganzgz.com','vegana',19.00,30,1,0,1,35,'2026-01-10 10:00:00'),(14,28,'Yami Sushi & Ramen','Cocina japonesa tradicional: sushi, ramen y gyozas.','Calle Coso, 55, Zaragoza','Zaragoza',41.65500000,-0.88300000,'976300814','info@yamizgz.com','japonesa',28.00,42,1,0,1,35,'2026-01-10 10:00:00'),(15,29,'Burger Artesanal Zgz','Hamburguesas premium con carne de ternasco y panes de masa madre.','Paseo de las Damas, 7, Zaragoza','Zaragoza',41.64750000,-0.87700000,'976300915','info@burgeriaartesanal.com','americana',16.00,48,1,0,1,35,'2026-01-10 10:00:00'),(16,30,'Bar de Pinchos Baturro','Pinchos y montaditos al estilo aragonés, imprescindible.','Calle Temple, 3, Zaragoza','Zaragoza',41.65100000,-0.87600000,'976301016','info@pinchoszgz.com','kebab',12.00,30,1,0,1,35,'2026-01-10 10:00:00'),(17,36,'Taberna del chipi','un sitio para comidas familiares o comidas de empresa , te sentiras como en casa','Avenida tenor fleta , 65','Zaragoza',NULL,NULL,'976343434',NULL,'Parrilla',NULL,50,1,0,1,35,'2026-04-30 23:16:16'),(18,37,'la recamara','.','calle mayor','Zaragoza',NULL,NULL,'976212321','recamara@info.com','Fusión',34.00,33,1,1,1,35,'2026-04-30 23:32:21'),(19,40,'La Buganvilla','Lo mejor en El centro','Plaza Ariño, 1, Zaragoza, ES 50003','Zaragoza',NULL,NULL,'976656565',NULL,'Alta cocina',NULL,50,1,1,1,8,'2026-05-06 09:10:21'),(40,44,'Cancook','Una estrella Michelin y dos Soles Repsol. Chef Ramsés González. Cocina geográfica aragonesa: más del 85% del producto es aragonés. Tres menús degustación (Gran Menú, Festival y Evolución). El recorrido comienza en La Fresquera y pasa por la cocina I+D antes del comedor con barra frente a los fogones.','Calle León XIII, 2-4, 50008 Zaragoza','Zaragoza',41.64810000,-0.89230000,'976239516','info@cancookrestaurant.com','alta cocina',120.00,20,1,0,1,1,'2026-01-10 10:00:00'),(41,45,'La Prensa','Una estrella Michelin desde 2012 y un Sol Repsol desde 2013. Chef Marisa Barberán y sumiller David Pérez. Nacida en los años 70 como despacho de vinos. Cocina de vanguardia con raíces en el producto local y de temporada. Dos menús degustación: corto (70 €) y largo (95 €), con maridaje disponible.','Calle José Nebra, 3, 50007 Zaragoza','Zaragoza',41.64350000,-0.88770000,'976381637','restaurante@laprensa.es','alta cocina',95.00,28,1,0,1,1,'2026-01-10 10:00:00'),(42,46,'Gente Rara','Una estrella Michelin y un Sol Repsol. Chefs Cristian Palacio y Sofía Sanz. Ubicado en un antiguo taller mecánico del barrio de Jesús. Gran lucernario y cocina totalmente a la vista del comensal. Dos menús degustación: Chalado y Lunático. Elaboraciones de pequeño formato llenas de técnica y sabor. Lista de espera de más de un año.','Calle Santiago Lapuente, 10, 50014 Zaragoza','Zaragoza',41.63310000,-0.88480000,'623002084','info@genterara.es','alta cocina',90.00,18,1,0,1,1,'2026-01-10 10:00:00'),(43,47,'Palomeque','Uno de los restaurantes más queridos y valorados de Zaragoza. Premio TripAdvisor a los 10 mejores de la ciudad en 2025. Cocina honesta que mezcla recetario tradicional con técnicas actuales. Imprescindibles: migas con foie y setas, guisos de cuchara y pescados frescos. Ambiente cálido y cercano.','Calle Agustín Palomeque, 11, 50004 Zaragoza','Zaragoza',41.65140000,-0.88590000,'976214082','info@restaurantepalomeque.es','española',35.00,45,1,0,1,1,'2026-01-11 10:00:00'),(44,48,'Brasería Fire','Restaurante de cocina aragonesa de autor del chef Adrián García. Ganador de la Mejor Tapa de Zaragoza y Provincia 2024. Especializado en Ternasco de Aragón IGP con hasta 12 elaboraciones diferentes. Cocina en horno Josper que combina parrilla y horno para conservar jugosidad y aportar toque ahumado. Terraza acristalada abierta todo el año.','Calle de Santiago, 12 (Bajos Hotel Alda), 50003 Zaragoza','Zaragoza',41.65680000,-0.87960000,'876544288','info@braseriafire.com','española',38.00,50,1,0,1,1,'2026-01-11 10:00:00'),(45,49,'Taberna El Sardi','Taberna moderna de referencia en Zaragoza con un Sol Repsol. Calle Eduardo Dato. Visitada por Alberto Chicote y Juan José Padilla. Imprescindibles: ensaladilla rusa, pulpo Sardi, atún rojo a la parrilla y tarta de queso casera. Siempre llena; reserva imprescindible. Producto de altísima calidad y trato personalizado.','Calle de Eduardo Dato, 23, 50005 Zaragoza','Zaragoza',41.64920000,-0.89110000,'976237890','taberna@elsardi.com','española',35.00,40,1,0,1,1,'2026-01-12 10:00:00'),(46,50,'Nola Gras','Ganador de la Mejor Tapa de Zaragoza 2021 y la Mejor Tapa de Aragón 2017. Chefs Álex Viñal y David Llorente (televisivos del programa La Báscula). Inspirado en Nueva Orleans: sabores ahumados, soul food americana, cócteles de autor y jazz de fondo. Menú degustación que sorprende. Propuesta única en la escena zaragozana.','Calle Francisco de Vitoria, 28-30, 50008 Zaragoza','Zaragoza',41.64760000,-0.89640000,'876008272','reservas@nolagras.es','fusión',40.00,55,1,0,1,1,'2026-01-12 10:00:00'),(47,51,'Brasserie Fire','Restaurante de cocina de mercado con terraza en el entorno de la Plaza del Pilar. Cocina de temporada con producto aragonés. Menú ejecutivo de lunes a viernes. Carta de cócteles artesanos. Ambiente moderno y luminoso en pleno Casco Histórico de Zaragoza.','Calle de Santiago, 14, Casco Antiguo, 50003 Zaragoza','Zaragoza',41.65650000,-0.87980000,'876544288','info@brasseriefire.com','española',32.00,48,1,0,1,1,'2026-01-13 10:00:00'),(48,52,'Zalamero','Restaurante de cocina mediterránea con acento local. Con ubicación en Plaza Salamero y segunda en calle Doctor Cerrada. Valorado en el top 10 de Zaragoza por TripAdvisor 2025. Propuesta fresca y sabrosa basada en producto de temporada. Ambiente familiar y acogedor.','Plaza de Salamero, 3, 50004 Zaragoza','Zaragoza',41.65160000,-0.88720000,'976210445','info@zalamero.es','mediterránea',28.00,50,1,0,1,1,'2026-01-13 10:00:00'),(49,53,'Mas Torres','Referente gastronómico reconocido en 2024 como creador del mejor cachopo del mundo. Elaborado con carne de wagyu nacional, jamón ibérico, queso cremoso, rebozado con panko. Tres espacios: barra, mesas altas y comedor para eventos. Carta basada en productos de temporada y proximidad.','Calle Francisco de Vitoria, 19, 50008 Zaragoza','Zaragoza',41.64880000,-0.89560000,'976228695','info@marestorres.com','española',34.00,60,1,0,1,1,'2026-01-14 10:00:00'),(50,54,'Voltereta','Experiencia inmersiva única en Zaragoza: cabañas hobbit, cascadas reales y lago interior. Cocina de fusión con platos como croquetas de pato teriyaki, tempura de verduras, gyozas de rabo de toro y raviolis de trufa. Menú de mediodía con entrante, principal y postre. Opciones vegetarianas y sin gluten.','Calle de la Salle, 4, 50006 Zaragoza','Zaragoza',41.64390000,-0.88040000,'976341177','reservas@volteretazgz.com','fusión',36.00,70,1,0,1,1,'2026-01-14 10:00:00'),(51,55,'Nola Smoke','Restaurante de street food de autor del chef Álex Viñal (Nola Gras). Cocina 100% Kamado con sabor ahumado. Hamburguesas de carnes de Argentina y Galicia en pan brioche ahumado. Platos para compartir con influencias mexicanas, asiáticas y mediterráneas. Postres imprescindibles: tarta de queso y de dulce de leche.','Calle Francisco de Vitoria, 31, 50008 Zaragoza','Zaragoza',41.64730000,-0.89650000,'648261879','info@nolasmoke.es','americana',22.00,40,1,0,1,1,'2026-01-15 10:00:00'),(52,56,'Gran Café de Zaragoza','Abierto desde 1885. Monumento histórico y cultural de Zaragoza. Aspecto decimonónico por dentro y por fuera. Imán fotográfico y pequeño reducto del clasicismo. Muy concurrido para meriendas, desayunos y churros. Referencia obligada al visitar la ciudad. Imprescindible tomarse los churros con chocolate.','Calle Alfonso I, 25, 50003 Zaragoza','Zaragoza',41.65380000,-0.88020000,'976296048','info@grancafezaragoza.com','cafetería',12.00,80,1,0,1,1,'2026-01-15 10:00:00'),(53,57,'Garbo Gastrobar','Gastrobar que toca muchos palos: brunch, sándwiches artesanos, cruasanes, panes de autor y cócteles de calidad. Se puede terminar la noche aquí y volver a la mañana siguiente. Muy popular los fines de semana para brunch. Ambiente joven y desenfadado. Uno de los locales más versátiles del centro.','Calle de San Miguel, 12, 50001 Zaragoza','Zaragoza',41.65320000,-0.87800000,'876041722','info@garbozgz.com','cafetería',18.00,45,1,0,1,1,'2026-01-16 10:00:00'),(54,58,'La Pata Negra','Taberna de tapas e ibéricos en la zona centro de Zaragoza. Amplia oferta de tapas y tablas de ibéricos a precios populares. Ambiente animado y tradicional. Muy frecuentada por los zaragozanos para el aperitivo del mediodía y del viernes noche.','Calle Azoque, 37, 50004 Zaragoza','Zaragoza',41.65500000,-0.88380000,'976158091','lapatanegra@gmail.com','española',16.00,35,1,0,1,1,'2026-01-16 10:00:00'),(55,59,'La Trastienda Gastro Taberna','Taberna gastronómica en el barrio de Las Fuentes. Recetas de toda la vida ejecutadas con producto de primera. Ambiente acogedor y sin pretensiones. Menú del día y carta de tapas y raciones. Muy recomendada por los locales que buscan cocina honesta a buen precio.','Calle José María Lacarra de Miguel, 18, 50008 Zaragoza','Zaragoza',41.65200000,-0.89780000,'976055459','latrastienda@gmail.com','española',18.00,38,1,0,1,1,'2026-01-17 10:00:00'),(56,60,'Il Romeo','Restaurante de innovadora cocina italiana en el centro de Zaragoza. Pasta fresca artesana, pizzas y risottos elaborados con ingredientes importados de Italia. Ambiente romántico y selecto. Una de las mejores propuestas italianas de la ciudad.','Calle San Miguel, 14, 50001 Zaragoza','Zaragoza',41.65290000,-0.87810000,'876541546','info@ilromeozgz.com','italiana',30.00,40,1,0,1,1,'2026-01-17 10:00:00'),(57,61,'Asador El Sarmiento','Asador especializado en carnes a la brasa y cordero lechal. Cocina tradicional aragonesa con brasas de sarmiento de vid. Ambiente rústico y familiar. Muy valorado por los zaragozanos para comidas en familia los fines de semana. Amplia carta de vinos aragoneses.','Avenida Pablo Gargallo, 41, 50003 Zaragoza','Zaragoza',41.65870000,-0.88650000,'639580211','asadorelsarmiento@gmail.com','asador',35.00,65,1,0,1,1,'2026-01-18 10:00:00'),(58,62,'Marisquería Tony','Marisquería clásica en el centro de Zaragoza. Tapas y frituras al momento con producto fresco. Don Jaime I, una de las calles más concurridas de la ciudad. Especialidades en gambas, calamares y mariscos frescos. Precio asequible y raciones generosas.','Calle Don Jaime I, 38, 50001 Zaragoza','Zaragoza',41.65530000,-0.87920000,'976390414','tony@marisqueriazgz.com','mariscos',25.00,45,1,0,1,1,'2026-01-18 10:00:00'),(59,63,'Restaurante El Real','Restaurante junto a la Plaza del Pilar. Carta de mercado con guiño a la cocina aragonesa: ternasco, pollo al chilindrón, migas y producto de la huerta. Menú de precio cerrado de 27 euros los fines de semana (aperitivo, primero, segundo, postre, agua y vino). La mejor terraza de Zaragoza con vistas a la Basílica del Pilar. Reservado para grupos de hasta 12.','Calle Alfonso I, 40, Plaza del Pilar, 50003 Zaragoza','Zaragoza',41.65710000,-0.87900000,'976295929','reservas@elreal.es','española',27.00,60,1,0,1,1,'2026-01-19 10:00:00');
+/*!40000 ALTER TABLE `restaurantes` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `usuarios`
+-- Table structure for table `usuarios`
 --
 
+DROP TABLE IF EXISTS `usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `apellidos` varchar(150) NOT NULL,
-  `email` varchar(200) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `rol` enum('usuario','restaurante','admin') NOT NULL DEFAULT 'usuario',
-  `foto_perfil` varchar(255) DEFAULT NULL,
-  `fecha_registro` datetime DEFAULT current_timestamp(),
-  `activo` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `apellidos` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `password_hash` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `rol` enum('usuario','restaurante','admin') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'usuario',
+  `foto_perfil` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
+  `activo` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `usuarios`
+-- Dumping data for table `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `nombre`, `apellidos`, `email`, `password_hash`, `telefono`, `rol`, `foto_perfil`, `fecha_registro`, `activo`) VALUES
-(1, 'Admin', 'Sistema', 'admin@restauranteszgz.com', '$2y$10$examplehashadmin', NULL, 'admin', NULL, '2026-04-08 18:31:37', 1),
-(2, 'Carlos', 'Martínez', 'carlos@labodegon.com', '$2y$10$hash1', '976111001', 'restaurante', NULL, '2026-04-08 18:31:37', 1),
-(3, 'Ana', 'López', 'ana@lacasadeana.com', '$2y$10$hash2', '976111002', 'restaurante', NULL, '2026-04-08 18:31:37', 1),
-(4, 'Miguel', 'Sánchez', 'miguel@elrinconsecret.com', '$2y$10$hash3', '976111003', 'restaurante', NULL, '2026-04-08 18:31:37', 1),
-(5, 'Laura', 'García', 'laura@gmail.com', '$2y$10$hash4', '612000001', 'usuario', NULL, '2026-04-08 18:31:37', 1),
-(6, 'Jorge', 'Fernández', 'jorge@gmail.com', '$2y$10$hash5', '612000002', 'usuario', NULL, '2026-04-08 18:31:37', 1),
-(7, 'Juan', 'Cano', 'juank@gmail.com', '$2y$10$xHkvZ.E3CWJ4QNZz/I37mOCFhvLy0oznksCqNwMGrggeuhLX7jb46', '640026831', 'usuario', NULL, '2026-04-13 19:24:50', 1),
-(8, 'Admin', 'Prueba', 'admin@test.com', '$2y$12$gdgxhQJ1hPowS7GGvp11guGiVEAkKE0.WOb3dwmMG6oL1cmwvSanu', '600000001', 'admin', NULL, '2026-04-13 20:23:44', 1),
-(9, 'Restaurante', 'Prueba', 'restaurante@test.com', '$2y$12$l.oSj2kY.ZovBLuUi8od/u6EIh/EOAER.2AVsxcvBPiGvL8uTTmVC', '600000002', 'restaurante', NULL, '2026-04-13 20:23:44', 1),
-(10, 'Juan', 'Cano Mediel', 'juancanomediel@gmail.com', '$2y$10$mhMC3kbzjZESgKyGCdTHNe1ypztGfOStYJ4VlNd8PI91tCpGIE0Xm', '640026830', 'restaurante', NULL, '2026-04-14 17:22:52', 1),
-(11, 'María', 'Jiménez Ruiz', 'maria.jimenez@gmail.com', '$2y$10$examplehash11', '611100011', 'usuario', NULL, '2026-01-05 10:00:00', 1),
-(12, 'Pedro', 'Moreno Blanco', 'pedro.moreno@gmail.com', '$2y$10$examplehash12', '611100012', 'usuario', NULL, '2026-01-10 11:00:00', 1),
-(13, 'Sofía', 'Navarro Pardo', 'sofia.navarro@gmail.com', '$2y$10$examplehash13', '611100013', 'usuario', NULL, '2026-01-15 12:00:00', 1),
-(14, 'Alejandro', 'Torres Gil', 'alejandro.torres@gmail.com', '$2y$10$examplehash14', '611100014', 'usuario', NULL, '2026-01-20 09:00:00', 1),
-(15, 'Lucía', 'Romero Castro', 'lucia.romero@gmail.com', '$2y$10$examplehash15', '611100015', 'usuario', NULL, '2026-01-25 14:00:00', 1),
-(16, 'Marcos', 'Vega Ortega', 'marcos.vega@gmail.com', '$2y$10$examplehash16', '611100016', 'usuario', NULL, '2026-02-01 10:30:00', 1),
-(17, 'Elena', 'Ramos Herrero', 'elena.ramos@gmail.com', '$2y$10$examplehash17', '611100017', 'usuario', NULL, '2026-02-08 08:00:00', 1),
-(18, 'David', 'Molina Serrano', 'david.molina@gmail.com', '$2y$10$examplehash18', '611100018', 'usuario', NULL, '2026-02-14 19:00:00', 1),
-(19, 'Carmen', 'Núñez Valdés', 'carmen.nunez@gmail.com', '$2y$10$examplehash19', '611100019', 'usuario', NULL, '2026-02-20 16:00:00', 1),
-(20, 'Raúl', 'Peña Domingo', 'raul.pena@gmail.com', '$2y$10$examplehash20', '611100020', 'usuario', NULL, '2026-03-01 11:00:00', 1),
-(21, 'Isabel', 'Crespo Lara', 'isabel@tabernapilar.com', '$2y$10$examplehash21', '976300021', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(22, 'Tomás', 'Aguirre Mena', 'tomas@asadorzgz.com', '$2y$10$examplehash22', '976300022', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(23, 'Beatriz', 'Salinas Ibáñez', 'beatriz@cafearagon.com', '$2y$10$examplehash23', '976300023', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(24, 'Fernando', 'Domínguez Vara', 'fernando@sidreriazgz.com', '$2y$10$examplehash24', '976300024', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(25, 'Rosa', 'Alcalde Tena', 'rosa@marisqueriaebro.com', '$2y$10$examplehash25', '976300025', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(26, 'Andrés', 'Fuentes Pla', 'andres@tacosmexzgz.com', '$2y$10$examplehash26', '976300026', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(27, 'Natalia', 'Bravo Espinosa', 'natalia@veganzgz.com', '$2y$10$examplehash27', '976300027', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(28, 'Héctor', 'Calvo Ríos', 'hector@yamizgz.com', '$2y$10$examplehash28', '976300028', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(29, 'Pilar', 'Montes Lago', 'pilar@burgeriaartesanal.com', '$2y$10$examplehash29', '976300029', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(30, 'Emilio', 'Cano Vergara', 'emilio@pinchoszgz.com', '$2y$10$examplehash30', '976300030', 'restaurante', NULL, '2026-01-03 09:00:00', 1),
-(31, 'Juan', 'del Campo Munoz', 'juaniko@gmail.com', '$2y$10$kee5tWQ8aea9I9wEaKexJuuAH5iuJJX9SHuhKr6YEmv5hJUyrXJdK', '675432319', 'restaurante', NULL, '2026-04-20 21:10:41', 1),
-(32, 'Pepe', 'Lopez', 'lopez@pepe.com', '$2y$10$KPEvAwPPSdASBGbt0.Bf9.PjOTlMV4CxCV0WEBleyna9ICe8ialL2', '65734523', 'usuario', NULL, '2026-04-29 16:25:21', 1),
-(33, 'Pepe', 'Lopez', 'pepe@lopez.com', '$2y$10$lQktwIVI6c/kox9stNK/MOJ3ruUuhRr0kvRWegdhe7bl2/ZXD.dxy', '645738290', 'usuario', NULL, '2026-04-29 16:36:51', 1),
-(34, 'prueba', 'prueba3', 'prueba@gmail.com', '$2y$10$jbeeIjLXZOtAKDdaR9xvKemt4Z6DFJ39TjxIzrjQdsagcwE9a9iq6', '32312121', 'usuario', NULL, '2026-04-30 21:56:40', 1),
-(35, 'samuadmin', '', 'admin@reats.com', '$2y$10$JunpgTeAHAXPwb0S7ThaSuIIiCTzPf9vvX1CAhPs/THJWsX39m.2e', '', 'admin', NULL, '2026-04-30 22:58:51', 1),
-(36, 'Pepe', 'Gil', 'gil@pepe.com', '$2y$10$ERC46Dw5OOnVWoPk8gMQt.vvvkcM7keaZN0SToLOq2/v0cUEt1Iyu', '345656565', 'restaurante', NULL, '2026-04-30 23:16:16', 1),
-(37, 'lucas', 'l', 'l@l.com', '$2y$10$zGfHy2EpXIHyn.PkCfodVeqXM/XHKrnqmRj/aqyl2ENvQMGzB7Bn6', '', 'restaurante', NULL, '2026-04-30 23:32:21', 1),
-(38, 'Samu', 'prueba', '25.dam.samuelmartinez@colegiomontessori.com', '$2y$10$69oqT3TlKSpxwzHpuO3NO.9MF/dmyEGU3P8iFRKqYzABviZKTE6W2', '232323232', 'usuario', NULL, '2026-05-04 18:41:25', 1),
-(39, 'Juako', 'cano', '23.daw.juancano@fundacionmontessori.com', '$2y$10$UrX12nO.GUCqpANwDOnZNeE5ZKWyQkYhLHMkt1lzq5YsPHBt97.Du', '640026875', 'usuario', NULL, '2026-05-06 09:05:27', 1),
-(40, 'Pablo', 'Lazaro', 'pablo@lazaro.com', '$2y$10$lniS48zs2H8c5uF5XKAVUe/EXF0jk6uWdjFia4bUNSPw/BVRNkwPG', '123455445', 'restaurante', NULL, '2026-05-06 09:10:21', 1);
-
--- --------------------------------------------------------
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,'Admin','Sistema','admin@restauranteszgz.com','$2y$10$examplehashadmin',NULL,'admin',NULL,'2026-04-08 18:31:37',1),(2,'Carlos','Martínez','carlos@labodegon.com','$2y$10$hash1','976111001','restaurante',NULL,'2026-04-08 18:31:37',1),(3,'Ana','López','ana@lacasadeana.com','$2y$10$hash2','976111002','restaurante',NULL,'2026-04-08 18:31:37',1),(4,'Miguel','Sánchez','miguel@elrinconsecret.com','$2y$10$hash3','976111003','restaurante',NULL,'2026-04-08 18:31:37',1),(5,'Laura','García','laura@gmail.com','$2y$10$hash4','612000001','usuario',NULL,'2026-04-08 18:31:37',1),(6,'Jorge','Fernández','jorge@gmail.com','$2y$10$hash5','612000002','usuario',NULL,'2026-04-08 18:31:37',1),(7,'Juan','Cano','juank@gmail.com','$2y$10$xHkvZ.E3CWJ4QNZz/I37mOCFhvLy0oznksCqNwMGrggeuhLX7jb46','640026831','usuario',NULL,'2026-04-13 19:24:50',1),(8,'Admin','Prueba','admin@test.com','$2y$12$gdgxhQJ1hPowS7GGvp11guGiVEAkKE0.WOb3dwmMG6oL1cmwvSanu','600000001','admin',NULL,'2026-04-13 20:23:44',1),(9,'Restaurante','Prueba','restaurante@test.com','$2y$12$l.oSj2kY.ZovBLuUi8od/u6EIh/EOAER.2AVsxcvBPiGvL8uTTmVC','600000002','restaurante',NULL,'2026-04-13 20:23:44',1),(10,'Juan','Cano Mediel','juancanomediel@gmail.com','$2y$10$mhMC3kbzjZESgKyGCdTHNe1ypztGfOStYJ4VlNd8PI91tCpGIE0Xm','640026830','restaurante',NULL,'2026-04-14 17:22:52',1),(11,'María','Jiménez Ruiz','maria.jimenez@gmail.com','$2y$10$examplehash11','611100011','usuario',NULL,'2026-01-05 10:00:00',1),(12,'Pedro','Moreno Blanco','pedro.moreno@gmail.com','$2y$10$examplehash12','611100012','usuario',NULL,'2026-01-10 11:00:00',1),(13,'Sofía','Navarro Pardo','sofia.navarro@gmail.com','$2y$10$examplehash13','611100013','usuario',NULL,'2026-01-15 12:00:00',1),(14,'Alejandro','Torres Gil','alejandro.torres@gmail.com','$2y$10$examplehash14','611100014','usuario',NULL,'2026-01-20 09:00:00',1),(15,'Lucía','Romero Castro','lucia.romero@gmail.com','$2y$10$examplehash15','611100015','usuario',NULL,'2026-01-25 14:00:00',1),(16,'Marcos','Vega Ortega','marcos.vega@gmail.com','$2y$10$examplehash16','611100016','usuario',NULL,'2026-02-01 10:30:00',1),(17,'Elena','Ramos Herrero','elena.ramos@gmail.com','$2y$10$examplehash17','611100017','usuario',NULL,'2026-02-08 08:00:00',1),(18,'David','Molina Serrano','david.molina@gmail.com','$2y$10$examplehash18','611100018','usuario',NULL,'2026-02-14 19:00:00',1),(19,'Carmen','Núñez Valdés','carmen.nunez@gmail.com','$2y$10$examplehash19','611100019','usuario',NULL,'2026-02-20 16:00:00',1),(20,'Raúl','Peña Domingo','raul.pena@gmail.com','$2y$10$examplehash20','611100020','usuario',NULL,'2026-03-01 11:00:00',1),(21,'Isabel','Crespo Lara','isabel@tabernapilar.com','$2y$10$examplehash21','976300021','restaurante',NULL,'2026-01-03 09:00:00',1),(22,'Tomás','Aguirre Mena','tomas@asadorzgz.com','$2y$10$examplehash22','976300022','restaurante',NULL,'2026-01-03 09:00:00',1),(23,'Beatriz','Salinas Ibáñez','beatriz@cafearagon.com','$2y$10$examplehash23','976300023','restaurante',NULL,'2026-01-03 09:00:00',1),(24,'Fernando','Domínguez Vara','fernando@sidreriazgz.com','$2y$10$examplehash24','976300024','restaurante',NULL,'2026-01-03 09:00:00',1),(25,'Rosa','Alcalde Tena','rosa@marisqueriaebro.com','$2y$10$examplehash25','976300025','restaurante',NULL,'2026-01-03 09:00:00',1),(26,'Andrés','Fuentes Pla','andres@tacosmexzgz.com','$2y$10$examplehash26','976300026','restaurante',NULL,'2026-01-03 09:00:00',1),(27,'Natalia','Bravo Espinosa','natalia@veganzgz.com','$2y$10$examplehash27','976300027','restaurante',NULL,'2026-01-03 09:00:00',1),(28,'Héctor','Calvo Ríos','hector@yamizgz.com','$2y$10$examplehash28','976300028','restaurante',NULL,'2026-01-03 09:00:00',1),(29,'Pilar','Montes Lago','pilar@burgeriaartesanal.com','$2y$10$examplehash29','976300029','restaurante',NULL,'2026-01-03 09:00:00',1),(30,'Emilio','Cano Vergara','emilio@pinchoszgz.com','$2y$10$examplehash30','976300030','restaurante',NULL,'2026-01-03 09:00:00',1),(31,'Juan','del Campo Munoz','juaniko@gmail.com','$2y$10$kee5tWQ8aea9I9wEaKexJuuAH5iuJJX9SHuhKr6YEmv5hJUyrXJdK','675432319','restaurante',NULL,'2026-04-20 21:10:41',1),(32,'Pepe','Lopez','lopez@pepe.com','$2y$10$KPEvAwPPSdASBGbt0.Bf9.PjOTlMV4CxCV0WEBleyna9ICe8ialL2','65734523','usuario',NULL,'2026-04-29 16:25:21',1),(33,'Pepe','Lopez','pepe@lopez.com','$2y$10$lQktwIVI6c/kox9stNK/MOJ3ruUuhRr0kvRWegdhe7bl2/ZXD.dxy','645738290','usuario',NULL,'2026-04-29 16:36:51',1),(34,'prueba','prueba3','prueba@gmail.com','$2y$10$jbeeIjLXZOtAKDdaR9xvKemt4Z6DFJ39TjxIzrjQdsagcwE9a9iq6','32312121','usuario',NULL,'2026-04-30 21:56:40',1),(35,'samuadmin','','admin@reats.com','$2y$10$JunpgTeAHAXPwb0S7ThaSuIIiCTzPf9vvX1CAhPs/THJWsX39m.2e','','usuario',NULL,'2026-04-30 22:58:51',1),(36,'Pepe','Gil','gil@pepe.com','$2y$10$ERC46Dw5OOnVWoPk8gMQt.vvvkcM7keaZN0SToLOq2/v0cUEt1Iyu','345656565','restaurante',NULL,'2026-04-30 23:16:16',0),(37,'lucas','l','l@l.com','$2y$10$zGfHy2EpXIHyn.PkCfodVeqXM/XHKrnqmRj/aqyl2ENvQMGzB7Bn6','','restaurante',NULL,'2026-04-30 23:32:21',1),(38,'Samu','prueba','25.dam.samuelmartinez@colegiomontessori.com','$2y$10$69oqT3TlKSpxwzHpuO3NO.9MF/dmyEGU3P8iFRKqYzABviZKTE6W2','232323232','usuario',NULL,'2026-05-04 18:41:25',1),(39,'Juako','cano','23.daw.juancano@fundacionmontessori.com','$2y$10$UrX12nO.GUCqpANwDOnZNeE5ZKWyQkYhLHMkt1lzq5YsPHBt97.Du','640026875','usuario',NULL,'2026-05-06 09:05:27',1),(40,'Pablo','Lazaro','pablo@lazaro.com','$2y$10$lniS48zs2H8c5uF5XKAVUe/EXF0jk6uWdjFia4bUNSPw/BVRNkwPG','123455445','restaurante',NULL,'2026-05-06 09:10:21',1),(41,'Samu','Martinez','samuprogramming25@gmail.com','$2y$10$IppeClaI2Gufr7UDfkHuBO/3u3EIBjFgVsX7R2xVQZt8x8htCIdjy','123453421','usuario',NULL,'2026-05-07 17:46:22',1),(42,'pp','pp','pp@gmail.com','$2y$10$53wNGNNgtVD3CQzkik.FGeyY4gtJuW3xw95Nr/r7ChW4/7T4QeuIi','67','usuario',NULL,'2026-05-08 16:14:28',1),(43,'Ernesto','Rezusta Aznarez','ernestorezustaaznarez@gmail.com','$2y$10$SZ8Ae0UrnfMJW6Cwx2xNtepgqKAKc51ib61NsQ/ny/9nUFiChWD7G','123456789','usuario',NULL,'2026-05-12 17:43:11',1),(44,'Ramsés','González Alarcón','info@cancookrestaurant.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976239516','restaurante',NULL,'2026-01-10 09:00:00',1),(45,'Marisa','Barberán Lozano','restaurante@laprensa.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976381637','restaurante',NULL,'2026-01-10 09:00:00',1),(46,'Cristian','Palacio Sanz','info@genterara.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','623002084','restaurante',NULL,'2026-01-10 09:00:00',1),(47,'Antonio','Palomeque Ruiz','info@restaurantepalomeque.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976214082','restaurante',NULL,'2026-01-11 09:00:00',1),(48,'Adrián','García Monreal','info@braseriafire.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','876544288','restaurante',NULL,'2026-01-11 09:00:00',1),(49,'Roberto','Sardi Ortega','taberna@elsardi.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976237890','restaurante',NULL,'2026-01-12 09:00:00',1),(50,'Álex','Viñal Benedé','reservas@nolagras.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','876008272','restaurante',NULL,'2026-01-12 09:00:00',1),(51,'Manuel','Recio Llorente','info@brasseriefire.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','876544288','restaurante',NULL,'2026-01-13 09:00:00',1),(52,'Patricia','Zalamero Ibáñez','info@zalamero.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976210445','restaurante',NULL,'2026-01-13 09:00:00',1),(53,'Javier','Torres Maestro','info@marestorres.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976228695','restaurante',NULL,'2026-01-14 09:00:00',1),(54,'Clara','Morales Tejada','reservas@volteretazgz.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976341177','restaurante',NULL,'2026-01-14 09:00:00',1),(55,'Álex','Viñal Benedé','info@nolasmoke.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','648261879','restaurante',NULL,'2026-01-15 09:00:00',1),(56,'Eduardo','Casanova Pardo','info@grancafezaragoza.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976296048','restaurante',NULL,'2026-01-15 09:00:00',1),(57,'Sergio','Garbo Vallés','info@garbozgz.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','876041722','restaurante',NULL,'2026-01-16 09:00:00',1),(58,'Francisco','Negrete Aranda','lapatanegra@gmail.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976158091','restaurante',NULL,'2026-01-16 09:00:00',1),(59,'Marta','Fuentes Bernal','latrastienda@gmail.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976055459','restaurante',NULL,'2026-01-17 09:00:00',1),(60,'Marco','Romano Villar','info@ilromeozgz.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','876541546','restaurante',NULL,'2026-01-17 09:00:00',1),(61,'Ignacio','Sarmiento Blasco','asadorelsarmiento@gmail.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','639580211','restaurante',NULL,'2026-01-18 09:00:00',1),(62,'Antonio','Montero Paz','tony@marisqueriazgz.com','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976390414','restaurante',NULL,'2026-01-18 09:00:00',1),(63,'Ángel','Real Coronado','reservas@elreal.es','$2y$10$gtUvbykodIJ0SGAZclpuXOkNvn6mtBTfIDshjpAVrNeMjGcntBYy2','976295929','restaurante',NULL,'2026-01-19 09:00:00',1);
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura de tabla para la tabla `valoraciones`
+-- Table structure for table `valoraciones`
 --
 
+DROP TABLE IF EXISTS `valoraciones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `valoraciones` (
-  `id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `restaurante_id` int(11) NOT NULL,
-  `reserva_id` int(11) DEFAULT NULL,
-  `puntuacion` tinyint(4) NOT NULL CHECK (`puntuacion` between 1 and 5),
-  `comentario` text DEFAULT NULL,
-  `fecha` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `restaurante_id` int NOT NULL,
+  `reserva_id` int DEFAULT NULL,
+  `puntuacion` tinyint NOT NULL,
+  `comentario` text COLLATE utf8mb4_general_ci,
+  `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_usuario_restaurante` (`usuario_id`,`restaurante_id`),
+  KEY `restaurante_id` (`restaurante_id`),
+  KEY `reserva_id` (`reserva_id`),
+  CONSTRAINT `valoraciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `valoraciones_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `valoraciones_ibfk_3` FOREIGN KEY (`reserva_id`) REFERENCES `reservas` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `valoraciones_chk_1` CHECK ((`puntuacion` between 1 and 5))
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Volcado de datos para la tabla `valoraciones`
+-- Dumping data for table `valoraciones`
 --
 
-INSERT INTO `valoraciones` (`id`, `usuario_id`, `restaurante_id`, `reserva_id`, `puntuacion`, `comentario`, `fecha`) VALUES
-(1, 7, 1, NULL, 3, 'Genial', '2026-04-16 22:29:03'),
-(2, 7, 2, NULL, 4, 'Excelente trato del camarero, la comida normalilla', '2026-04-14 17:18:42'),
-(3, 11, 7, 4, 5, 'Ambiente inmejorable y las migas están para chuparse los dedos.', '2026-02-15 12:00:00'),
-(4, 12, 8, 5, 4, 'El chuletón de buey es una experiencia única. Un poco caro pero vale la pena.', '2026-02-21 13:00:00'),
-(5, 13, 11, 6, 5, 'El mejor marisco que he comido en Zaragoza. El arroz de bogavante, espectacular.', '2026-03-01 14:00:00'),
-(6, 14, 14, 7, 4, 'El ramen tonkotsu muy bueno aunque el caldo podría ser un poco más concentrado.', '2026-03-06 13:00:00'),
-(7, 15, 16, 8, 5, 'Pinchos increíbles, el montadito de foie se va en un segundo. Imprescindible.', '2026-03-11 14:00:00'),
-(8, 16, 12, 9, 4, 'Tacos muy ricos, el de carnitas el mejor. El mezcal también excelente.', '2026-03-16 13:00:00'),
-(9, 17, 9, 10, 3, 'Desayuno correcto, nada especial. El café estaba algo flojo.', '2026-03-21 12:00:00'),
-(10, 18, 13, 11, 5, 'Sorprendente para ser vegano. El curry de garbanzos y la burger vegana, tops.', '2026-03-26 13:00:00'),
-(11, 19, 15, 12, 4, 'Buenas hamburguesas artesanales. La Baturra con el queso Tronchón, increíble.', '2026-04-02 14:00:00'),
-(12, 20, 10, 13, 4, 'Sidra muy bien tirada y el cachopo grandísimo. Repetiremos.', '2026-04-06 13:00:00'),
-(13, 5, 7, 14, 5, 'Las tapas aragonesas son fantásticas. El servicio muy atento y rápido.', '2026-04-09 12:00:00'),
-(14, 6, 8, 15, 5, 'El cordero al sarmiento, una delicia. Sitio ideal para celebraciones.', '2026-04-11 13:00:00'),
-(15, 11, 9, 31, 4, 'Brunch muy completo y bien presentado. Buenos precios.', '2026-01-21 13:00:00'),
-(16, 11, 12, 32, 5, 'El guacamole hecho en el momento y los tacos de jackfruit para repetir.', '2026-01-29 14:00:00'),
-(17, 12, 10, 33, 3, 'Ambiente muy animado pero el servicio tardó bastante. La fabada correcta.', '2026-02-06 13:00:00'),
-(18, 12, 16, 34, 4, 'Buena calidad-precio en los pinchos. Me gustó el de salmón especialmente.', '2026-02-13 12:00:00'),
-(19, 13, 7, 35, 5, 'El ternasco al horno deshacía en la boca. Vino de Somontano muy bueno.', '2026-02-19 13:00:00'),
-(20, 14, 15, 36, 4, 'La Picante es para los valientes, muy bien ejecutada. Los aros de cebolla top.', '2026-03-02 14:00:00'),
-(21, 15, 8, 37, 5, 'Sin duda el mejor asador de Zaragoza. El secreto ibérico a la brasa, perfecto.', '2026-03-13 13:00:00'),
-(22, 16, 11, 38, 5, 'Las gambas al ajillo y la lubina a la plancha, frescura total. Lo recomiendo.', '2026-03-23 14:00:00'),
-(23, 17, 13, 39, 4, 'Propuesta vegana muy cuidada. Me encantó el bowl de quinoa.', '2026-04-03 13:00:00'),
-(24, 18, 16, 40, 3, 'Pinchos bien pero el servicio un poco desorganizado esa noche.', '2026-04-10 12:00:00'),
-(25, 19, 7, 41, 5, 'Perfecto para una comida rápida y rica. Las bravas caseras, las mejores.', '2026-04-13 13:00:00'),
-(26, 20, 9, 42, 4, 'Brunch del domingo muy agradable, buena música y ambiente relajado.', '2026-04-15 14:00:00'),
-(27, 5, 12, 43, 4, 'Tacos de pescado muy originales. El guacamole imprescindible.', '2026-04-16 13:00:00'),
-(28, 6, 14, 44, 5, 'La mejor cocina japonesa que he probado en Zaragoza. El ramen tonkotsu, brutal.', '2026-04-17 14:00:00'),
-(29, 7, 7, 45, 4, 'Muy buena taberna con sabor aragonés de verdad.', '2026-04-18 13:00:00'),
-(30, 7, 16, 46, 5, 'Los pinchos calientes son una maravilla. No te pierdas el champiñón relleno.', '2026-03-21 14:00:00'),
-(31, 7, 8, 47, 5, 'Las verduras a la brasa con las carnes hacen un menú perfecto.', '2026-02-26 13:00:00'),
-(32, 7, 13, 48, 4, 'Muy bien para comer sano sin renunciar al sabor. Las gyozas, sorprendentes.', '2026-01-31 14:00:00');
-
--- --------------------------------------------------------
+LOCK TABLES `valoraciones` WRITE;
+/*!40000 ALTER TABLE `valoraciones` DISABLE KEYS */;
+INSERT INTO `valoraciones` VALUES (1,7,1,NULL,3,'Genial','2026-04-16 22:29:03'),(2,7,2,NULL,4,'Excelente trato del camarero, la comida normalilla','2026-04-14 17:18:42'),(3,11,7,4,5,'Ambiente inmejorable y las migas están para chuparse los dedos.','2026-02-15 12:00:00'),(4,12,8,5,4,'El chuletón de buey es una experiencia única. Un poco caro pero vale la pena.','2026-02-21 13:00:00'),(5,13,11,6,5,'El mejor marisco que he comido en Zaragoza. El arroz de bogavante, espectacular.','2026-03-01 14:00:00'),(6,14,14,7,4,'El ramen tonkotsu muy bueno aunque el caldo podría ser un poco más concentrado.','2026-03-06 13:00:00'),(7,15,16,8,5,'Pinchos increíbles, el montadito de foie se va en un segundo. Imprescindible.','2026-03-11 14:00:00'),(8,16,12,9,4,'Tacos muy ricos, el de carnitas el mejor. El mezcal también excelente.','2026-03-16 13:00:00'),(9,17,9,10,3,'Desayuno correcto, nada especial. El café estaba algo flojo.','2026-03-21 12:00:00'),(10,18,13,11,5,'Sorprendente para ser vegano. El curry de garbanzos y la burger vegana, tops.','2026-03-26 13:00:00'),(11,19,15,12,4,'Buenas hamburguesas artesanales. La Baturra con el queso Tronchón, increíble.','2026-04-02 14:00:00'),(12,20,10,13,4,'Sidra muy bien tirada y el cachopo grandísimo. Repetiremos.','2026-04-06 13:00:00'),(13,5,7,14,5,'Las tapas aragonesas son fantásticas. El servicio muy atento y rápido.','2026-04-09 12:00:00'),(14,6,8,15,5,'El cordero al sarmiento, una delicia. Sitio ideal para celebraciones.','2026-04-11 13:00:00'),(15,11,9,31,4,'Brunch muy completo y bien presentado. Buenos precios.','2026-01-21 13:00:00'),(16,11,12,32,5,'El guacamole hecho en el momento y los tacos de jackfruit para repetir.','2026-01-29 14:00:00'),(17,12,10,33,3,'Ambiente muy animado pero el servicio tardó bastante. La fabada correcta.','2026-02-06 13:00:00'),(18,12,16,34,4,'Buena calidad-precio en los pinchos. Me gustó el de salmón especialmente.','2026-02-13 12:00:00'),(19,13,7,35,5,'El ternasco al horno deshacía en la boca. Vino de Somontano muy bueno.','2026-02-19 13:00:00'),(20,14,15,36,4,'La Picante es para los valientes, muy bien ejecutada. Los aros de cebolla top.','2026-03-02 14:00:00'),(21,15,8,37,5,'Sin duda el mejor asador de Zaragoza. El secreto ibérico a la brasa, perfecto.','2026-03-13 13:00:00'),(22,16,11,38,5,'Las gambas al ajillo y la lubina a la plancha, frescura total. Lo recomiendo.','2026-03-23 14:00:00'),(23,17,13,39,4,'Propuesta vegana muy cuidada. Me encantó el bowl de quinoa.','2026-04-03 13:00:00'),(24,18,16,40,3,'Pinchos bien pero el servicio un poco desorganizado esa noche.','2026-04-10 12:00:00'),(25,19,7,41,5,'Perfecto para una comida rápida y rica. Las bravas caseras, las mejores.','2026-04-13 13:00:00'),(26,20,9,42,4,'Brunch del domingo muy agradable, buena música y ambiente relajado.','2026-04-15 14:00:00'),(27,5,12,43,4,'Tacos de pescado muy originales. El guacamole imprescindible.','2026-04-16 13:00:00'),(28,6,14,44,5,'La mejor cocina japonesa que he probado en Zaragoza. El ramen tonkotsu, brutal.','2026-04-17 14:00:00'),(29,7,7,45,4,'Muy buena taberna con sabor aragonés de verdad.','2026-04-18 13:00:00'),(30,7,16,46,5,'Los pinchos calientes son una maravilla. No te pierdas el champiñón relleno.','2026-03-21 14:00:00'),(31,7,8,47,5,'Las verduras a la brasa con las carnes hacen un menú perfecto.','2026-02-26 13:00:00'),(32,7,13,48,4,'Muy bien para comer sano sin renunciar al sabor. Las gyozas, sorprendentes.','2026-01-31 14:00:00'),(33,33,3,NULL,4,'opcional','2026-05-12 09:04:57'),(34,41,17,NULL,5,'12','2026-05-12 09:05:34');
+/*!40000 ALTER TABLE `valoraciones` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
--- Estructura Stand-in para la vista `vista_restaurantes`
--- (Véase abajo para la vista actual)
+-- Temporary view structure for view `vista_restaurantes`
 --
-CREATE TABLE `vista_restaurantes` (
-`id` int(11)
-,`nombre` varchar(150)
-,`descripcion` text
-,`direccion` varchar(255)
-,`latitud` decimal(10,8)
-,`longitud` decimal(11,8)
-,`telefono` varchar(20)
-,`email_contacto` varchar(200)
-,`categoria` varchar(80)
-,`precio_medio` decimal(6,2)
-,`aforo_total` int(11)
-,`activo` tinyint(1)
-,`valoracion_media` decimal(5,1)
-,`num_valoraciones` bigint(21)
-,`reservas_hoy` bigint(21)
-,`plazas_disponibles_hoy` bigint(22)
-);
 
--- --------------------------------------------------------
-
---
--- Estructura para la vista `vista_restaurantes`
---
 DROP TABLE IF EXISTS `vista_restaurantes`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_restaurantes`  AS SELECT `r`.`id` AS `id`, `r`.`nombre` AS `nombre`, `r`.`descripcion` AS `descripcion`, `r`.`direccion` AS `direccion`, `r`.`latitud` AS `latitud`, `r`.`longitud` AS `longitud`, `r`.`telefono` AS `telefono`, `r`.`email_contacto` AS `email_contacto`, `r`.`categoria` AS `categoria`, `r`.`precio_medio` AS `precio_medio`, `r`.`aforo_total` AS `aforo_total`, `r`.`activo` AS `activo`, coalesce(round(avg(`v`.`puntuacion`),1),0) AS `valoracion_media`, count(distinct `v`.`id`) AS `num_valoraciones`, (select count(0) from `reservas` `res` where `res`.`restaurante_id` = `r`.`id` and `res`.`fecha` = curdate() and `res`.`estado` in ('pendiente','confirmada')) AS `reservas_hoy`, `r`.`aforo_total`- (select count(0) from `reservas` `res2` where `res2`.`restaurante_id` = `r`.`id` and `res2`.`fecha` = curdate() and `res2`.`estado` in ('pendiente','confirmada')) AS `plazas_disponibles_hoy` FROM (`restaurantes` `r` left join `valoraciones` `v` on(`v`.`restaurante_id` = `r`.`id`)) WHERE `r`.`activo` = 1 GROUP BY `r`.`id` ;
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `fotos_restaurante`
---
-ALTER TABLE `fotos_restaurante`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `restaurante_id` (`restaurante_id`);
-
---
--- Indices de la tabla `horarios`
---
-ALTER TABLE `horarios`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `restaurante_id` (`restaurante_id`);
-
---
--- Indices de la tabla `menu_categorias`
---
-ALTER TABLE `menu_categorias`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `restaurante_id` (`restaurante_id`);
+/*!50001 DROP VIEW IF EXISTS `vista_restaurantes`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vista_restaurantes` AS SELECT 
+ 1 AS `id`,
+ 1 AS `nombre`,
+ 1 AS `descripcion`,
+ 1 AS `direccion`,
+ 1 AS `latitud`,
+ 1 AS `longitud`,
+ 1 AS `telefono`,
+ 1 AS `email_contacto`,
+ 1 AS `categoria`,
+ 1 AS `precio_medio`,
+ 1 AS `aforo_total`,
+ 1 AS `activo`,
+ 1 AS `valoracion_media`,
+ 1 AS `num_valoraciones`,
+ 1 AS `reservas_hoy`,
+ 1 AS `plazas_disponibles_hoy`*/;
+SET character_set_client = @saved_cs_client;
 
 --
--- Indices de la tabla `menu_platos`
---
-ALTER TABLE `menu_platos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `categoria_id` (`categoria_id`),
-  ADD KEY `restaurante_id` (`restaurante_id`);
-
---
--- Indices de la tabla `propinas`
---
-ALTER TABLE `propinas`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `reserva_id` (`reserva_id`),
-  ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `restaurante_id` (`restaurante_id`);
-
---
--- Indices de la tabla `reservas`
---
-ALTER TABLE `reservas`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `restaurante_id` (`restaurante_id`);
-
---
--- Indices de la tabla `restaurantes`
---
-ALTER TABLE `restaurantes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `fk_aprobado_por` (`aprobado_por`);
-
---
--- Indices de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- Indices de la tabla `valoraciones`
---
-ALTER TABLE `valoraciones`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_usuario_restaurante` (`usuario_id`,`restaurante_id`),
-  ADD KEY `restaurante_id` (`restaurante_id`),
-  ADD KEY `reserva_id` (`reserva_id`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
+-- Final view structure for view `vista_restaurantes`
 --
 
---
--- AUTO_INCREMENT de la tabla `fotos_restaurante`
---
-ALTER TABLE `fotos_restaurante`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+/*!50001 DROP VIEW IF EXISTS `vista_restaurantes`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`adminReats`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vista_restaurantes` AS select `r`.`id` AS `id`,`r`.`nombre` AS `nombre`,`r`.`descripcion` AS `descripcion`,`r`.`direccion` AS `direccion`,`r`.`latitud` AS `latitud`,`r`.`longitud` AS `longitud`,`r`.`telefono` AS `telefono`,`r`.`email_contacto` AS `email_contacto`,`r`.`categoria` AS `categoria`,`r`.`precio_medio` AS `precio_medio`,`r`.`aforo_total` AS `aforo_total`,`r`.`activo` AS `activo`,coalesce(round(avg(`v`.`puntuacion`),1),0) AS `valoracion_media`,count(distinct `v`.`id`) AS `num_valoraciones`,(select count(0) from `reservas` `res` where ((`res`.`restaurante_id` = `r`.`id`) and (`res`.`fecha` = curdate()) and (`res`.`estado` in ('pendiente','confirmada','esperando_usuario')))) AS `reservas_hoy`,(`r`.`aforo_total` - (select count(0) from `reservas` `res2` where ((`res2`.`restaurante_id` = `r`.`id`) and (`res2`.`fecha` = curdate()) and (`res2`.`estado` in ('pendiente','confirmada','esperando_usuario'))))) AS `plazas_disponibles_hoy` from (`restaurantes` `r` left join `valoraciones` `v` on((`v`.`restaurante_id` = `r`.`id`))) where (`r`.`activo` = 1) group by `r`.`id` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
---
--- AUTO_INCREMENT de la tabla `horarios`
---
-ALTER TABLE `horarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
-
---
--- AUTO_INCREMENT de la tabla `menu_categorias`
---
-ALTER TABLE `menu_categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
-
---
--- AUTO_INCREMENT de la tabla `menu_platos`
---
-ALTER TABLE `menu_platos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
-
---
--- AUTO_INCREMENT de la tabla `propinas`
---
-ALTER TABLE `propinas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT de la tabla `reservas`
---
-ALTER TABLE `reservas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
-
---
--- AUTO_INCREMENT de la tabla `restaurantes`
---
-ALTER TABLE `restaurantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
---
--- AUTO_INCREMENT de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
-
---
--- AUTO_INCREMENT de la tabla `valoraciones`
---
-ALTER TABLE `valoraciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `fotos_restaurante`
---
-ALTER TABLE `fotos_restaurante`
-  ADD CONSTRAINT `fotos_restaurante_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `horarios`
---
-ALTER TABLE `horarios`
-  ADD CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `menu_categorias`
---
-ALTER TABLE `menu_categorias`
-  ADD CONSTRAINT `menu_categorias_ibfk_1` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `menu_platos`
---
-ALTER TABLE `menu_platos`
-  ADD CONSTRAINT `menu_platos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `menu_categorias` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `menu_platos_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `propinas`
---
-ALTER TABLE `propinas`
-  ADD CONSTRAINT `propinas_ibfk_1` FOREIGN KEY (`reserva_id`) REFERENCES `reservas` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `propinas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `propinas_ibfk_3` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `reservas`
---
-ALTER TABLE `reservas`
-  ADD CONSTRAINT `reservas_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reservas_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `restaurantes`
---
-ALTER TABLE `restaurantes`
-  ADD CONSTRAINT `fk_aprobado_por` FOREIGN KEY (`aprobado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `restaurantes_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `valoraciones`
---
-ALTER TABLE `valoraciones`
-  ADD CONSTRAINT `valoraciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `valoraciones_ibfk_2` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurantes` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `valoraciones_ibfk_3` FOREIGN KEY (`reserva_id`) REFERENCES `reservas` (`id`) ON DELETE SET NULL;
-COMMIT;
-
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-05-13 11:04:10
