@@ -308,13 +308,24 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
 
                 //Galería
                 val fotos = rest.fotos
-                if (fotos.isNotEmpty()) {
-                    Text("Galería", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Spacer(Modifier.height(10.dp))
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Galería", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(Modifier.height(10.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (fotos.isNotEmpty()) {
                         items(fotos) { foto ->
                             AsyncImage(
                                 model = foto.urlFoto,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(160.dp, 110.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                            )
+                        }
+                    } else {
+                        item {
+                            Image(
+                                painter = painterResource(id = imageParaRestaurante(rest.categoria.orEmpty())),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
