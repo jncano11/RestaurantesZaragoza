@@ -334,13 +334,14 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                         }
 
                         ScrollableTabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT, edgePadding = 0.dp) {
-                            listOf("Todas", "Pendientes", "Hoy", "Menú", "Fotos").forEachIndexed { idx, label ->
+                            listOf("Todas", "Pendientes", "Hoy", "Menú", "Fotos", "Horarios").forEachIndexed { idx, label ->
                                 Tab(selected = tabIndex == idx, onClick = { tabIndex = idx }) {
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
                                         when (label) {
-                                            "Menú"  -> { Icon(Icons.Default.MenuBook, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
-                                            "Fotos" -> { Icon(Icons.Default.PhotoLibrary, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
-                                            else    -> {}
+                                            "Menú"     -> { Icon(Icons.Default.MenuBook,     null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
+                                            "Fotos"    -> { Icon(Icons.Default.PhotoLibrary, null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
+                                            "Horarios" -> { Icon(Icons.Default.Schedule,     null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
+                                            else       -> {}
                                         }
                                         Text(label, color = if (tabIndex == idx) ACCENT else Color.Gray, fontSize = 13.sp)
                                         if (label == "Pendientes" && pendientes > 0) {
@@ -357,7 +358,9 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                             }
                         }
 
-                        if (tabIndex == 4) {
+                        if (tabIndex == 5) {
+                            HorariosTab(restauranteId = miRestaurante?.id ?: 0, onGuardado = { snackMsg = "✅ Horarios guardados" })
+                        } else if (tabIndex == 4) {
                             FotosTab(restauranteId = miRestaurante?.id ?: 0)
                         } else if (tabIndex == 3) {
                             MenuTab(
@@ -1034,6 +1037,168 @@ private fun AñadirPlatoSheet(
                 if (loading) CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.Black, strokeWidth = 2.dp)
                 else { Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text("Añadir plato", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
             }
+        }
+    }
+}
+
+private data class HorarioDia(
+    val diaSemana: Int,
+    val nombre: String,
+    var cerrado: Boolean = true,
+    var apertura: String = "",
+    var cierre: String = ""
+)
+
+@Composable
+private fun HorariosTab(restauranteId: Int, onGuardado: () -> Unit) {
+    val scope   = rememberCoroutineScope()
+    val dias    = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+    var horarios by remember {
+        mutableStateOf(dias.mapIndexed { i, nombre -> HorarioDia(i, nombre) })
+    }
+    var cargando by remember { mutableStateOf(true) }
+    var guardando by remember { mutableStateOf(false) }
+    var errorMsg  by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(restauranteId) {
+        cargando = true
+        try {
+            val existentes = RetrofitClient.instancia.listarHorarios(restauranteId)
+            if (existentes.isNotEmpty()) {
+                horarios = horarios.map { dia ->
+                    val h = existentes.firstOrNull { it.diaSemana == dia.diaSemana }
+                    if (h != null) dia.copy(
+                        cerrado  = h.cerrado,
+                        apertura = h.horaApertura,
+                        cierre   = h.horaCierre
+                    ) else dia
+                }
+            }
+        } catch (_: Exception) {}
+        cargando = false
+    }
+
+    if (cargando) {
+        Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator(color = ACCENT) }
+        return
+    }
+
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(horarios.size) { idx ->
+            val dia = horarios[idx]
+            Card(
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = CARD_BG),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(14.dp)) {
+                    Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+                        Text(dia.nombre, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(if (dia.cerrado) "Cerrado" else "Abierto", color = if (dia.cerrado) Color.Gray else ACCENT, fontSize = 12.sp)
+                            Spacer(Modifier.width(8.dp))
+                            Switch(
+                                checked = !dia.cerrado,
+                                onCheckedChange = { abierto ->
+                                    horarios = horarios.toMutableList().also { it[idx] = dia.copy(cerrado = !abierto) }
+                                },
+                                colors = SwitchDefaults.colors(checkedThumbColor = Color.Black, checkedTrackColor = ACCENT, uncheckedTrackColor = Color(0xFF3A2E1A))
+                            )
+                        }
+                    }
+                    if (!dia.cerrado) {
+                        Spacer(Modifier.height(10.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedTextField(
+                                value = dia.apertura,
+                                onValueChange = { v ->
+                                    val limpio = v.filter { it.isDigit() || it == ':' }.take(5)
+                                    horarios = horarios.toMutableList().also { it[idx] = dia.copy(apertura = limpio) }
+                                    errorMsg = null
+                                },
+                                label = { Text("Apertura") },
+                                placeholder = { Text("09:00", color = Color.Gray) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = fieldColors()
+                            )
+                            OutlinedTextField(
+                                value = dia.cierre,
+                                onValueChange = { v ->
+                                    val limpio = v.filter { it.isDigit() || it == ':' }.take(5)
+                                    horarios = horarios.toMutableList().also { it[idx] = dia.copy(cierre = limpio) }
+                                    errorMsg = null
+                                },
+                                label = { Text("Cierre") },
+                                placeholder = { Text("23:00", color = Color.Gray) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = fieldColors()
+                            )
+                        }
+                        Text("Formato HH:MM (ej: 09:00 · 23:30)", color = Color.Gray, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+            }
+        }
+
+        errorMsg?.let { msg ->
+            item {
+                Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1A1A))) {
+                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Warning, null, tint = Color(0xFFEF5350), modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(msg, color = Color(0xFFEF5350), fontSize = 13.sp)
+                    }
+                }
+            }
+        }
+
+        item {
+            Button(
+                onClick = {
+                    // Validar horas de días abiertos
+                    val invalido = horarios.firstOrNull { !it.cerrado && (it.apertura.isBlank() || it.cierre.isBlank()) }
+                    if (invalido != null) {
+                        errorMsg = "Completa la hora de apertura y cierre de ${invalido.nombre}"
+                        return@Button
+                    }
+                    guardando = true
+                    scope.launch {
+                        try {
+                            val lista = horarios.map { d ->
+                                """{"dia_semana":${d.diaSemana},"hora_apertura":"${d.apertura}","hora_cierre":"${d.cierre}","cerrado":${d.cerrado}}"""
+                            }
+                            val json = "[${lista.joinToString(",")}]"
+                            val resp = RetrofitClient.instancia.guardarHorarios(mapOf(
+                                "restaurante_id" to restauranteId.toString(),
+                                "horarios"       to json
+                            ))
+                            if (resp.success) onGuardado()
+                            else errorMsg = resp.message.ifBlank { "Error al guardar" }
+                        } catch (_: Exception) {
+                            errorMsg = "Error de conexión"
+                        } finally { guardando = false }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = ACCENT),
+                enabled = !guardando
+            ) {
+                if (guardando) CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.Black, strokeWidth = 2.dp)
+                else {
+                    Icon(Icons.Default.Save, null, tint = Color.Black, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Guardar horarios", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                }
+            }
+            Spacer(Modifier.height(24.dp))
         }
     }
 }

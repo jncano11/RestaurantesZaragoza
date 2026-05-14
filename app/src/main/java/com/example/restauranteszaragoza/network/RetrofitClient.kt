@@ -122,6 +122,12 @@ interface ApiService {
     @POST("restaurantes/actualizar_aforo_precio.php")
     suspend fun actualizarAforoPrecio(@Body body: Map<String, String>): ApiResponse
 
+    @GET("restaurantes/horarios_listar.php")
+    suspend fun listarHorarios(@Query("restaurante_id") restauranteId: Int): List<Horario>
+
+    @POST("restaurantes/horarios_guardar.php")
+    suspend fun guardarHorarios(@Body body: Map<String, String>): ApiResponse
+
     // Reservas
     @GET("reservas/mis_reservas.php")
     suspend fun misReservas(@Query("usuario_id") usuarioId: Int): List<Reserva>
