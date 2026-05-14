@@ -487,8 +487,8 @@ private fun ReservaBottomSheet(
         val slots = mutableListOf<String>()
         turnosDelDia.forEach { turno ->
             try {
-                var h = turno.horaApertura.split(":").let { it[0].toInt() * 60 + it[1].toInt() }
-                val rawFin = turno.horaCierre.split(":").let { it[0].toInt() * 60 + it[1].toInt() }
+                var h = (turno.horaApertura ?: "00:00").split(":").let { it[0].toInt() * 60 + it[1].toInt() }
+                val rawFin = (turno.horaCierre ?: "00:00").split(":").let { it[0].toInt() * 60 + it[1].toInt() }
                 val hFin = (if (rawFin == 0) 1440 else rawFin) - 30
                 while (h <= hFin) {
                     slots.add("%02d:%02d".format(h / 60, h % 60))

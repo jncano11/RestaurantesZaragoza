@@ -102,8 +102,8 @@ data class Plato(
 //HORARIO
 data class Horario(
     @SerializedName("dia_semana") val diaSemana: Int = 0,
-    @SerializedName("hora_apertura") val horaApertura: String = "",
-    @SerializedName("hora_cierre") val horaCierre: String = "",
+    @SerializedName("hora_apertura") val horaApertura: String? = null,
+    @SerializedName("hora_cierre") val horaCierre: String? = null,
     val cerrado: Boolean = false
 ) {
     val nombreDia: String get() = when (diaSemana) {

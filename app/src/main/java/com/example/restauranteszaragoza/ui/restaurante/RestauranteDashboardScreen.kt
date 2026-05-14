@@ -2,6 +2,9 @@ package com.example.restauranteszaragoza.ui.restaurante
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -67,7 +70,8 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
     // null = aún no sabemos, true = no tiene restaurante, false = tiene restaurante
     var sinRestaurante by remember { mutableStateOf<Boolean?>(null) }
     var errorMsg       by remember { mutableStateOf<String?>(null) }
-    var tabIndex      by remember { mutableStateOf(0) }
+    var tabIndex        by remember { mutableStateOf(0) }
+    var headerExpandido by remember { mutableStateOf(true) }
     var snackMsg      by remember { mutableStateOf<String?>(null) }
     val snackState    = remember { SnackbarHostState() }
 
@@ -196,6 +200,18 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                     else -> {
                         var showEditarDatos by remember { mutableStateOf(false) }
 
+                        // Calculados aquí para que sean accesibles tanto en el header como en las tabs
+                        val pendientes  = reservas.count { it.estado == "pendiente" }
+                        val confirmadas = reservas.count { it.estado == "confirmada" || it.estado == "esperando_usuario" }
+                        val hoy         = reservas.count { it.fecha == java.time.LocalDate.now().toString() }
+
+                        // Header colapsable
+                        AnimatedVisibility(
+                            visible = headerExpandido,
+                            enter   = expandVertically(),
+                            exit    = shrinkVertically()
+                        ) {
+                        Column {
                         miRestaurante?.let { rest ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
@@ -320,10 +336,6 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                             }
                         }
 
-                        val pendientes  = reservas.count { it.estado == "pendiente" }
-                        val confirmadas = reservas.count { it.estado == "confirmada" || it.estado == "esperando_usuario" }
-                        val hoy         = reservas.count { it.fecha == java.time.LocalDate.now().toString() }
-
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -332,10 +344,28 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                             StatCard("Confirmadas", confirmadas.toString(), Icons.Default.CheckCircle,  Color(0xFF43A047), Modifier.weight(1f))
                             StatCard("Hoy",         hoy.toString(),         Icons.Default.Today,        Color(0xFF1E88E5), Modifier.weight(1f))
                         }
+                        } // Column
+                        } // AnimatedVisibility
+
+                        // Botón para expandir/colapsar el header
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { headerExpandido = !headerExpandido }
+                                .padding(vertical = 2.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                if (headerExpandido) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = if (headerExpandido) "Colapsar" else "Expandir",
+                                tint = ACCENT.copy(0.6f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
 
                         ScrollableTabRow(selectedTabIndex = tabIndex, containerColor = Color.Transparent, contentColor = ACCENT, edgePadding = 0.dp) {
                             listOf("Todas", "Pendientes", "Hoy", "Menú", "Fotos", "Horarios").forEachIndexed { idx, label ->
-                                Tab(selected = tabIndex == idx, onClick = { tabIndex = idx }) {
+                                Tab(selected = tabIndex == idx, onClick = { tabIndex = idx; headerExpandido = false }) {
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
                                         when (label) {
                                             "Menú"     -> { Icon(Icons.Default.MenuBook,     null, modifier = Modifier.size(14.dp), tint = if (tabIndex == idx) ACCENT else Color.Gray); Spacer(Modifier.width(4.dp)) }
@@ -1045,18 +1075,19 @@ private data class HorarioDia(
     val diaSemana: Int,
     val nombre: String,
     var cerrado: Boolean = true,
-    var apertura: String = "",
-    var cierre: String = ""
+    var apertura1: String = "",
+    var cierre1: String = "",
+    var partidoActivo: Boolean = false,
+    var apertura2: String = "",
+    var cierre2: String = ""
 )
 
 @Composable
 private fun HorariosTab(restauranteId: Int, onGuardado: () -> Unit) {
-    val scope   = rememberCoroutineScope()
-    val dias    = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
-    var horarios by remember {
-        mutableStateOf(dias.mapIndexed { i, nombre -> HorarioDia(i, nombre) })
-    }
-    var cargando by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
+    val dias  = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+    var horarios by remember { mutableStateOf(dias.mapIndexed { i, n -> HorarioDia(i, n) }) }
+    var cargando  by remember { mutableStateOf(true) }
     var guardando by remember { mutableStateOf(false) }
     var errorMsg  by remember { mutableStateOf<String?>(null) }
 
@@ -1066,12 +1097,24 @@ private fun HorariosTab(restauranteId: Int, onGuardado: () -> Unit) {
             val existentes = RetrofitClient.instancia.listarHorarios(restauranteId)
             if (existentes.isNotEmpty()) {
                 horarios = horarios.map { dia ->
-                    val h = existentes.firstOrNull { it.diaSemana == dia.diaSemana }
-                    if (h != null) dia.copy(
-                        cerrado  = h.cerrado,
-                        apertura = h.horaApertura,
-                        cierre   = h.horaCierre
-                    ) else dia
+                    val filas = existentes.filter { it.diaSemana == dia.diaSemana }
+                    when {
+                        filas.isEmpty()       -> dia
+                        filas[0].cerrado      -> dia.copy(cerrado = true)
+                        filas.size == 1       -> dia.copy(
+                            cerrado = false,
+                            apertura1 = filas[0].horaApertura ?: "",
+                            cierre1   = filas[0].horaCierre   ?: ""
+                        )
+                        else                  -> dia.copy(
+                            cerrado       = false,
+                            apertura1     = filas[0].horaApertura ?: "",
+                            cierre1       = filas[0].horaCierre   ?: "",
+                            partidoActivo = true,
+                            apertura2     = filas[1].horaApertura ?: "",
+                            cierre2       = filas[1].horaCierre   ?: ""
+                        )
+                    }
                 }
             }
         } catch (_: Exception) {}
@@ -1083,65 +1126,106 @@ private fun HorariosTab(restauranteId: Int, onGuardado: () -> Unit) {
         return
     }
 
+    @Composable
+    fun turnoField(value: String, label: String, placeholder: String, onChange: (String) -> Unit) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { v -> onChange(v.filter { it.isDigit() || it == ':' }.take(5)) },
+            label = { Text(label, fontSize = 11.sp) },
+            placeholder = { Text(placeholder, color = Color.Gray, fontSize = 11.sp) },
+            singleLine = true,
+            modifier = Modifier.width(100.dp),
+            shape = RoundedCornerShape(10.dp),
+            colors = fieldColors()
+        )
+    }
+
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(horarios.size) { idx ->
             val dia = horarios[idx]
+            fun update(nuevo: HorarioDia) { horarios = horarios.toMutableList().also { it[idx] = nuevo }; errorMsg = null }
+
             Card(
                 shape = RoundedCornerShape(14.dp),
                 colors = CardDefaults.cardColors(containerColor = CARD_BG),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(Modifier.padding(14.dp)) {
+
+                    // Fila: nombre + switch abierto/cerrado
                     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                         Text(dia.nombre, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(if (dia.cerrado) "Cerrado" else "Abierto", color = if (dia.cerrado) Color.Gray else ACCENT, fontSize = 12.sp)
+                            Text(
+                                if (dia.cerrado) "Cerrado" else "Abierto",
+                                color = if (dia.cerrado) Color.Gray else ACCENT,
+                                fontSize = 12.sp
+                            )
                             Spacer(Modifier.width(8.dp))
                             Switch(
                                 checked = !dia.cerrado,
-                                onCheckedChange = { abierto ->
-                                    horarios = horarios.toMutableList().also { it[idx] = dia.copy(cerrado = !abierto) }
-                                },
-                                colors = SwitchDefaults.colors(checkedThumbColor = Color.Black, checkedTrackColor = ACCENT, uncheckedTrackColor = Color(0xFF3A2E1A))
+                                onCheckedChange = { update(dia.copy(cerrado = !it)) },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.Black, checkedTrackColor = ACCENT,
+                                    uncheckedTrackColor = Color(0xFF3A2E1A)
+                                )
                             )
                         }
                     }
+
                     if (!dia.cerrado) {
                         Spacer(Modifier.height(10.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            OutlinedTextField(
-                                value = dia.apertura,
-                                onValueChange = { v ->
-                                    val limpio = v.filter { it.isDigit() || it == ':' }.take(5)
-                                    horarios = horarios.toMutableList().also { it[idx] = dia.copy(apertura = limpio) }
-                                    errorMsg = null
-                                },
-                                label = { Text("Apertura") },
-                                placeholder = { Text("09:00", color = Color.Gray) },
-                                singleLine = true,
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(10.dp),
-                                colors = fieldColors()
+
+                        // Turno 1
+                        Text("Turno 1", color = ACCENT, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(Modifier.height(4.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            turnoField(dia.apertura1, "Apertura", "09:00") { update(dia.copy(apertura1 = it)) }
+                            Text("–", color = Color.Gray)
+                            turnoField(dia.cierre1, "Cierre", "16:00") { update(dia.copy(cierre1 = it)) }
+                        }
+
+                        Spacer(Modifier.height(10.dp))
+
+                        // Toggle horario partido
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { update(dia.copy(partidoActivo = !dia.partidoActivo, apertura2 = "", cierre2 = "")) }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                if (dia.partidoActivo) Icons.Default.RemoveCircleOutline else Icons.Default.AddCircleOutline,
+                                null,
+                                tint = if (dia.partidoActivo) Color(0xFFEF5350) else ACCENT.copy(0.7f),
+                                modifier = Modifier.size(16.dp)
                             )
-                            OutlinedTextField(
-                                value = dia.cierre,
-                                onValueChange = { v ->
-                                    val limpio = v.filter { it.isDigit() || it == ':' }.take(5)
-                                    horarios = horarios.toMutableList().also { it[idx] = dia.copy(cierre = limpio) }
-                                    errorMsg = null
-                                },
-                                label = { Text("Cierre") },
-                                placeholder = { Text("23:00", color = Color.Gray) },
-                                singleLine = true,
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(10.dp),
-                                colors = fieldColors()
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                if (dia.partidoActivo) "Quitar turno 2" else "Añadir turno 2 (horario partido)",
+                                color = if (dia.partidoActivo) Color(0xFFEF5350) else ACCENT.copy(0.7f),
+                                fontSize = 12.sp
                             )
                         }
-                        Text("Formato HH:MM (ej: 09:00 · 23:30)", color = Color.Gray, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+
+                        // Turno 2
+                        if (dia.partidoActivo) {
+                            Spacer(Modifier.height(4.dp))
+                            Text("Turno 2", color = ACCENT, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                            Spacer(Modifier.height(4.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                turnoField(dia.apertura2, "Apertura", "20:00") { update(dia.copy(apertura2 = it)) }
+                                Text("–", color = Color.Gray)
+                                turnoField(dia.cierre2, "Cierre", "23:30") { update(dia.copy(cierre2 = it)) }
+                            }
+                        }
+
+                        Spacer(Modifier.height(4.dp))
+                        Text("Formato HH:MM", color = Color.Gray, fontSize = 10.sp)
                     }
                 }
             }
@@ -1162,22 +1246,31 @@ private fun HorariosTab(restauranteId: Int, onGuardado: () -> Unit) {
         item {
             Button(
                 onClick = {
-                    // Validar horas de días abiertos
-                    val invalido = horarios.firstOrNull { !it.cerrado && (it.apertura.isBlank() || it.cierre.isBlank()) }
+                    val invalido = horarios.firstOrNull { d ->
+                        !d.cerrado && (d.apertura1.isBlank() || d.cierre1.isBlank()) ||
+                        (!d.cerrado && d.partidoActivo && (d.apertura2.isBlank() || d.cierre2.isBlank()))
+                    }
                     if (invalido != null) {
-                        errorMsg = "Completa la hora de apertura y cierre de ${invalido.nombre}"
+                        errorMsg = "Completa todas las horas de ${invalido.nombre}"
                         return@Button
                     }
                     guardando = true
                     scope.launch {
                         try {
-                            val lista = horarios.map { d ->
-                                """{"dia_semana":${d.diaSemana},"hora_apertura":"${d.apertura}","hora_cierre":"${d.cierre}","cerrado":${d.cerrado}}"""
+                            val entradas = mutableListOf<String>()
+                            horarios.forEach { d ->
+                                if (d.cerrado) {
+                                    entradas.add("""{"dia_semana":${d.diaSemana},"hora_apertura":null,"hora_cierre":null,"cerrado":true}""")
+                                } else {
+                                    entradas.add("""{"dia_semana":${d.diaSemana},"hora_apertura":"${d.apertura1}","hora_cierre":"${d.cierre1}","cerrado":false}""")
+                                    if (d.partidoActivo && d.apertura2.isNotBlank() && d.cierre2.isNotBlank()) {
+                                        entradas.add("""{"dia_semana":${d.diaSemana},"hora_apertura":"${d.apertura2}","hora_cierre":"${d.cierre2}","cerrado":false}""")
+                                    }
+                                }
                             }
-                            val json = "[${lista.joinToString(",")}]"
                             val resp = RetrofitClient.instancia.guardarHorarios(mapOf(
                                 "restaurante_id" to restauranteId.toString(),
-                                "horarios"       to json
+                                "horarios"       to "[${entradas.joinToString(",")}]"
                             ))
                             if (resp.success) onGuardado()
                             else errorMsg = resp.message.ifBlank { "Error al guardar" }
