@@ -12,7 +12,8 @@ data class Usuario(
     val contrasena: String? = null,
     val telefono: String? = null,
     val rol: String = "usuario",          // "usuario" | "restaurante" | "admin"
-    @SerializedName("foto_perfil") val fotoPerfil: String? = null
+    @SerializedName("foto_perfil") val fotoPerfil: String? = null,
+    val activo: Boolean = true
 )
 
 // Respuesta del login

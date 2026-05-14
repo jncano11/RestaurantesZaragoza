@@ -1045,9 +1045,10 @@ private fun EditarAforoPrecioDialog(
     onSuccess: (Int, Float) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    // Extraer solo números del precio actual (viene como "15€")
-    val precioInicial = restaurante.precioMedio.replace("[^0-9.]".toRegex(), "")
-    var aforo by remember { mutableStateOf(restaurante.aforoTotal.toString()) }
+    // Extraer solo números del precio actual (viene como "15€"); si está vacío o es 0, dejar en blanco para que el usuario lo introduzca
+    val precioInicial = restaurante.precioMedio.replace("[^0-9.]".toRegex(), "").let { if (it == "0" || it.isBlank()) "" else it }
+    val aforoInicial  = if (restaurante.aforoTotal > 0) restaurante.aforoTotal.toString() else ""
+    var aforo by remember { mutableStateOf(aforoInicial) }
     var precio by remember { mutableStateOf(precioInicial) }
     var error by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
@@ -1071,6 +1072,7 @@ private fun EditarAforoPrecioDialog(
                         error = null
                     },
                     label = { Text("Aforo total") },
+                    placeholder = { Text("ej: 50", color = Color.Gray) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     leadingIcon = { Icon(Icons.Default.People, null, tint = ACCENT, modifier = Modifier.size(18.dp)) },
@@ -1091,6 +1093,7 @@ private fun EditarAforoPrecioDialog(
                         error = null
                     },
                     label = { Text("Precio medio (€)") },
+                    placeholder = { Text("ej: 15.00", color = Color.Gray) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     leadingIcon = { Icon(Icons.Default.Euro, null, tint = ACCENT, modifier = Modifier.size(18.dp)) },

@@ -472,9 +472,17 @@ private fun AdminUsuarioCard(
                     Text("${usuario.nombre} ${usuario.apellidos}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Text(usuario.email, color = Color.Gray, fontSize = 12.sp)
                     Spacer(Modifier.height(4.dp))
-                    Surface(color = rolColor.copy(0.15f), shape = RoundedCornerShape(8.dp)) {
-                        Text(usuario.rol.uppercase(), color = rolColor, fontSize = 10.sp, fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Surface(color = rolColor.copy(0.15f), shape = RoundedCornerShape(8.dp)) {
+                            Text(usuario.rol.uppercase(), color = rolColor, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                        }
+                        if (!usuario.activo) {
+                            Surface(color = Color(0xFFEF5350).copy(0.15f), shape = RoundedCornerShape(8.dp)) {
+                                Text("DESACTIVADO", color = Color(0xFFEF5350), fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                            }
+                        }
                     }
                 }
             }
