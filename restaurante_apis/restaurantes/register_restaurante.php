@@ -33,6 +33,7 @@ $descripcion           = trim($body['descripcion']           ?? '');
 $direccion             = trim($body['direccion']             ?? '');
 $categoria             = trim($body['categoria']             ?? '');
 $telefono_restaurante  = trim($body['telefono_restaurante']  ?? '');
+$email_contacto        = trim($body['email_contacto']        ?? '');
 
 // ── Validaciones ───────────────────────────────────────────
 if (empty($nombre) || empty($email) || empty($contrasena)) {
@@ -69,11 +70,26 @@ try {
     $stmtUser->execute([$nombre, $apellidos, $email, $hash, $telefono]);
     $usuario_id = $pdo->lastInsertId();
 
+    // Geocodificación automática con Nominatim (OpenStreetMap)
+    $lat = null;
+    $lon = null;
+    $query   = urlencode($direccion . ', Zaragoza, España');
+    $geoUrl  = "https://nominatim.openstreetmap.org/search?q={$query}&format=json&limit=1";
+    $context = stream_context_create(['http' => ['header' => "User-Agent: ReatsZaragoza/1.0\r\n", 'timeout' => 5]]);
+    $geoRaw  = @file_get_contents($geoUrl, false, $context);
+    if ($geoRaw) {
+        $geoData = json_decode($geoRaw, true);
+        if (!empty($geoData[0])) {
+            $lat = (float) $geoData[0]['lat'];
+            $lon = (float) $geoData[0]['lon'];
+        }
+    }
+
     $stmtRest = $pdo->prepare("
         INSERT INTO restaurantes
-            (usuario_id, nombre, descripcion, direccion, categoria, telefono, aprobado, aprobado_por)
+            (usuario_id, nombre, descripcion, direccion, categoria, telefono, email_contacto, latitud, longitud, aprobado, aprobado_por)
         VALUES
-            (?, ?, ?, ?, ?, ?, 0, NULL)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NULL)
     ");
     $stmtRest->execute([
         $usuario_id,
@@ -81,7 +97,10 @@ try {
         $descripcion,
         $direccion,
         $categoria,
-        $telefono_restaurante
+        $telefono_restaurante,
+        $email_contacto ?: null,
+        $lat,
+        $lon
     ]);
 
     $pdo->commit();

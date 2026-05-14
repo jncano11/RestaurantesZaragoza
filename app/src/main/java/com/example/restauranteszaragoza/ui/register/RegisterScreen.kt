@@ -53,6 +53,7 @@ fun RegisterScreen(
     var direccion             by remember { mutableStateOf("") }
     var categoriaSeleccionada by remember { mutableStateOf("") }
     var telefonoRestaurante   by remember { mutableStateOf("") }
+    var emailContacto         by remember { mutableStateOf("") }
     var dropdownAbierto       by remember { mutableStateOf(false) }
 
     var errorMsg by remember { mutableStateOf<String?>(null) }
@@ -165,6 +166,7 @@ fun RegisterScreen(
                         FormField("Nombre del restaurante *", nombreRestaurante) { nombreRestaurante = it; errorMsg = null }
                         FormField("Dirección *", direccion) { direccion = it; errorMsg = null }
                         FormField("Teléfono del restaurante", telefonoRestaurante) { telefonoRestaurante = it }
+                        FormField("Email de contacto del restaurante", emailContacto) { emailContacto = it }
 
                         // Dropdown categoría
                         Box(Modifier.fillMaxWidth()) {
@@ -255,7 +257,8 @@ fun RegisterScreen(
                                             "descripcion"          to descripcion,
                                             "direccion"            to direccion,
                                             "categoria"            to categoriaSeleccionada,
-                                            "telefono_restaurante" to telefonoRestaurante
+                                            "telefono_restaurante" to telefonoRestaurante,
+                                            "email_contacto"       to emailContacto
                                         )
                                     )
                                 } else {
