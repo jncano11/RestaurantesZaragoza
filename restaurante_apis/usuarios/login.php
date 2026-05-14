@@ -29,7 +29,7 @@ if (!$usuario) {
 }
 
 if (!$usuario['activo']) {
-    jsonResponse(['success' => false, 'message' => 'Cuenta desactivada. Contacta con el administrador.'], 403);
+    jsonResponse(['success' => false, 'message' => 'Los administradores han desactivado el acceso a tu cuenta'], 403);
 }
 
 if (!password_verify($contrasena, $usuario['password_hash'])) {

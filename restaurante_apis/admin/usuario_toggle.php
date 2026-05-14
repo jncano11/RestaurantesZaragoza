@@ -19,7 +19,8 @@ if ($usuarioId <= 0) {
 }
 
 $pdo  = getDB();
-$stmt = $pdo->prepare("UPDATE usuarios SET activo = NOT activo WHERE id = ? AND rol != 'admin'");
+// Permite desactivar usuarios, restaurantes y administradores
+$stmt = $pdo->prepare("UPDATE usuarios SET activo = NOT activo WHERE id = ?");
 $stmt->execute([$usuarioId]);
 
 if ($stmt->rowCount() === 0) {

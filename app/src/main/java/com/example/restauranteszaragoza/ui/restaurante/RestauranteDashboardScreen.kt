@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -192,6 +194,8 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                     }
 
                     else -> {
+                        var showEditarDatos by remember { mutableStateOf(false) }
+
                         miRestaurante?.let { rest ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
@@ -203,13 +207,51 @@ fun RestauranteDashboardScreen(onLogout: () -> Unit) {
                                     Spacer(Modifier.width(10.dp))
                                     Column(Modifier.weight(1f)) {
                                         Text(rest.nombre, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                        Text("${rest.categoria} · ${rest.precioMedio}", color = Color.Gray, fontSize = 12.sp)
+                                        Text("${rest.categoria} · ${rest.precioMedio} · Aforo ${rest.aforoTotal}", color = Color.Gray, fontSize = 12.sp)
+                                    }
+                                    IconButton(onClick = { showEditarDatos = true }, modifier = Modifier.size(34.dp)) {
+                                        Icon(Icons.Default.Edit, "Editar aforo y precio", tint = ACCENT, modifier = Modifier.size(18.dp))
                                     }
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.Star, null, tint = Color(0xFFFFB300), modifier = Modifier.size(14.dp))
                                         Text(" ${rest.ratingGlobal}", color = Color.LightGray, fontSize = 13.sp)
                                     }
                                 }
+                            }
+
+                            // Banner: el admin ha desactivado el restaurante al público
+                            if (rest.activo == 0) {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                                    shape = RoundedCornerShape(14.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF2E1A1A))
+                                ) {
+                                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Block, null, tint = Color(0xFFEF5350), modifier = Modifier.size(22.dp))
+                                        Spacer(Modifier.width(10.dp))
+                                        Column(Modifier.weight(1f)) {
+                                            Text("Restaurante desactivado", color = Color(0xFFEF5350), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text("Un administrador ha desactivado tu restaurante. Los usuarios no pueden verlo ni reservar. Contacta con el administrador.", color = Color.Gray, fontSize = 12.sp)
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (showEditarDatos) {
+                                EditarAforoPrecioDialog(
+                                    restaurante = rest,
+                                    onDismiss = { showEditarDatos = false },
+                                    onSuccess = { aforoNuevo, precioNuevo ->
+                                        showEditarDatos = false
+                                        snackMsg = "✅ Datos actualizados"
+                                        // Actualizar el estado local inmediatamente
+                                        miRestaurante = rest.copy(
+                                            aforoTotal = aforoNuevo,
+                                            precioMedio = "${precioNuevo.toInt()}€"
+                                        )
+                                        cargarDatos()
+                                    }
+                                )
                             }
                         }
 
@@ -938,7 +980,26 @@ private fun AñadirPlatoSheet(
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción (opcional)") }, maxLines = 3, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
             Spacer(Modifier.height(12.dp))
-            OutlinedTextField(value = precio, onValueChange = { precio = it; error = null }, label = { Text("Precio (€) *") }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
+            OutlinedTextField(
+                value = precio,
+                onValueChange = { nuevo ->
+                    // Solo dígitos y un único punto decimal; sustituye comas por puntos automáticamente
+                    val normalizado = nuevo.replace(',', '.').filter { it.isDigit() || it == '.' }
+                    val limpio = if (normalizado.count { it == '.' } > 1) {
+                        val i = normalizado.indexOf('.')
+                        normalizado.substring(0, i + 1) + normalizado.substring(i + 1).replace(".", "")
+                    } else normalizado
+                    precio = limpio
+                    error = null
+                },
+                label = { Text("Precio (€) *") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                supportingText = { Text("Usa el punto como separador decimal (ej: 12.50)", color = Color.Gray, fontSize = 11.sp) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = fieldColors()
+            )
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(value = alergenos, onValueChange = { alergenos = it }, label = { Text("Alérgenos (opcional)") }, singleLine = true, placeholder = { Text("gluten, lactosa...", color = Color.Gray) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors())
             error?.let {
@@ -975,6 +1036,111 @@ private fun AñadirPlatoSheet(
             }
         }
     }
+}
+
+@Composable
+private fun EditarAforoPrecioDialog(
+    restaurante: Restaurante,
+    onDismiss: () -> Unit,
+    onSuccess: (Int, Float) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    // Extraer solo números del precio actual (viene como "15€")
+    val precioInicial = restaurante.precioMedio.replace("[^0-9.]".toRegex(), "")
+    var aforo by remember { mutableStateOf(restaurante.aforoTotal.toString()) }
+    var precio by remember { mutableStateOf(precioInicial) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1E1A14),
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Edit, null, tint = ACCENT, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Editar aforo y precio", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = aforo,
+                    onValueChange = { nuevo ->
+                        aforo = nuevo.filter { it.isDigit() }
+                        error = null
+                    },
+                    label = { Text("Aforo total") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    leadingIcon = { Icon(Icons.Default.People, null, tint = ACCENT, modifier = Modifier.size(18.dp)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = fieldColors()
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = precio,
+                    onValueChange = { nuevo ->
+                        val normalizado = nuevo.replace(',', '.').filter { it.isDigit() || it == '.' }
+                        val limpio = if (normalizado.count { it == '.' } > 1) {
+                            val i = normalizado.indexOf('.')
+                            normalizado.substring(0, i + 1) + normalizado.substring(i + 1).replace(".", "")
+                        } else normalizado
+                        precio = limpio
+                        error = null
+                    },
+                    label = { Text("Precio medio (€)") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    leadingIcon = { Icon(Icons.Default.Euro, null, tint = ACCENT, modifier = Modifier.size(18.dp)) },
+                    supportingText = { Text("Usa el punto como separador (ej: 12.50)", color = Color.Gray, fontSize = 11.sp) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = fieldColors()
+                )
+                error?.let {
+                    Spacer(Modifier.height(8.dp))
+                    Text(it, color = Color(0xFFEF5350), fontSize = 12.sp)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !loading,
+                onClick = {
+                    val aforoInt = aforo.toIntOrNull()
+                    val precioFloat = precio.toFloatOrNull()
+                    when {
+                        aforoInt == null || aforoInt <= 0 -> { error = "Introduce un aforo válido"; return@TextButton }
+                        precioFloat == null || precioFloat <= 0f -> { error = "Introduce un precio medio válido"; return@TextButton }
+                    }
+                    loading = true
+                    scope.launch {
+                        try {
+                            val resp = RetrofitClient.instancia.actualizarAforoPrecio(mapOf(
+                                "restaurante_id" to restaurante.id.toString(),
+                                "aforo_total"    to aforoInt.toString(),
+                                "precio_medio"   to precioFloat.toString()
+                            ))
+                            if (resp.success) onSuccess(aforoInt!!, precioFloat!!)
+                            else error = resp.message.ifBlank { "Error al actualizar" }
+                        } catch (_: Exception) {
+                            error = "Error de conexión"
+                        } finally { loading = false }
+                    }
+                }
+            ) {
+                if (loading) CircularProgressIndicator(modifier = Modifier.size(18.dp), color = ACCENT, strokeWidth = 2.dp)
+                else Text("Guardar", color = ACCENT, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, enabled = !loading) {
+                Text("Cancelar", color = Color.Gray)
+            }
+        }
+    )
 }
 
 @Composable

@@ -6,6 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -16,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.restauranteszaragoza.R
 import com.example.restauranteszaragoza.model.LoginResponse
@@ -34,6 +38,7 @@ fun LoginScreen(
     var email     by remember { mutableStateOf(prefs.getString("saved_email", "") ?: "") }
     var password  by remember { mutableStateOf(prefs.getString("saved_password", "") ?: "") }
     var recuerdame by remember { mutableStateOf(prefs.getBoolean("recuerdame", false)) }
+    var showPass  by remember { mutableStateOf(false) }
     var errorMsg  by remember { mutableStateOf<String?>(null) }
     var loading   by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -126,7 +131,16 @@ fun LoginScreen(
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { showPass = !showPass }) {
+                            Icon(
+                                if (showPass) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = if (showPass) "Ocultar contraseña" else "Mostrar contraseña",
+                                tint = Color.Gray
+                            )
+                        }
+                    },
                     shape = RoundedCornerShape(16.dp),
                     colors = textFieldColors()
                 )

@@ -63,7 +63,17 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
         }
     }
 
+    fun recargarPendientes() {
+        scope.launch {
+            try {
+                pendientes = RetrofitClient.instancia.restaurantesPendientes()
+            } catch (_: Exception) { /* silencioso */ }
+        }
+    }
+
     LaunchedEffect(Unit) { recargar() }
+    // Refrescar pendientes cada vez que el admin entra al tab "Pendientes"
+    LaunchedEffect(tabIndex) { if (tabIndex == 3) recargarPendientes() }
     LaunchedEffect(snackMsg) { snackMsg?.let { snackState.showSnackbar(it); snackMsg = null } }
 
     Scaffold(snackbarHost = { SnackbarHost(snackState) }, containerColor = Color(0xFF0A0814)) { padding ->
@@ -85,8 +95,41 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                             }
                             Text("Bienvenido, ${SessionManager.usuarioActual?.nombre ?: "Admin"}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         }
-                        IconButton(onClick = onLogout, modifier = Modifier.background(Color.Black.copy(0.3f), CircleShape).size(42.dp)) {
-                            Icon(Icons.AutoMirrored.Filled.Logout, "Salir", tint = Color.White, modifier = Modifier.size(20.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { recargar(); snackMsg = "🔄 Datos actualizados" }, modifier = Modifier.background(Color.Black.copy(0.3f), CircleShape).size(42.dp)) {
+                                Icon(Icons.Default.Refresh, "Refrescar", tint = Color.White, modifier = Modifier.size(20.dp))
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            IconButton(onClick = onLogout, modifier = Modifier.background(Color.Black.copy(0.3f), CircleShape).size(42.dp)) {
+                                Icon(Icons.AutoMirrored.Filled.Logout, "Salir", tint = Color.White, modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+                }
+
+                // Aviso visible si hay solicitudes pendientes — clicable para ir directo al tab
+                if (pendientes.isNotEmpty() && tabIndex != 3) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clickable { tabIndex = 3 },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFEF5350).copy(0.15f))
+                    ) {
+                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(38.dp).background(Color(0xFFEF5350), CircleShape), Alignment.Center) {
+                                Text(pendientes.size.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    if (pendientes.size == 1) "1 solicitud pendiente" else "${pendientes.size} solicitudes pendientes",
+                                    color = Color(0xFFEF5350), fontWeight = FontWeight.Bold, fontSize = 14.sp
+                                )
+                                Text("Pulsa para revisarlas", color = Color.Gray, fontSize = 12.sp)
+                            }
+                            Icon(Icons.Default.ChevronRight, null, tint = Color(0xFFEF5350))
                         }
                     }
                 }
