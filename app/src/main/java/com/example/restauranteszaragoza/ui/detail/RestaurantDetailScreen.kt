@@ -323,9 +323,10 @@ fun RestaurantDetailScreen(restaurante: Restaurante, onBack: () -> Unit) {
                             )
                         }
                     } else {
-                        item {
+                        val placeholders = listOf(R.drawable.parrilla, R.drawable.pasta, R.drawable.sushi, R.drawable.alta_cocina, R.drawable.modern_eats)
+                        items(placeholders) { img ->
                             Image(
-                                painter = painterResource(id = imageParaRestaurante(rest.categoria.orEmpty())),
+                                painter = painterResource(id = img),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
